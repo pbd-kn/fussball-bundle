@@ -1,0 +1,4 @@
+# config/routes.yaml
+pbdkn_fussball.controller:
+    resource: ../../Controller
+    type: annotation
