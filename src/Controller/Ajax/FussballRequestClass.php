@@ -1138,6 +1138,19 @@ EOT;
       $str= str_replace($search, $replace, $str);     
       return $str;     
     }
+    // dient zum sortieren
+    /* GRUPPENwertung Platz
+       a) Für die Tabellenplatzierung sind die erspielten Punkte entscheidend. 
+       b) Bei Punktgleichheit entscheidet zunächst das Torverhältnis/Differenz und 
+       c) schließlich die höhere Anzahl der erzielten Tore. 
+       Wenn zwei oder mehrere Mannschaften in den drei erwähnten Kriterien gleich abschneiden, entscheiden folgende Kriterien: 
+       1. Punkte im direkten Vergleich 
+       2. Torverhältnis/Differenz im direkten Vergleich 
+       3. Anzahl der erzielten Tore im direkten Vergleich 
+       4. Fair-Play-Wertung 
+       5. Losentscheid
+    */
+    
     if (!isset($aktion)) {
       $html.="fehlerhafte Aktion empty<br>";
       $errortxt.="fehlerhafte Aktion empty<br>";
@@ -1177,6 +1190,7 @@ EOT;
          $Update=1;
          while (($row = $stmt->fetchAssociative()) !== false) {
           $ExistGruppen[$row['Gruppe']][$row['M1']]=$row;                 // index Gruppe und Mannschaft
+          $debug.='gespeichert als ExistGruppen['.$row['Gruppe'].']['.$row['M1'].']<br>';
          }
        }    
        //$cnt = $this->connection->executeStatement($sql);
@@ -1250,8 +1264,97 @@ EOT;
        $debug.="!!!!!!!!!!!!!Platz nicht bestimmt !!!!!!!!!!!!!!!!!!!!!\n";
        $html=replace16Bit($html);
        $html = utf8_encode($html); 
-       return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]);  
+       //return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]);  
        // Versuch der Platzbestimmung
+       // lies alle Gruppen nochmals ein
+       $sql="SELECT * FROM hy_gruppen WHERE Wettbewerb='$Wettbewerb' ORDER BY Gruppe";
+       $stmt = $this->connection->executeQuery($sql);
+       $Update=0;
+       $ExistGruppen=[];
+       $num_rows = $stmt->rowCount();
+       if ($num_rows > 0) {
+         $Update=1;
+         while (($row = $stmt->fetchAssociative()) !== false) {
+          $ExistGruppen[$row['Gruppe']][$row['M1']] = $row;
+         }
+       } else {
+         $errortxt.="Fehler bei Platzbestimmung Anz gruppen $num_rows";
+         return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]);  
+       } 
+       $grpNameSelect="";
+       //$debug="";
+       
+       foreach ($ExistGruppen as $k=>$grp) {
+         $grpName=$k;
+         $debug.="index $k grpName $grpName<br>";
+         if ($grpNameSelect != $grpName) {
+           foreach ($ExistGruppen[$k] as $k1=>$v1) {
+             $debug.="ExistGruppen[$k][$k1] Plaetze berechnen vor sort len ".count($ExistGruppen[$k])."<br>";
+             foreach ($v1 as $k2=>$v2) $debug.="ExistGruppen[$k][$k1][$k2]: $v2 ";
+             $debug.="<br>";
+           }
+           // dient zum sortieren
+           /* GRUPPENwertung Platz
+             a) Für die Tabellenplatzierung sind die erspielten Punkte entscheidend. 
+             b) Bei Punktgleichheit entscheidet zunächst das Torverhältnis/Differenz und 
+             c) schließlich die höhere Anzahl der erzielten Tore. 
+             Wenn zwei oder mehrere Mannschaften in den drei erwähnten Kriterien gleich abschneiden, entscheiden folgende Kriterien: 
+             1. Punkte im direkten Vergleich 
+             2. Torverhältnis/Differenz im direkten Vergleich 
+             3. Anzahl der erzielten Tore im direkten Vergleich 
+             4. Fair-Play-Wertung 
+             5. Losentscheid
+           */
+           usort($ExistGruppen[$k], function ($a, $b) use (&$debug)
+                {
+                  $ap = $a['Punkte'];
+                  $bp = $b['Punkte'];
+                  $debug.="SORT grp: ".$a['Gruppe']." a:(" . $a['M1'] . ") Punkte " . $a['Punkte']  . "($ap)) b:(" . $b['M1'] . ") Punkte " . $b['Punkte'] . "($bp)<br>";
+                  if ($a['Punkte'] == $b['Punkte'])  {  // punktestand gleich
+//                  $debug.=" Punkte gleich<br>";
+                    if ($a['Differenz'] == $b['Differenz']) {    // Differenz gleich
+//                    $debug.=" Differenz gleich<br> ";
+                        if ($a['Tore'] == $b['Tore']) {    // Tore gleich   jetzt gilt der direkte Vergleich
+//                        $debug.=" Tore gleich<br> ";
+/*                        Hier muss noch das Spiel eingelesen werden
+                            $M1 = $a['MID'];
+                            $M2 = $b['MID'];      // Suche das entsprechende Spiel
+                            echo "($M1) " . $a['M1'] . " ($M2) " . $b['M1'] . " !!!!!!!!!!!!!!!!!!!! Platz von Hand eintragen   !!! <br>";
+                            foreach ($spiele as $k=>$row)  {
+                              $M1Ind = $row['M1Ind'];
+                              $M2Ind = $row['M2Ind'];
+                              if ( ($M1 = $M1Ind && $M2 = $M2Ind) || ($M2 = $M2Ind && $M1 = $M1Ind)) {   // Spiel gefunden
+                            }
+                            return 0;
+                          }
+*/
+//                        $debug.=" return 0<br> ";
+                          return 0;
+                        }
+//                    $debug.=" return Tore Ungleich<br> ";
+                      return ($a['Tore'] > $b['Tore']) ? -1 : 1;
+                    }
+//                $debug.=" return Differenz Ungleich<br> ";
+                  return ($a['Differenz'] > $b['Differenz']) ? -1 : 1;
+                  }
+//              $debug.=" return Punkte Ungleich<br> ";
+                return ($a['Punkte'] > $b['Punkte']) ? -1 : 1;
+               }
+           );   // usort ende
+           foreach ($ExistGruppen[$k] as $mid=>$row) {
+             $Platz = $mid + 1;
+             $Spiele=$row['Spiele'];
+             if ($Spiele != -1) {
+               $value = "SET Platz=$Platz" ;
+  	           $sql = "update hy_gruppen $value where ID='".$row['ID']."'";
+               $debug.= "Update K $k Spiele $Spiele sql $sql<br>";    
+               $cnt = $this->connection->executeStatement($sql);
+             }
+           }
+         }
+       }
+
+       return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]);           
     }
   }  
 

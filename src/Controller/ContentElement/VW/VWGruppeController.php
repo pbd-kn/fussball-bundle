@@ -166,7 +166,7 @@ class VWGruppeController extends AbstractFussballController
             var url =  '/fussball/anzeigegruppe/u/'+id;
 console.log(" Gruppe bearbeiten url " + url);
             jQuery.get(url, function(data, status){
-//alert ("data " + " status " + status);
+//console.log ("data " + " status " + status);
               jQuery("#result").html(data['data']);
             });
           }    
@@ -179,11 +179,27 @@ console.log(" createAlleGruppen errortxt " + errortxt);
               if (errortxt != '') {
                 jQuery("#result").html(errortxt);
               } else {
-                jQuery("#result").html(data['data']);
+                jQuery("#result").html(data['data']+'<br>'+data['debug']);
                 location.reload();
               }
             });
-          }         
+          }
+          function gruppeLoeschen(obj) {
+            var id=obj.name;	 
+            var url =  '/fussball/bearbeitegruppe/d/'+id;
+console.log(" Gruppe Loeschen url " + url);
+            jQuery.get(url, function(data, status){
+              errortxt=data['error'];
+console.log(" Gruppe Loeschen errortxt " + errortxt);
+              if (errortxt != '') {
+                jQuery("#result").html(errortxt);
+             } else {
+console.log(" Gruppe Loeschen reload " + data['error']);
+               location.reload();
+             }
+           });
+         }
+         
         </script>
 EOT;
         $html.=$my_script_txt; 
