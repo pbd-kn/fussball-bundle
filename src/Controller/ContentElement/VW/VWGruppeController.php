@@ -241,6 +241,7 @@ EOT;
 	      $html.=$c->end_tr() . "\n";
       }
       $html=replace16Bit($html);
+      $html = utf8_encode($html);      
       $response = new Response($html,Response::HTTP_OK,['content-type' => 'text/html']);
       return $response;
     }

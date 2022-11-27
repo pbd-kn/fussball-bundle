@@ -335,8 +335,8 @@ EOT;
         if (strpos(strtolower ($this->aktWettbewerb['aktWettbewerb']),'em')!== false) $Type='%:EU:%';
         $html.=$c->td(array("valign"=>"top"),"Nation").$c->td(array("valign"=>"top"),createNationOption ($this->connection,$c,"nation",$Nation,$Type))."\n";
         //$html.=$c->td(array("valign"=>"top"),"Gruppe").$c->td(array("valign"=>"top"),$c->textfield(array("name"=>"Gruppe","id"=>"name","value"=>"$Gruppe")))."\n";
-        $grpArray=$fkt->createGruppenArray($this->aktWettbewerb['aktAnzgruppen']);
         $html.=$c->td(array("valign"=>"top"),"Gruppe");
+        $grpArray=$fkt->createGruppenArray($this->aktWettbewerb['aktAnzgruppen']);
         $html.=$c->td(array("valign"=>"top"),createGruppenOption ($c,"Gruppe",$grpArray,$Gruppe))."\n";
   
         //$html.=$c->td(array("valign"=>"top"),"Flagge") . "\n";
@@ -787,6 +787,320 @@ EOT;
       $html = utf8_encode($html);
 	  return new JsonResponse(['data' => $html,'debug'=>$debug]); 
   }
+
+    /**
+     * @throws \Exception
+     *
+     * @Route("/fussball/anzeigewette/{aktion}/{ID}/{Type}", 
+     * name="FussballRequestClass::class\anzeigewette", 
+     * defaults={"_scope" = "frontend"})
+     */
+
+  public function anzeigewette(string $aktion, int $ID=-1,string $Type='')
+  { 
+    function createSpieleOption ($conn,$cgi,$Wettbewerb,$name,$selected) {
+      // selected ist der Index der des Spiels
+      $sql =  "SELECT ";
+      $sql .= " spiele.ID AS ID,"; 
+	  $sql .= " spiele.Nr AS NR,";
+	  $sql .= " spiele.Gruppe as Gruppe, ";
+	  $sql .= " spiele.M1 as 'M1Ind',";
+      $sql .= " mannschaft1.Nation as 'M1',";
+      $sql .= " mannschaft1.Name as 'M1Name',";
+      $sql .= " flagge1.Image as 'Flagge1',";
+      $sql .= " spiele.M2 as 'M2Ind',";
+      $sql .= " mannschaft2.Nation as 'M2',";
+      $sql .= " mannschaft2.Name as 'M2Name',";
+      $sql .= " flagge2.Image as 'Flagge2'";
+      $sql .= " FROM hy_spiele as spiele";
+      $sql .= " LEFT JOIN hy_mannschaft AS mannschaft1 ON spiele.M1 = mannschaft1.ID";
+      $sql .= " LEFT JOIN hy_flagge AS flagge1 ON flagge1.ID = mannschaft1.flgindex";
+      $sql .= " LEFT JOIN hy_mannschaft AS mannschaft2 ON spiele.M2 = mannschaft2.ID";
+      $sql .= " LEFT JOIN hy_flagge AS flagge2 ON flagge2.ID = mannschaft2.flgindex";
+      $sql .= " WHERE spiele.Wettbewerb  ='$Wettbewerb'";
+      $sql .= " ORDER BY spiele.Nr ASC , spiele.Datum ASC, spiele.Uhrzeit ASC ;";
+//echo "create Spiele option sql: $sql<br>";	
+      $stmt = $conn->executeQuery($sql);
+      $optarray= array();
+      while (($row = $stmt->fetchAssociative()) !== false) {
+	    $str = $row['NR']  . ":" .  $row['M1Name'] . "/" . $row['M2Name'];
+        $optarray[$str] = $row['ID'];
+      }
+      $res=$cgi->select($name, $optarray,$selected);
+      $search  = array("\xC3\xA4", "\xC3\xB6", "\xC3\xBC", "\xC3\x84", "\xC3\x96","\xC3\x9f");
+      $replace = array("ä", 'ö', 'ü', 'Ä', 'Ö','Ü','ß');
+      $res= str_replace($search, $replace, $res);          
+      return $res;
+    }
+
+    function createMannschaftOption ($conn,$cgi,$Wettbewerb,$name,$selected,$gruppe) {
+  	  $sql =  "SELECT ";
+	  $sql .= " gruppen.ID AS ID,";
+	  $sql .= " gruppen.Gruppe AS Gruppe,";
+	  $sql .= " gruppen.M1 As M1ind,";
+	  $sql .= " gruppen.Platz as Platz,";
+      $sql .= " mannschaft1.Nation as 'M1',";
+      $sql .= " mannschaft1.Name as 'M1Name',";
+      $sql .= " flagge1.Image as 'Flagge1'";
+	  $sql .= " FROM hy_gruppen as gruppen";
+      $sql .= " LEFT JOIN hy_mannschaft AS mannschaft1 ON gruppen.M1 = mannschaft1.ID";
+      $sql .= " LEFT JOIN hy_flagge AS flagge1 ON flagge1.ID = mannschaft1.flgindex";
+      $sql .= " WHERE gruppen.Wettbewerb  ='$Wettbewerb'";
+      if ($gruppe != -1) {
+	    $sql .= " AND gruppen.Gruppe = '$gruppe'";
+	  }	
+//echo "Mannschaft Option sql: $sql<br>";	
+      $stmt = $conn->executeQuery($sql);
+      $optarray= array();
+	  $optarray['Keine Angabe'] = -1;
+      while (($row = $stmt->fetchAssociative()) !== false) {
+	    $str = $row['Gruppe'] . ":&nbsp;" . $row['M1'];
+        $optarray[$str] = $row['M1ind'];
+      }
+      $res=$cgi->select($name, $optarray,$selected);
+      $search  = array("\xC3\xA4", "\xC3\xB6", "\xC3\xBC", "\xC3\x84", "\xC3\x96","\xC3\x9f");
+      $replace = array("ä", 'ö', 'ü', 'Ä', 'Ö','Ü','ß');
+      $res= str_replace($search, $replace, $res);          
+      return $res;
+    }
+
+    function createGruppenOption ($cgi,$name,$GruppenArray,$selected) {
+      $res=$cgi->select($name,$GruppenArray,$selected);
+      $search  = array("\xC3\xA4", "\xC3\xB6", "\xC3\xBC", "\xC3\x84", "\xC3\x96","\xC3\x9f");
+      $replace = array('ä', 'ö', 'ü', 'Ä', 'Ö','Ü','ß');
+      $res= str_replace($search, $replace, $res);          
+      return $res;
+    }
+    function createWettheader($Row,$cgi) {
+  	  $ID=$Row['ID'];
+	  $Kommentar=$Row['Kommentar'];
+      $Pok=$Row['Pok'];
+      $Ptrend=$Row['Ptrend'];
+	  $Art=  $Row['Art'];
+	  if ($ID == -1) { $str =  "<center><h2>Wette eintragen</h2></center><br>\n";
+	  } else { $str =  "<center><h2>Wette bearbeiten</h2></center><br>\n";
+	  }
+      $str .= $cgi->Button(array("onClick"=>"uebernehmen();"),"&Uuml;bernehmen","Übernehmen") . "\n";
+      $str .= $cgi->Button(array("onClick"=>"abbrechen();"),"Abbrechen","Abbrechen") . "<br>\n";
+      $str .= $cgi->start_form("", null,null,array("id"=>"inputForm"));
+      $str .= $cgi->hidden("ID", $ID);                    // zur weitergabe bei übernehmen
+      $str .= $cgi->table (array("border"=>1));
+      $str .= $cgi->tr();
+      $str .= $cgi->td(array("valign"=>"top"),"Art");
+      $str .= $cgi->td(array("valign"=>"top"),$cgi->textfield(array("name"=>"Art","id"=>"Art","value"=>"$Art","size"=>"4"))) . "\n";
+      $str .= $cgi->td(array("valign"=>"top"),"Kommentar");
+      $str .= $cgi->td(array("valign"=>"top"),$cgi->textfield(array("name"=>"Kommentar","id"=>"Kommentar","value"=>"$Kommentar"))) . "\n";
+      $str .= $cgi->td(array("valign"=>"top"),"Pok");
+      $str .= $cgi->td(array("valign"=>"top"),$cgi->textfield(array("name"=>"Pok","id"=>"Pok","value"=>"$Pok","size"=>"4"))) . "\n";
+      $str .= $cgi->td(array("valign"=>"top"),"Ptrend");
+      $str .= $cgi->td(array("valign"=>"top"),$cgi->textfield(array("name"=>"Ptrend","id"=>"Ptrend","value"=>"$Ptrend","size"=>"4"))) . "\n";
+	  $str .= $cgi->end_tr().$cgi->tr();
+      return $str;
+    }
+
+    function createWettbottom($row,$cgi) {
+      $str =$cgi->end_tr()."\n";;
+      $str .=$cgi->end_table()."\n";;
+      $str .=$cgi->end_form();
+	  return $str;
+    }
+
+    function createSpielwette($conn,$cgi,$Wettbewerb,$row,$debug) {
+      $str=createWettheader($row,$cgi);
+      $S1 = $row['Tipp1'];  // Spiel
+	  $T1 = $row['Tipp2'];  // T1
+	  $T2 = $row['Tipp3'];  // T2
+      $debug.=" S1 $S1 T1 $T1 T2 $T2 T3 $T3";
+	  $str.=$cgi->td(array("valign"=>"top"),"Spiel");
+	  $str.=$cgi->td(array("valign"=>"top"),createSpieleOption ($conn,$cgi,$Wettbewerb,"Tipp1",$S1)) . "\n";
+      $str.=$cgi->td(array("valign"=>"top"),"T1");
+      $str.=$cgi->td(array("valign"=>"top"),$cgi->textfield(array("name"=>"Tipp2","id"=>"Tipp2","value"=>"$T1","size"=>"4"))) . "\n";
+      $str.=$cgi->td(array("valign"=>"top"),"T2");
+      $str.=$cgi->td(array("valign"=>"top"),$cgi->textfield(array("name"=>"Tipp3","id"=>"Tipp3","value"=>"$T2","size"=>"4"))) . "\n";
+	  $str.=createWettbottom($row,$cgi);
+	  return $str;  
+    }
+    function createGruppenwette($conn,$cgi,$fkt,$GruppenArray,$Wettbewerb,$row,$debug) {
+      $str=createWettheader($row,$cgi);
+	  $G1=$row['Tipp1'];             // Tipp1 ist hier der Gruppenname
+	  $M1=$row['Tipp2'];             // Gruppenerster
+	  $M2=$row['Tipp3'];             // Gruppenzweiter
+	  $M3=$row['Tipp4'];             // Gruppendritter
+      $debug.="Create Gruppenwette G1 $G1 M1 $M1 M2 $M2 M3 $M3";
+	  $str .= $cgi->td(array("valign"=>"top"),"G1");
+      $str.=$cgi->td(array("valign"=>"top"),createGruppenOption ($cgi,"Tipp1",$GruppenArray,$G1))."\n";
+      $str.=$cgi->td(array("valign"=>"top"),"Erster");
+	  $str.=$cgi->td(array("valign"=>"top"),createMannschaftOption ($conn,$cgi,$Wettbewerb,"Tipp2",$M1,$G1)) . "\n";
+      $str.=$cgi->td(array("valign"=>"top"),"Zweiter");
+	  $str.=$cgi->td(array("valign"=>"top"),createMannschaftOption ($conn,$cgi,$Wettbewerb,"Tipp3",$M2,$G1)) . "\n";
+      $str.=$cgi->td(array("valign"=>"top"),"Dritter");
+	  $str.=$cgi->td(array("valign"=>"top"),createMannschaftOption ($conn,$cgi,$Wettbewerb,"Tipp4",$M3,$G1)) . "\n";
+	  $str.=createWettbottom($row,$cgi);
+	  return $str;
+    }
+
+    function createVergleichswette($conn,$cgi,$Row) {
+      $str=createWettheader($Row,$cgi);
+	  $V1=$Row['Tipp1'];
+	  $str.=$cgi->td(array("valign"=>"top"),"Wert");
+      $str.=$cgi->td(array("valign"=>"top"),$cgi->textfield(array("name"=>"Tipp1","id"=>"Tipp1","value"=>"$V1","size"=>"4"))) . "\n";
+	  $str.=$cgi->hidden("Tipp2", -1);  // damit speichern klappt
+	  $str.=$cgi->hidden("Tipp3", -1);  // damit speichern klappt
+	  $str.=$cgi->hidden("Tipp4", -1);  // damit speichern klappt
+      //$str .= td(array("valign"=>"top"),"Erster");
+	  //$str .= td(array("valign"=>"top"),createMannschaftOption ($conn,"T1",$M1,$G1)) . "\n";
+      //$str .= td(array("valign"=>"top"),"Zweiter");
+	  //$str .= td(array("valign"=>"top"),createMannschaftOption ($conn,"T2",$M2,$G1)) . "\n";
+	  $str.=createWettbottom($Row,$cgi);
+	  return $str;
+    }
+
+    function createPlatzwette($conn,$cgi,$Wettbewerb,$Row) {
+      $str=createWettheader($Row,$cgi);
+	  $M1=$Row['Tipp1'];
+	  $str.=$cgi->td(array("valign"=>"top"),"Mannschaft");
+	  $str.=$cgi->td(array("valign"=>"top"),createMannschaftOption ($conn,$cgi,$Wettbewerb,"Tipp1",$M1,-1)) . "\n";
+	  $str.=$cgi->hidden("Tipp2", -1);  // damit speichern klappt
+	  $str.=$cgi->hidden("Tipp3", -1);  // damit speichern klappt
+	  $str.=$cgi->hidden("Tipp4", -1);  // damit speichern klappt
+      //$str .= td(array("valign"=>"top"),"Erster");
+	  //$str .= td(array("valign"=>"top"),createMannschaftOption ($conn,"T1",$M1,$G1)) . "\n";
+      //$str .= td(array("valign"=>"top"),"Zweiter");
+	  //$str .= td(array("valign"=>"top"),createMannschaftOption ($conn,"T2",$M2,$G1)) . "\n";
+	  $str.=createWettbottom($Row,$cgi);
+	  return $str;
+    }
+      
+      $c=$this->cgiUtil;
+      $fkt=$this->fussballUtil;
+      $id=$ID;
+      $Nr=1;
+      $Gruppe="H";
+      $M1=-1;
+      $M2=-1;
+      $Ort=-1;
+      $Datum="2022-11-01";
+      $Uhrzeit="16:00";
+      $T1=-1;
+      $T2=-1;
+      $Wettbewerb = $this->aktWettbewerb['aktWettbewerb'];
+      $conn=$this->connection;
+
+
+      $html="";      // gerenderte
+      $debug="";     //  debuginfo
+      $my_script_txt = <<< EOT
+        <script language="javascript" type="text/javascript">
+        function uebernehmen() {     /* neuer aktuelle Wette */
+          var _par = jQuery("#inputForm :input").serialize();   // ich habe den Eindruck nur so bekomme ich die Werte
+console.log('par: '+_par);
+          var _inputArr = _par.split("&");
+          let myA=[];
+          for (var x = 0; x < _inputArr.length; x++) {
+            var _kv = _inputArr[x].split("=");
+            myA[_kv[0]] = _kv[1];
+            //console.log(_kv);
+          }
+          var url='/fussball/bearbeitewette/'+myA['aktion']+'/'+myA['ID']+'/'+myA['Kommentar']+'/'+myA['Art']+'/'+myA['Pok']+'/'+myA['Ptrend']+'/'+myA['Tipp1']+'/'+myA['Tipp2']+'/'+myA['Tipp3']+'/'+myA['Tipp4'];
+console.log('url: '+url);
+          jQuery.get(url, function(data, status){
+console.log('res da ');
+             errortxt=data['error'];
+             if (errortxt != '') {
+console.log('error: '+errortxt);
+               jQuery("#result").html(errortxt);
+             } else {
+               jQuery("#result").html("");
+               jQuery("#eingabe").html(data['data']);
+console.log('data: '+data['data']);
+               location.reload();
+             }
+          });
+
+        }
+        function abbrechen() {
+          location.reload();
+        }
+        </script>
+EOT;
+      $html.=$my_script_txt;              
+
+      $id=$ID;
+      $aktion=strtolower($aktion);
+      $Type=strtolower(trim($Type));
+      $debug.='id: '.$id.' aktion: '.$aktion.' Type: '.$Type;
+// create output
+      $html.=$c->start_form("", null,null,array("id"=>"inputForm"));
+      $html.=$c->hidden("ID", $id);                    // zur weitergabe bei übernehmen
+      $html.=$c->hidden("aktion", $aktion);                    // zur weitergabe bei übernehmen
+      if ($aktion == 'n') {
+        // neue Wette
+        $debug.=' Create Neue Wette TYPE |'.$Type.'|';
+	    $Row = array();
+	    $Row['ID']=-1;
+	    $Row['Kommentar'] = "";
+        $Row['Pok']=-1;
+        $Row['Ptrend']=-1;
+	    if ($Type == 's') {  // Spielwette
+    	  $Row['Art']= 'S';
+	      $Row['Tipp1']=-1;          // Spiel
+          $Row['Tipp2']=-1;          // T1 
+          $Row['Tipp3']=-1;          // T2
+          $Row['Tipp4']=-1;          // irrelevant
+          $debug.=' Create Spielwette';
+	      $html.=createSpielwette($conn,$c,$Wettbewerb,$Row,$debug);
+	    } else if ($Type == 'g') {  // Gruppenwette
+	      $Row['Art']='G';
+	      $Row['Tipp1']=-1;          // Gruppe
+          $Row['Tipp2']=-1;          // M1 
+          $Row['Tipp3']=-1;          // M2
+          $Row['Tipp4']=-1;          // M3
+          $debug.=' Create Spielwette';
+          $grpArray=$fkt->createGruppenArray($this->aktWettbewerb['aktAnzgruppen']);
+          $debug.=' Create Spielwette len grpArray '.count($grpArray);
+	      $html.=createGruppenwette($conn,$c,$fkt,$grpArray,$Wettbewerb,$Row,$debug);
+        } else if ($Type == 'p') {  // Platz Wette
+	      $Row['Art']='P';
+	      $Row['Tipp1']=-1;          // Mannschaftsindex
+          $Row['Tipp2']=-1;          // irrelevant
+          $Row['Tipp3']=-1;          // irrelevant
+          $Row['Tipp4']=-1;          // irrelevant
+          $debug.=' Create Platzwette';
+	      $html.=createPlatzwette($conn,$c,$Wettbewerb,$Row);
+	    } else if ($Type == 'v') {  // Vergleich Wette
+	      $Row['Art']='V';
+	      $Row['Tipp1']=-1;          // Vergleichswert
+          $Row['Tipp2']=-1;          // irrelevant
+          $Row['Tipp3']=-1;          // irrelevant
+          $Row['Tipp4']=-1;          // irrelevant
+	      $html.=createVergleichswette($conn,$c,$Row);
+	    }
+      } else if ($aktion == 'b') { // Wette bearbeiten	
+  	    $id = $ID;
+	    // Besorge Wettdaten
+        $sql=" select ID,Kommentar,Pok,Ptrend,Art,Tipp1,Tipp2,Tipp3,Tipp4 from hy_wetten Where ID = '$id';";
+        $debug.="Wettdaten sql: $sql";
+        $stmt=$conn->executeQuery($sql);
+	    $Row=$stmt->fetchAssociative();
+	    $type = strtolower($Row['Art']);
+        $debug.= " type $type";
+	    if ($type == 's') {  // Spielwette  
+          $html.=createSpielwette($conn,$c,$Wettbewerb,$Row,$debug); //createSpielwette($conn,$row,$cgi)		
+	    } else if ($type == 'g') {  // Gruppenwette
+          $grpArray=$fkt->createGruppenArray($this->aktWettbewerb['aktAnzgruppen']);
+          $html.=createGruppenwette($conn,$c,$fkt,$grpArray,$Wettbewerb,$Row,$debug);		
+	    } else if ($type == 'p') {  // Platz Wette
+          $debug.="Create Platzwette Anzeigen";
+          $html.=createPlatzwette($conn,$c,$Wettbewerb,$Row);		
+	    } else if ($type == 'v') {  // Vergleich Wette
+	      $html.=createVergleichswette($conn,$c,$Row);
+	    }
+    }
+    $html.= $c->end_table() . "\n";
+    $html.= $c->end_form();
+    $html = utf8_encode($html);
+	return new JsonResponse(['data' => $html,'debug'=>$debug]); 
+  }
   
     /**
      * @throws \Exception
@@ -1137,20 +1451,7 @@ EOT;
       $replace = array('ä', 'ö', 'ü', 'Ä', 'Ö','Ü','ß');
       $str= str_replace($search, $replace, $str);     
       return $str;     
-    }
-    // dient zum sortieren
-    /* GRUPPENwertung Platz
-       a) Für die Tabellenplatzierung sind die erspielten Punkte entscheidend. 
-       b) Bei Punktgleichheit entscheidet zunächst das Torverhältnis/Differenz und 
-       c) schließlich die höhere Anzahl der erzielten Tore. 
-       Wenn zwei oder mehrere Mannschaften in den drei erwähnten Kriterien gleich abschneiden, entscheiden folgende Kriterien: 
-       1. Punkte im direkten Vergleich 
-       2. Torverhältnis/Differenz im direkten Vergleich 
-       3. Anzahl der erzielten Tore im direkten Vergleich 
-       4. Fair-Play-Wertung 
-       5. Losentscheid
-    */
-    
+    }    
     if (!isset($aktion)) {
       $html.="fehlerhafte Aktion empty<br>";
       $errortxt.="fehlerhafte Aktion empty<br>";
@@ -1190,7 +1491,7 @@ EOT;
          $Update=1;
          while (($row = $stmt->fetchAssociative()) !== false) {
           $ExistGruppen[$row['Gruppe']][$row['M1']]=$row;                 // index Gruppe und Mannschaft
-          $debug.='gespeichert als ExistGruppen['.$row['Gruppe'].']['.$row['M1'].']<br>';
+          //$debug.='gespeichert als ExistGruppen['.$row['Gruppe'].']['.$row['M1'].']<br>';
          }
        }    
        //$cnt = $this->connection->executeStatement($sql);
@@ -1203,34 +1504,36 @@ EOT;
        while (($row = $stmt->fetchAssociative()) !== false) {
          $Mannschaften[]=$row;
        }
-       // alle aktuellen Spiele einlesen
+        // alle aktuellen Spiele einlesen
        foreach ($Mannschaften as $k=>$row) {
          $M1=$row['ID'];$Platz=-1;$Spiele=-1;$Sieg=-1;$Unentschieden=-1;$Niederlage=-1;$Tore=-1;$Gegentore=-1;$Differenz=-1;$Punkte=-1;
          $Gruppe=$row['Gruppe'];    
          $sql  = "SELECT ID,Nr,M1,M2,T1,T2 FROM hy_spiele WHERE Wettbewerb  ='$Wettbewerb' AND M1 = $M1";  // Heim Spiele
          $stmt = $this->connection->executeQuery($sql); $num_rows = $stmt->rowCount();    
-         $debug.="|spiele sql: $sql anz: $num_rows | ";	
+         //$debug.="|spiele sql: $sql anz: $num_rows | ";	
          while (($spielrow = $stmt->fetchAssociative()) !== false) {
-           $debug.="| heimspiel T1 ".$spielrow['T1']."  heimspiel T2 ".$spielrow['T2']." | ";	
+           //$debug.="| heimspiel T1 ".$spielrow['T1']."  heimspiel T2 ".$spielrow['T2']." | ";	
            if ($spielrow['T1'] != -1 && $spielrow['T2'] != -1) {   
              if ($Spiele < 0) $Spiele=0; $Spiele ++;            // Spiel hat stattgefunden
              if ($Tore < 0) $Tore=0; $Tore = $Tore+$spielrow['T1'];
              if ($Gegentore < 0) $Gegentore=0; $Gegentore = $Gegentore+$spielrow['T2'];
              if ( $spielrow['T1'] >  $spielrow['T2']) { if ($Sieg < 0) $Sieg=0; $Sieg ++; if ($Punkte < 0) $Punkte=0; $Punkte=$Punkte+3;}
-             if ( $spielrow['T1'] <  $spielrow['T2']) { if ($Niederlage < 0) $Niederlage=0; $Niederlage ++;}
-             if ( $spielrow['T1'] == $spielrow['T2']){ if ($Unentschieden < 0) $Unentschieden=0; $Unentschieden ++; if ($Punkte < 0) $Punkte=0; $Punkte=$Punkte+1;}
+             if ( $spielrow['T1'] <  $spielrow['T2']) { if ($Niederlage < 0) $Niederlage=0; $Niederlage ++; if ($Punkte < 0) $Punkte=0;}
+             if ( $spielrow['T1'] == $spielrow['T2']) { 
+               if ($Unentschieden < 0) $Unentschieden=0; $Unentschieden ++; if ($Punkte < 0) $Punkte=0; $Punkte=$Punkte+1;
+            }
            }
          }
          $sql  = "SELECT ID,Nr,M1,M2,T1,T2 FROM hy_spiele WHERE Wettbewerb  ='$Wettbewerb' AND M2 = $M1";  // Auswaerts Spiele
          $stmt = $this->connection->executeQuery($sql); $num_rows = $stmt->rowCount();    
          while (($spielrow = $stmt->fetchAssociative()) !== false) {
-           $debug.="| auswaerts T1 ".$spielrow['T1']."  auswaerts T2 ".$spielrow['T2']." | ";	
+           //$debug.="| auswaerts T1 ".$spielrow['T1']."  auswaerts T2 ".$spielrow['T2']." | ";	
            if ($spielrow['T1'] != -1 && $spielrow['T2'] != -1) {   
              if ($Spiele < 0) $Spiele=0; $Spiele ++;        // Spiel hat stattgefunden
              if ($Tore < 0) $Tore=0; $Tore = $Tore+$spielrow['T2'];
              if ($Gegentore < 0) $Gegentore=0; $Gegentore = $Gegentore+$spielrow['T1'];
              if ( $spielrow['T2'] >  $spielrow['T1']) { if ($Sieg < 0) $Sieg=0; $Sieg ++; if ($Punkte < 0) $Punkte=0; $Punkte=$Punkte+3;}
-             if ( $spielrow['T2'] <  $spielrow['T1']) { if ($Niederlage < 0) $Niederlage=0; $Niederlage ++;}
+             if ( $spielrow['T2'] <  $spielrow['T1']) { if ($Niederlage < 0) $Niederlage=0; $Niederlage ++; if ($Punkte < 0) $Punkte=0;}
              if ( $spielrow['T1'] == $spielrow['T2']) { if ($Unentschieden < 0) $Unentschieden=0; $Unentschieden ++; if ($Punkte < 0) $Punkte=0; $Punkte=$Punkte+1;}
            }
          }
@@ -1239,7 +1542,6 @@ EOT;
            $oldRow=$ExistGruppen[$row['Gruppe']][$row['ID']];        // ID = MannschaftsID Row der Gruppe
            $Groupid = $oldRow['ID'];
            $value = "SET ";
-//           $value .= "Platz=$Platz ," ;                    // Platz bleibt erhalten muss derzeit von Hand eingegeben werden
            $value .= "Spiele=$Spiele ," ;
            $value .= "Sieg=$Sieg ," ;
            $value .= "Unentschieden=$Unentschieden ," ;
@@ -1250,20 +1552,18 @@ EOT;
            $value .= "Punkte=$Punkte " ;
   	       $sql = "UPDATE hy_gruppen $value  where ID='$Groupid'";
          
-           $debug.="'|' update sql: $sql '|' ";	
+           //$debug.="'|' update sql: $sql '|' ";	
            $cnt = $this->connection->executeStatement($sql);
-	       //$html.="Update  Gruppe $Gruppe M1 ".$M1." cnt ".$cnt;
+	       $html.="Update  Gruppe $Gruppe M1 ".$M1." cnt ".$cnt;
          } else {
            $value = "( '$Wettbewerb','$Gruppe',$M1,$Platz,$Spiele,$Sieg,$Unentschieden,$Niederlage,$Tore,$Gegentore,$Differenz,$Punkte)" ;
            $sql="INSERT INTO hy_gruppen(Wettbewerb,Gruppe,M1,Platz,Spiele,Sieg,Unentschieden,Niederlage,Tore,Gegentore,Differenz,Punkte) VALUES $value";
-           $debug.="'|' insert sql: $sql '|' ";	
-         //$cnt = $this->connection->executeStatement($sql);
-	       //$html.="Eingefügt  Gruppe $Gruppe M1 $M1 ";
+           //$debug.="'|' insert sql: $sql '|' ";	
+           $cnt = $this->connection->executeStatement($sql);
+	       $html.="Eingefügt  Gruppe $Gruppe M1 $M1 ";
          }
        }
-       $debug.="!!!!!!!!!!!!!Platz nicht bestimmt !!!!!!!!!!!!!!!!!!!!!\n";
-       $html=replace16Bit($html);
-       $html = utf8_encode($html); 
+       $debug.="!!!!!!!!!!!!!Platz bestimmen !!!!!!!!!!!!!!!!!!!!!\n";
        //return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]);  
        // Versuch der Platzbestimmung
        // lies alle Gruppen nochmals ein
@@ -1287,12 +1587,14 @@ EOT;
        foreach ($ExistGruppen as $k=>$grp) {
          $grpName=$k;
          $debug.="index $k grpName $grpName<br>";
-         if ($grpNameSelect != $grpName) {
+         if ($grpNameSelect != $grpName) {          // neue Gruppe
+           /*
            foreach ($ExistGruppen[$k] as $k1=>$v1) {
              $debug.="ExistGruppen[$k][$k1] Plaetze berechnen vor sort len ".count($ExistGruppen[$k])."<br>";
              foreach ($v1 as $k2=>$v2) $debug.="ExistGruppen[$k][$k1][$k2]: $v2 ";
              $debug.="<br>";
            }
+           */
            // dient zum sortieren
            /* GRUPPENwertung Platz
              a) Für die Tabellenplatzierung sind die erspielten Punkte entscheidend. 
@@ -1309,7 +1611,7 @@ EOT;
                 {
                   $ap = $a['Punkte'];
                   $bp = $b['Punkte'];
-                  $debug.="SORT grp: ".$a['Gruppe']." a:(" . $a['M1'] . ") Punkte " . $a['Punkte']  . "($ap)) b:(" . $b['M1'] . ") Punkte " . $b['Punkte'] . "($bp)<br>";
+                  //$debug.="SORT grp: ".$a['Gruppe']." a:(" . $a['M1'] . ") Punkte " . $a['Punkte']  . "($ap)) b:(" . $b['M1'] . ") Punkte " . $b['Punkte'] . "($bp)<br>";
                   if ($a['Punkte'] == $b['Punkte'])  {  // punktestand gleich
 //                  $debug.=" Punkte gleich<br>";
                     if ($a['Differenz'] == $b['Differenz']) {    // Differenz gleich
@@ -1342,7 +1644,7 @@ EOT;
                }
            );   // usort ende
            foreach ($ExistGruppen[$k] as $mid=>$row) {
-             $Platz = $mid + 1;
+             $Platz = $mid + 1;    // gruppen durch usort umsortiert nach index 0,1,2,3
              $Spiele=$row['Spiele'];
              if ($Spiele != -1) {
                $value = "SET Platz=$Platz" ;
@@ -1353,7 +1655,8 @@ EOT;
            }
          }
        }
-
+       $html=replace16Bit($html);
+       $html = utf8_encode($html); 
        return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]);           
     }
   }  
@@ -1490,6 +1793,90 @@ $debug.=" sql: $sql\n";
     return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
   } 
 
+    /**
+     * @throws \Exception
+     * @throws DoctrineDBALException
+     *
+     * @Route("/fussball/bearbeitewette/{aktion}/{ID}/{Kommentar}/{Art}/{Pok}/{Ptrend}/{Tipp1}/{Tipp2}/{Tipp3}/{Tipp4}", 
+     * name="FussballRequestClass::class\bearbeitewette", 
+     * defaults={"_scope" = "frontend"})
+     */
+
+  public function bearbeitewette(
+    string $aktion,
+    int $ID=-1,
+    string $Kommentar='',
+    string $Art='',
+    int $Pok=-1,
+    int $Ptrend=-1,
+    string $Tipp1='',        
+    string $Tipp2='',
+    string $Tipp3='',
+    string $Tipp4='',
+    )
+  {
+    $aktion=trim(strtolower($aktion));
+    if (!isset($aktion)) {
+      $html.="fehlerhafte Aktion empty<br>";
+      $errortxt.="fehlerhafte Aktion empty<br>";
+      $errortxt = utf8_encode($errortxt);
+      return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+    }
+    $c=$this->cgiUtil;
+    $id = $ID;
+    $html="";
+    $debug="aktion: |$aktion|";
+    $errortxt="";
+    $Wettbewerb = $this->aktWettbewerb['aktWettbewerb'];
+    // check kein leerer Parameter
+    if ($aktion != 'd' && ($Kommentar=='' || $Art=='')) {
+	  $errortxt.="Fehlerhafte Eingabe ";
+      $errortxt.="Kommentar: $Kommentar Art: $Art";
+      //$errortxt = utf8_encode($errortxt);
+      return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+    }
+    if ($aktion == "n" ) {   // neueintrag
+      $value = "( '$Wettbewerb','$Kommentar','$Art',$Pok,$Ptrend,'$Tipp1','$Tipp2','$Tipp3','$Tipp4')";
+	  $sql="INSERT INTO hy_wetten(Wettbewerb,Kommentar,Art,Pok,Ptrend,Tipp1,Tipp2,Tipp3,Tipp4) VALUES $value";
+      $cnt = $this->connection->executeStatement($sql);
+      $debug.="sql: $sql<br>";	
+      $html.="Kommentar: $Kommentar Art: $Art Pok: $Pok Ptrend: $Ptrend Tipp1: $Tipp1 Tipp2: $Tipp2 Tipp3: $Tipp3 Tipp4: $Tipp4 neu";
+      $html = utf8_encode($html); 
+      return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]);  
+    }
+    if ($aktion == "b" ) {   // Wette uebernehmen
+      if ($Tipp2 == 'undefined') $Tipp2 = -1;
+      if ($Tipp3 == 'undefined') $Tipp3 = -1;
+      if ($Tipp4 == 'undefined') $Tipp4 = -1;
+      $value = "SET ";
+      $value .= "Wettbewerb='$Wettbewerb' ," ; 
+      $value .= "Kommentar='$Kommentar' ," ; 
+      $value .= "Art='$Art' ," ; 
+      $value .= "Pok=$Pok ," ; 
+      $value .= "Ptrend=$Ptrend ," ; 
+      $value .= "Tipp1='$Tipp1' ," ; 
+      $value .= "Tipp2='$Tipp2'," ; 
+      $value .= "Tipp3='$Tipp3' ," ; 
+      $value .= "Tipp4='$Tipp4' " ; 
+	  $sql = "update hy_wetten $value where ID=$id";$debug.=" sql: $sql\n";	
+      $cnt = $this->connection->executeStatement($sql);
+      $html.="Wettbewerb $Wettbewerb Kommentar: $Kommentar Art: $Art Pok: $Pok Ptrend: $Ptrend Tipp1: $Tipp1 Tipp2: $Tipp2 Tipp3: $Tipp3 Tipp4: $Tipp4 neu";
+      //$html = utf8_encode($html);
+      return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+    }
+    if ($aktion == "d" ) {   // Wette loeschen
+	  $sql = "Delete from hy_wetten WHERE ID='$id' LIMIT 1";
+      $cnt = $this->connection->executeStatement($sql);
+      //$html.="in Tabelle hy_mannschaft betroffene Saetze $cnt<br>";
+	  $html.="Wette $id Nr $Nr gel&ouml;scht";
+      $html = utf8_encode($html);
+      return new JsonResponse(['data' => $html,'error'=>$errortxt,'debug'=>$debug]); 
+    }
+    $html.="fehlerhafte Aktion $aktion Wette bearbeiten<br>";
+    $errortxt.="fehlerhafte Aktion $aktion\n";
+    $errortxt = utf8_encode($errortxt);
+    return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+  } 
     /**
      * @throws \Exception
      *
