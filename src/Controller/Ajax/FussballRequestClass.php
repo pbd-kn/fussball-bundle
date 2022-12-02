@@ -1101,6 +1101,110 @@ EOT;
     $html = utf8_encode($html);
 	return new JsonResponse(['data' => $html,'debug'=>$debug]); 
   }
+    /**
+     * @throws \Exception
+     *
+     * @Route("/fussball/anzeigeteilnehmer/{aktion}/{ID}", 
+     * name="FussballRequestClass::class\anzeigeteilnehmer", 
+     * defaults={"_scope" = "frontend"})
+     */
+
+  public function anzeigeteilnehmer(string $aktion, int $ID=-1)
+  {
+    function displayTeilnehmer($cgi,$aktion,$row) {
+  	  $ID=$row['ID'];
+	  $Name=$row['Name'];
+      $Email=$row['Email'];
+      $Kurzname=$row['Kurzname'];
+	  if ($ID == -1) {
+        $str.="<center><h3>Neuer Teilnehmer eintragen</h3></center><br>\n";
+	  } else {
+        $str.="<center><h3>Teilnehmer bearbeiten</h3></center><br>\n";
+	  }
+      $str.=$cgi->Button(array("onClick"=>"uebernehmen();"),"&Uuml;bernehmen","Übernehmen") . "\n";
+      $str.=$cgi->Button(array("onClick"=>"abbrechen();"),"Abbrechen","Abbrechen") . "<br>\n";
+      $str.=$cgi->start_form("", null,null,array("id"=>"inputForm"));
+      $str.=$cgi->hidden("ID", $ID);                    // zur weitergabe bei übernehmen
+      $str.=$cgi->hidden("aktion", $aktion);            // zur weitergabe bei übernehmen
+      $str.=$cgi->hidden("Art", $row['Art']);           // zuwas das dient weiss ich noch nicht
+      $str.=$cgi->table (array("border"=>1));
+      $str.=$cgi->tr();
+      $str.=$cgi->td(array("valign"=>"top"),"ID");
+      $str.=$cgi->td(array("valign"=>"top"),$cgi->textfield(array("name"=>"ID","id"=>"ID","value"=>"$ID","size"=>"4"))) . "\n";
+      $str.=$cgi->td(array("valign"=>"top"),"Kurzname");
+      $str.=$cgi->td(array("valign"=>"top"),$cgi->textfield(array("name"=>"Kurzname","id"=>"Kurzname","value"=>"$Kurzname"))) . "\n";
+      $str.=$cgi->td(array("valign"=>"top"),"Name");
+      $str.=$cgi->td(array("valign"=>"top"),$cgi->textfield(array("name"=>"Name","id"=>"Name","value"=>"$Name"))) . "\n";
+      $str.=$cgi->td(array("valign"=>"top"),"Email");
+      $str.=$cgi->td(array("valign"=>"top"),$cgi->textfield(array("name"=>"Email","id"=>"Email","value"=>"$Email"))) . "\n";
+      $str.=$cgi->end_tr() . "\n";;
+      $str.=$cgi->end_table() . "\n";;
+      $str.=$cgi->end_form();
+      return $str;
+    }
+      $c=$this->cgiUtil;
+      $id=$ID;
+
+      $html="";      // gerenderte
+      $debug="";     //  debuginfo
+      $my_script_txt = <<< EOT
+        <script language="javascript" type="text/javascript">
+        function uebernehmen() {     /* neuer Teilnehmer */
+          var _par = jQuery("#inputForm :input").serialize();   // ich habe den Eindruck nur so bekomme ich die Werte
+console.log('Teilnehmer uebernehmen: '+_par);
+          var _inputArr = _par.split("&");
+          let myA=[];
+          for (var x = 0; x < _inputArr.length; x++) {
+            var _kv = _inputArr[x].split("=");
+            myA[_kv[0]] = _kv[1];
+            console.log(_kv);
+          }
+          var url =  '/fussball/bearbeiteteilnehmer/'+myA['aktion']+'/'+myA['ID']+'/'+myA['Art']+'/'+myA['Kurzname']+'/'+myA['Name']+'/'+myA['Email'];
+console.log('url: '+url);
+          jQuery.get(url, function(data, status){
+console.log('res da ');
+             errortxt=data['error'];
+             if (errortxt != '') {
+console.log('error: '+errortxt);
+               jQuery("#result").html(errortxt);
+             } else {
+               //location.reload();
+               jQuery("#result").html("");
+               jQuery("#eingabe").html(data['data']);
+             }
+          });
+
+        }
+        function abbrechen() {
+          location.reload();
+        }
+        </script>
+EOT;
+      $html.=$my_script_txt;              
+
+      if (strtolower($aktion) == 'n') {
+      // neue Teilnehmer
+	    $Row = array();
+	    $Row['ID'] = -1;
+	    $Row['Name'] = -1;
+	    $Row['Kurzname'] = -1;
+	    $Row['Email'] = -1;
+	    $Row['Art'] = "T";                // Teilnehmerdaten
+	    $html.= displayTeilnehmer($c,$aktion,$Row);
+      } 
+      if ($aktion == 'u') { // bearbeiten	
+	    // Besorge Teilnehmerdaten
+        $sql = " select ID,Kurzname,Name,Email from hy_teilnehmer Where ID = '$id';";
+        $debug .= "sql: $sql  ";	
+        $stmt = $this->connection->executeQuery($sql);
+        $Row = $stmt->fetchAssociative();
+	    $Row['Art'] = "T";                // Teilnehmerdaten
+        $html.=displayTeilnehmer($c,$aktion,$Row);
+      }
+      $html = utf8_encode($html);
+	  return new JsonResponse(['data' => $html,'debug'=>$debug]); 
+  }
+
   
     /**
      * @throws \Exception
@@ -1877,6 +1981,111 @@ $debug.=" sql: $sql\n";
     $errortxt = utf8_encode($errortxt);
     return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
   } 
+    
+    /**
+     * @throws \Exception
+     * @throws DoctrineDBALException
+     * @Route("/fussball/bearbeiteteilnehmer/{aktion}/{ID}/{Art}/{Kurzname}/{Name}/{Email}", 
+     * name="FussballRequestClass::class\bearbeiteteilnehmer", 
+     * defaults={"_scope" = "frontend"})
+     */
+
+  public function bearbeiteteilnehmer(string $aktion,int $ID=-1,string $Art="",string $Kurzname='',string $Name='',string $Email='')
+  {
+    if (!isset($aktion)) {
+      $html.="fehlerhafte Aktion empty<br>";
+      $errortxt.="fehlerhafte Aktion empty<br>";
+      $errortxt = utf8_encode($errortxt);
+      return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+    }
+    $c=$this->cgiUtil;
+    $id = $ID;
+    $html="";
+    $aktion=strtolower($aktion);
+    $debug="aktion: $aktion";
+    $errortxt="";
+    $Wettbewerb = $this->aktWettbewerb['aktWettbewerb'];
+    $debug.=" id: $id, Wettbewerb: $Wettbewerb, Ort: $ort, Beschreibung $beschreibung";
+    if ($aktion == "u" || $aktion == "n") { 
+      if ($Kurzname=='' || $Kurzname == '-1') {
+          $html.="Kurzname fehlerhafter Wert ($Kurzname)<br>";
+          $errortxt.="Kurzname fehlerhafter Wert ($Kurzname)<br>";
+          $errortxt = utf8_encode($errortxt);
+          return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+      }
+      if ($aktion == "n" ) {   // neueintrag
+        $value = "( '$Wettbewerb' ,'$Kurzname' , '$Name' , '$Email' )" ; 
+        $sql="INSERT INTO hy_teilnehmer(Wettbewerb,Kurzname,Name,Email) VALUES $value";
+        $cnt = $this->connection->executeStatement($sql);
+	    $html.="Wettbewerb $Wettbewerb Teilnehmer $Kurzname Name $Name Email $Email neu gesetzt";
+      // TeilnehmerId besorgen
+	    $sql = "Select ID from hy_teilnehmer where Wettbewerb = '$Wettbewerb'  and Kurzname='" . $Kurzname."';";
+        $stmt = $this->connection->executeQuery($sql);
+        $debug.="sql: $sql<br>";	
+        $anz = $stmt->rowCount();
+        $row = $stmt->fetchAssociative();
+        $tid=$row['ID'];
+        $html.="Teilnehmer &uuml;bernommen<br> Wetten einrichten <br>";
+	    // Wetten fuer Teilnehmer uebernehmen aus wetten Tabelle
+        $sql = "Select ID,Kommentar,Art From hy_wetten WHERE Wettbewerb='$Wettbewerb'";
+        $debug.="Wetten sql: $sql<br>";
+        $stmt = $this->connection->executeQuery($sql);
+        $anz = $stmt->rowCount();
+        $wetten=array();
+        while (($row = $stmt->fetchAssociative()) !== false) {
+	      $wetten[]=$row;
+        }
+	    foreach ($wetten as $data) {
+          $wettid=$data['ID'];
+	      $value = "( '$Wettbewerb' , $tid , $wettid,-1 ,-1,-1 )" ; 
+	      $sql="INSERT INTO hy_wetteaktuell(Wettbewerb,Teilnehmer,Wette,W1,W2,W3) VALUES $value";
+          $debug.="Teilnehmerwetten: $sql<br>";
+          $cnt = $this->connection->executeStatement($sql);
+	    }      
+      } elseif ($aktion == 'u') {
+        // TeilnehmerId besorgen/pruefen
+	    $sql = "Select ID from hy_teilnehmer where Wettbewerb = '$Wettbewerb'  and ID='$id.';";
+        $debug.="sql: $sql<br>";	
+        $stmt = $this->connection->executeQuery($sql);
+        $anz = $stmt->rowCount();
+        if ($anz > 0) {
+          $row = $stmt->fetchAssociative();
+          $tid=$row['ID'];
+        } else {
+          $html.="Teilnehmer bearbeiten ID nicht vorhanden ($ID)<br>";
+          $errortxt.="Teilnehmer bearbeiten ID nicht vorhanden ($ID)<br>";
+          $errortxt = utf8_encode($errortxt);
+          return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+        }
+        $value = "SET Wettbewerb='$Wettbewerb' ,Kurzname='$Kurzname' Name='$Name' Email='Email'" ; 
+	    $sql = "UPDATE hy_teilnehmer $value where ID='$id'";
+        $debug.="UPDATE Teilnehmer sql: $sql<br>";	
+        $cnt = $this->connection->executeStatement($sql);
+	    $html.="Teilnehmer " . $_GET['Kurzname'] . " ge&auml;ndert";
+      }
+      $html = utf8_encode($html);
+      return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+    }
+    if ($aktion == "d" ) {   
+      $tid=$id;
+	  $sql = "Delete from hy_teilnehmer WHERE ID=$tid LIMIT 1";
+      $cnt = $this->connection->executeStatement($sql);
+      //$html.="in Tabelle hy_mannschaft betroffene Saetze $cnt<br>";
+	  $html.="Teilnehmer gel&ouml;scht";                     // eigentlich muessen auch noch die Teilnehmerwetten in hy_wetteaktuell
+                                                             // geloescht werden
+	  $sql = "Delete from hy_wetteaktuell where Wettbewerb = '$Wettbewerb' AND Teilnehmer =$tid";
+      $cnt = $this->connection->executeStatement($sql);
+      $debug.="Teilnehmer $id und in Tabelle hy_wetteaktuell betroffene Saetze $cnt<br>";
+      $html.="Teilnehmer $id und in Tabelle hy_wetteaktuell betroffene Saetze $cnt<br>";
+      $html = utf8_encode($html);
+      return new JsonResponse(['data' => $html,'error'=>$errortxt,'debug'=>$debug]); 
+    }
+    $html.="fehlerhafte Aktion $aktion<br>";
+    $errortxt.="fehlerhafte Aktion $aktion<br>";
+    $errortxt = utf8_encode($errortxt);
+    return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+  } 
+
     /**
      * @throws \Exception
      *
