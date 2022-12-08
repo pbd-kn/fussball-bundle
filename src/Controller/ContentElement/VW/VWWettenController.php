@@ -233,7 +233,16 @@ class VWWettenController extends AbstractFussballController
               jQuery.get(url, function(data, status){
                 jQuery("#eingabe").html(data['data']);
               });
-            }            
+            }  
+            function wettenUpdate(obj) {
+              //var id=obj.name;
+              var url =  '/fussball/bearbeitewette/u/-1';
+              console.log('url: '+url);
+              jQuery.get(url, function(data, status){
+                jQuery("#eingabe").html(data['data']);
+                location.reload();
+              });
+            }          
         </script>
 EOT;
         $html.=$my_script_txt;        
@@ -245,6 +254,7 @@ EOT;
         $html.=$c->Button(array("onClick"=>"neueWetteG();"),"Neue Gruppenwette","Neu") . "\n";
         $html.=$c->Button(array("onClick"=>"neueWetteP();"),"Neue Platzwette","Neu") . "\n";
         $html.=$c->Button(array("onClick"=>"neueWetteV();"),"Neue Abschneidenwette","Neu") . "\n";
+        $html.=$c->Button(array("onClick"=>"wettenUpdate();"),"Wetten aktualisieren","Neu") . "\n";
         
         $html.=$c->start_form("", null,null,array("id"=>"inputForm"));
         $html.=$c->table(array("class"=>"verwtablecss","border"=>1));

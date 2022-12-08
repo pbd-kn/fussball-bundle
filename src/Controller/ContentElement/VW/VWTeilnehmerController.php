@@ -122,10 +122,10 @@ class VWTeilnehmerController extends AbstractFussballController
   	    $sql =  "select ";
 	    $sql .= " gruppen.ID AS ID,";
 	    $sql .= " gruppen.Gruppe AS Gruppe,";
-	    $sql .= " gruppen.M1 As M1ind,";
 	    $sql .= " gruppen.Platz as Platz,";
         $sql .= " mannschaft1.Nation as 'M1',";
         $sql .= " mannschaft1.Name as 'M1Name',";
+        $sql .= " mannschaft1.ID as 'M1Ind',";
         $sql .= " flagge1.Image as 'Flagge1'";
 	    $sql .= " FROM hy_gruppen as gruppen";
         $sql .= " LEFT JOIN hy_mannschaft AS mannschaft1 ON gruppen.M1 = mannschaft1.ID";
@@ -144,7 +144,7 @@ class VWTeilnehmerController extends AbstractFussballController
         $optarray= array();
 	    $optarray['Keine Angabe'] = -1;
         while (($row = $stmt->fetchAssociative()) !== false) {
-          $optarray[$row['M1Name']] = $row['ID'];
+          $optarray[$row['M1Name']] = $row['M1Ind'];
         }     
         $str.=$cgi->select($name, $optarray,$selected);
         return $str;
@@ -173,7 +173,6 @@ class VWTeilnehmerController extends AbstractFussballController
         $sql =  "SELECT ";
 	    $sql .= " hy_wetteaktuell.ID as ID,";
 	    $sql .= " hy_wetteaktuell.Wettbewerb as Wettbewerb,";
-	    $sql .= " hy_wetteaktuell.Wette as Wettindex,";
     	$sql .= " hy_wetteaktuell.W1 as W1,";
 	    $sql .= " hy_wetteaktuell.W2 as W2,";
 	    $sql .= " hy_wetteaktuell.W3 as W3,";
@@ -182,6 +181,7 @@ class VWTeilnehmerController extends AbstractFussballController
 	    $sql .= " hy_wetten.Tipp2 as Tipp2,";
 	    $sql .= " hy_wetten.Tipp3 as Tipp3,";
 	    $sql .= " hy_wetten.Tipp4 as Tipp4,";
+        $sql .= " hy_wetten.ID as Hywettenindex,";
 	    $sql .= " hy_wetten.Kommentar as Kommentar";
 	    $sql .= " FROM hy_wetteaktuell";
 	    $sql .= " LEFT JOIN hy_wetten ON hy_wetteaktuell.Wette = hy_wetten.ID";
@@ -198,7 +198,7 @@ class VWTeilnehmerController extends AbstractFussballController
         $str .= $cgi->table(array("border"=>"1")) . "\n";
         $str.=$cgi->thead();
         $str.=$cgi->tr();
-          $str.=$cgi->th("&nbsp;").$cgi->th("ID").$cgi->th("Windex").$cgi->th("Kommentar").$cgi->th("Art").$cgi->th("W1").$cgi->th("W2").$cgi->th("W3").$cgi->th("W4");
+          $str.=$cgi->th("&nbsp;").$cgi->th("ID").$cgi->th("WettenIndex").$cgi->th("Kommentar").$cgi->th("Art").$cgi->th("Tipp1").$cgi->th("Tipp2").$cgi->th("Tipp3").$cgi->th("Tipp4");
         $str.=$cgi->end_tr();
         $str.=$cgi->end_thead();
         $str.=$cgi->tbody();
@@ -208,52 +208,53 @@ class VWTeilnehmerController extends AbstractFussballController
         // indices Tipp1, Tipp2, Tipp3, Tipp4     Werte aus der Tabelle hy_wetten
         //         W1,W2,W3,W4                    Werte der getippten aus hy_wetteaktuell
 	    foreach ($wetten as $w) {
-	      $wettindex=$w['Wettindex'];
+	      $wettindex=$w['ID'];    // Id aus wetteaktuell
 	      $kommentar=$w['Kommentar'];
 	      $id=$w['ID'];
+	      $Hywettenindex=$w['Hywettenindex'];
+          //$str.=$cgi->hidden("Wette$wettindex", -1);                 // zur weitergabe bei speichern übernehmen
 	      $str.=$cgi->tr();
           $str.=$cgi->td($cgi->Button(array("onClick"=>"wetteSpeichern(this);","title"=>"Wette speichern"),"S",$id)) . "\n";
 	      $str.=$cgi->td((string)$id);
-	      $str.=$cgi->td((string)$wettindex);
+	      $str.=$cgi->td((string)$Hywettenindex);
 	      $str.=$cgi->td((string) $kommentar);
-	      $Art=strtolower($w['Art']);
+	      $Art=strtolower((string)$w['Art']);
 	      $str.=$cgi->td((string)$Art);
+          $cgi->td($w['Tipp1']).$cgi->td($w['Tipp2']).$cgi->td($w['Tipp3']).$cgi->td($w['Tipp4']);          
     // Bestimmung der gewetteten Werte Interpretation je nach Wett Typ
-	      $Wetten1=$w['Tipp1'];            // aktuelle Werte aus hy_wetten
-          $Wetten2=$w['Tipp2'];
+          $Wetten1=$w['Tipp1'];            // Wert1 aus hy_wetten nur der ist relevant und wird abhaengig vom Wetttyp interpretiert
+          $Wetten2=$w['Tipp2'];       
           $Wetten3=$w['Tipp3'];
           $Wetten4=$w['Tipp4'];
-	      $W1=$w['W1'];            // aktuelle Werte aus hy_wetteaktuell
+	      $W1=$w['W1'];            // aktuelle Werte aus hy_wetteaktuell des Teilnehmers werden abhaenig vom Wetttyp interpretiert
           $W2=$w['W2'];
           $W3=$w['W3'];
-	      $str.=$cgi->td((string)$Wetten1).$cgi->td((string)$Wetten2).$cgi->td((string)$Wetten3).$cgi->td((string)$Wetten4);  // Wert aus Wetten
+	      $str.=$cgi->td((string)$w['Tipp1']);  // Wert aus Wetten
          
 	      if ($Art == 's') {    // Spielausgang Tipp 1 = Spiel
+
             // Spiel einlesen
             $sql  = "SELECT";
             $sql .= " mannschaft1.Name as 'M1Name',";
-            $sql .= " mannschaft2.Name as 'M2Name',";
-            $sql.= "hy_spiele.T1 as 'T1',";
-            $sql.= "hy_spiele.T2 as 'T2'";
+            $sql .= " mannschaft2.Name as 'M2Name'";
             $sql .= " FROM hy_spiele";
             $sql .= " LEFT JOIN hy_mannschaft AS mannschaft1 ON hy_spiele.M1 = mannschaft1.ID";
-            $sql .= " LEFT JOIN hy_mannschaft AS mannschaft2 ON hy_spiele.M2 = mannschaft2.ID";
+            $sql .= " LEFT JOIN hy_mannschaft AS mannschaft2 ON hy_spiele.M2 = mannschaft2.ID";            
             $sql .= " WHERE hy_spiele.Wettbewerb  ='".$Wettbewerb."' AND hy_spiele.ID=".$w['Tipp1'].";";
             $stmt = $conn->executeQuery($sql);
             $num_rows = $stmt->rowCount();    
             $row = $stmt->fetchAssociative();
-            $T1=$row['T1'];
-            $T2=$row['T2'];
+            $T1=$w['Tipp2'];
+            $T2=$w['Tipp3'];
 
             $str.=$cgi->hidden("W3$wettindex", -1);                    // zur weitergabe bei übernehmen
             $str.=$cgi->hidden("W4$wettindex", -1);                    // zur weitergabe bei übernehmen
-	  	    $str.=$cgi->td('Spiel: '.$w['Tipp1'].' '.$row['M1Name']."/".$row['M2Name']."<br>".$T1.":".$T2);
+	  	    $str.=$cgi->td($row['M1Name']."/".$row['M2Name']."<br>".$T1.":".$T2);
             $str.=$cgi->td(array("valign"=>"top"),"T1: ".$cgi->textfield(array("name"=>"W1$wettindex","id"=>"W1$wettindex","value"=>"$W1","size"=>"4"))) . "\n";
             $str.=$cgi->td(array("valign"=>"top"),"T2: ".$cgi->textfield(array("name"=>"W2$wettindex","id"=>"W2$wettindex","value"=>"$W2","size"=>"4"))) . "\n";
 	      }
 	      if ($Art == 'v') {    // Zahl Platz
             $str.=$cgi->hidden("W2$wettindex", -1);                    // zur weitergabe bei übernehmen
-            $str.=$cgi->hidden("W3$wettindex", -1);                    // zur weitergabe bei übernehmen
             $str.=$cgi->hidden("W3$wettindex", -1);                    // zur weitergabe bei übernehmen
 	        $str.=$cgi->td($w['Tipp1']);                               // Wert wird aus der Wettentabelle genommen
             $str.=$cgi->td(array("valign"=>"top"),"T1: ".$cgi->textfield(array("name"=>"W1$id","id"=>"W1$id","value"=>"$W1","size"=>"4"))) . "\n";
@@ -262,35 +263,36 @@ class VWTeilnehmerController extends AbstractFussballController
 	      if ($Art == 'p') {    // Mannschaft 
             $str.=$cgi->hidden("W2$wettindex", -1);                    // zur weitergabe bei übernehmen
             $str.=$cgi->hidden("W3$wettindex", -1);                    // zur weitergabe bei übernehmen
-            $str.=$cgi->hidden("W3$wettindex", -1);                    // zur weitergabe bei übernehmen
 	        //$str.=$cgi->td($w['Tipp1'].'abc');
-  	        $sql =  "SELECT hy_mannschaft.Name as 'M1Name' FROM hy_mannschaft WHERE Wettbewerb ='".$Wettbewerb."' AND ID=".$w['Tipp1'].";";
+  	        $sql =  "SELECT hy_mannschaft.Name as 'M1Name',hy_mannschaft.ID as 'M1Ind' FROM hy_mannschaft WHERE Wettbewerb ='".$Wettbewerb."' AND ID=".$w['Tipp1'].";";
             $stmt = $conn->executeQuery($sql); 
             $row = $stmt->fetchAssociative();
             $erster=$row['M1Name'];
 	        $str.=$cgi->td($row['M1Name']);
-	        $s1=createAllMannschaftOption ($conn,$cgi,$Wettbewerb,"W1$id",$W1);
-	        $str.=$cgi->td($Wetten1 . $s1);
+	        $s1=createAllMannschaftOption ($conn,$cgi,$Wettbewerb,"W1$wettindex",$W1);
+	        $str.=$cgi->td($W1 . $s1);
 	        $str.=$cgi->td("&nbsp;");
           }
 	      if ($Art == 'g') {    // Gruppen erster / Zweiter / Dritter
+
             // gruppe einlesen nach Platz sortiert
-            $sql= "SELECT Platz,mannschaft1.Name as 'M1Name' FROM  `hy_gruppen`"; 
+            $sql= "SELECT Platz,mannschaft1.Name as 'M1Name' ,mannschaft1.ID as 'M1Ind' FROM  `hy_gruppen`"; 
             $sql.=" LEFT JOIN hy_mannschaft AS mannschaft1 ON hy_gruppen.M1 = mannschaft1.ID"; 
-            $sql.=" WHERE hy_gruppen.wettbewerb='".$Wettbewerb."' AND hy_gruppen.Gruppe='a' ORDER BY Platz";
+            $sql.=" WHERE hy_gruppen.wettbewerb='".$Wettbewerb."' AND hy_gruppen.Gruppe='".$w['Tipp1']."' ORDER BY Platz";
             $stmt = $conn->executeQuery($sql); 
             $Pl=array();
             while (($row = $stmt->fetchAssociative()) !== false) {
               $Pl[] = $row;
             }     
-	        $str.=$cgi->td('Gruppe: '.$w['Tipp1']."<br>1) ".$Pl[0]['M1Name']."<br>2) ".$Pl[1]['M1Name']."<br>3) ".$Pl[2]['M1Name']);   
-		    $g1=createMannschaftOption ($conn,$cgi,$Wettbewerb,"W1$id",$w['M1Eindex'],$w['Tipp1']);
-		    $g2=createMannschaftOption ($conn,$cgi,$Wettbewerb,"W2$id",$w['M2Eindex'],$w['Tipp1']);
-		    $g3=createMannschaftOption ($conn,$cgi,$Wettbewerb,"W3$id",$w['M3Eindex'],$w['Tipp1']);
+	        $str.=$cgi->td('Gruppe: '.$w['Tipp1']."<br>1) ".$Pl[0]['M1Name']."<br>2) ".$Pl[1]['M1Name']."<br>3) ".$Pl[2]['M1Name']); 
+		    $g1=createMannschaftOption ($conn,$cgi,$Wettbewerb,"W1$wettindex",$W1,$w['Tipp1']);
+		    $g2=createMannschaftOption ($conn,$cgi,$Wettbewerb,"W2$wettindex",$W2,$w['Tipp1']);
+		    $g3=createMannschaftOption ($conn,$cgi,$Wettbewerb,"W3$wettindex",$W3,$w['Tipp1']);
 	        $str.=$cgi->td("<br>1) ".$g1."<br>2) ".$g2."<br>3) ".$g3);   
 	      }
 
 	    $str.=$cgi->end_tr();
+//        break;
       }
       $str.=$cgi->end_tbody().$cgi->end_table() . "\n";
 	  return $str;
@@ -355,15 +357,29 @@ class VWTeilnehmerController extends AbstractFussballController
           }
           function wetteSpeichern(obj) {
             var id= obj.name;
+//            wettindex=obj.parentElement.parentElement.childNodes[3].innerText
+//            tlnrwettindex=obj.parentElement.parentElement.childNodes[2].innerText
+//            debugger;
+          var _par = jQuery("#inputForm :input").serialize();   // ich habe den Eindruck nur so bekomme ich die Werte
+//console.log('par: '+_par);
+          var _inputArr = _par.split("&");
+          let myA=[];
+          for (var x = 0; x < _inputArr.length; x++) {
+            var _kv = _inputArr[x].split("=");
+            myA[_kv[0]] = _kv[1];
+            //console.log(_kv);
+          }
+            
+            var Wette = "Wette" +  obj.name; 
             var W1 = "W1" +  obj.name; 
             var W2 = "W2" +  obj.name;
             var W3 = "W3" +  obj.name;
-            var V1 = escape($(W1).value); 
-            var V2 = escape($(W2).value); 
-            var V3 = escape($(W3).value); 
-            //var par = "aktion=s&ID=" + id + "&W1=" + V1 + "&W2=" + V2 + "&W3=" + V3;
-            //var url =  "bundles/hoyzer/verwaltung/saveaktWette.php?" +par;
-            var url='/fussball/bearbeiteteilnehmer/s/'+id+'/'+W1+'/'+V1+'/'+W2+'/'+V2+'/'+W3+'/'+V3;
+            var V1=myA[W1]
+            var V2=myA[W2]
+            var V3=myA[W3]
+            var par = "aktion=s&ID=" + id + "&W1=" + V1 + "&W2=" + V2 + "&W3=" + V3;
+            console.log ('wetteSpeichern par: '+par);
+            var url='/fussball/storeteilnehmerwette/s/'+id+'/'+V1+'/'+V2+'/'+V3;
             console.log ('wetteSpeichern url: '+url);
             jQuery.get(url, function(data, status){
               jQuery("#eingabe").html(data['data']);
