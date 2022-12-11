@@ -176,12 +176,12 @@ class VWTeilnehmerController extends AbstractFussballController
     	$sql .= " hy_wetteaktuell.W1 as W1,";
 	    $sql .= " hy_wetteaktuell.W2 as W2,";
 	    $sql .= " hy_wetteaktuell.W3 as W3,";
+        $sql .= " hy_wetteaktuell.Wette as Hywettenindex,";
 	    $sql .= " hy_wetten.Art as Art,";
 	    $sql .= " hy_wetten.Tipp1 as Tipp1,";
 	    $sql .= " hy_wetten.Tipp2 as Tipp2,";
 	    $sql .= " hy_wetten.Tipp3 as Tipp3,";
 	    $sql .= " hy_wetten.Tipp4 as Tipp4,";
-        $sql .= " hy_wetten.ID as Hywettenindex,";
 	    $sql .= " hy_wetten.Kommentar as Kommentar";
 	    $sql .= " FROM hy_wetteaktuell";
 	    $sql .= " LEFT JOIN hy_wetten ON hy_wetteaktuell.Wette = hy_wetten.ID";

@@ -36,7 +36,7 @@ use PBDKN\FussballBundle\Controller\ContentElement\AbstractFussballController;
 use PBDKN\FussballBundle\Controller\ContentElement\DependencyAggregate;
 
 /**
- * Class MannschaftController
+ * Class FeGruppeController
  *
  * @ContentElement(FeGruppeController::TYPE, category="fussball-FE")
  */

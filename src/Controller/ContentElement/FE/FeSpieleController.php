@@ -173,18 +173,18 @@ class FeSpieleController extends AbstractFussballController
         foreach ($this->Spiele as $k=>$row) {
 	      $html.=$c->tr();
             //$html.=$c->td(array("class"=>"spielnrcss"),(string)$row['Nr']);
-            $html.=$c->td(array("class"=>"datumcss"),$row['Datum']);
-            $html.=$c->td(array("class"=>"gruppecss"),$row['Gruppe']);
+            $html.=$c->td(array("class"=>"datumcss","data-label"=>"Datum"),$row['Datum']);
+            $html.=$c->td(array("class"=>"gruppecss","data-label"=>"Gruppe"),$row['Gruppe']);
 	        $str="<img src='".$this->fussballUtil->getImagePath($row['Flagge1']). "' >&nbsp;" . $row['M1Name'] ;
-            $html.=$c->td(array("class"=>"heimcss"),$str);
+            $html.=$c->td(array("class"=>"heimcss","data-label"=>"Heim"),$str);
 	        if ($row['T1'] == -1) {         // noch kein Ergebnis
-              $html.=$c->td(array("class"=>"scorecss"),$row['Uhrzeit']);
+              $html.=$c->td(array("class"=>"scorecss","data-label"=>"Uhrzeit"),$row['Uhrzeit']);
             } else {
-              $html.=$c->td(array("class"=>"scorecss"),$row['T1'] . ":" . $row['T2']);
+              $html.=$c->td(array("class"=>"scorecss","data-label"=>"Ergebnis"),$row['T1'] . ":" . $row['T2']);
             }
 	        $str="<img src='".$this->fussballUtil->getImagePath($row['Flagge2']). "' >&nbsp;" . $row['M2Name'] ;
-            $html.=$c->td(array("class"=>"auswaertscss"),$str);
-            $html.=$c->td(array("class"=>"ortcss"),$row['Ort']);
+            $html.=$c->td(array("class"=>"auswaertscss","data-label"=>"Ausw"),$str);
+            $html.=$c->td(array("class"=>"ortcss","data-label"=>"Ort"),$row['Ort']);
           $html.=$c->end_tr();
           $rowcnt++;
 
