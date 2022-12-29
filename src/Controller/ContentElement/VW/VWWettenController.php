@@ -67,6 +67,7 @@ class VWWettenController extends AbstractFussballController
     
     private $Wetten = array();
     private $WettenArten = array();
+    private $Mannschaften =array();
 
     public function __construct(
       DependencyAggregate $dependencyAggregate, 
@@ -123,37 +124,6 @@ class VWWettenController extends AbstractFussballController
         $c=$this->cgiUtil;
         $html="";
         // alle aktuellen Wetten einlesen
-/*
-        $sql  = "SELECT";
-        $sql .= " hy_wetten.ID as 'ID',";
-        $sql .= " hy_wetten.Kommentar as 'Kommentar',";
-        $sql .= " hy_spiele.Nr as 'Nr',";
-        $sql .= " hy_wetten.Art as 'Art',";
-        $sql .= " hy_wetten.Tipp1 as 'Spiel',";
-        $sql .= " hy_wetten.Tipp2 as 'T2',";
-        $sql .= " hy_wetten.Tipp3 as 'T3',";
-        $sql .= " hy_wetten.Tipp4 as 'T4',";
-        $sql .= " hy_wetten.Pok as 'Pok',";
-        $sql .= " hy_wetten.Ptrend as 'Ptrend',";
-        $sql .= " mannschaft1.ID as 'M1Ind',";
-        $sql .= " mannschaft1.Nation as 'M1',";
-        $sql .= " mannschaft1.Name as 'M1Name',";
-        $sql .= " mannschaft1.Flagge as 'Flagge1',";
-        $sql .= " flagge1.Image as 'Flagge1xx',";
-        $sql .= " mannschaft2.ID as 'M2Ind',";
-        $sql .= " mannschaft2.Nation as 'M2',";
-        $sql .= " mannschaft2.Name as 'M2Name',";
-        $sql .= " mannschaft2.Flagge as 'Flagge2',";
-        $sql .= " flagge2.Image as 'Flagge2xx'";
-        $sql .= " FROM hy_wetten";
-        $sql .= " Left JOIN hy_spiele AS hy_spiele ON hy_wetten.Tipp1 = hy_spiele.ID";
-        $sql .= " LEFT JOIN hy_mannschaft AS mannschaft1 ON hy_spiele.M1 = mannschaft1.ID";
-        $sql .= " LEFT JOIN hy_flagge AS flagge1 ON flagge1.ID = mannschaft1.flgindex";
-        $sql .= " LEFT JOIN hy_mannschaft AS mannschaft2 ON hy_spiele.M2 = mannschaft2.ID";
-        $sql .= " LEFT JOIN hy_flagge AS flagge2 ON flagge2.ID = mannschaft2.flgindex";
-        $sql .= " WHERE hy_wetten.Wettbewerb  ='".$this->aktWettbewerb['aktWettbewerb']."' ";
-        $sql .= " ORDER by hy_wetten.Kommentar ASC, hy_spiele.Nr ASC  ;";
-*/
         $sql  = "SELECT";
         $sql .= " hy_wetten.ID as 'ID',";
         $sql .= " hy_wetten.Kommentar as 'Kommentar',";
@@ -173,7 +143,11 @@ class VWWettenController extends AbstractFussballController
         while (($row = $stmt->fetchAssociative()) !== false) {
           $this->Wetten[]=$row;
           $this->WettenArten[$row['Art']] = $row['Art'];
-
+        }
+        $sql="SELECT * FROM hy_mannschaft WHERE Wettbewerb ='".$this->aktWettbewerb['aktWettbewerb']."'";
+        $stmt = $this->connection->executeQuery($sql);
+        while (($row = $stmt->fetchAssociative()) !== false) {
+          $this->Mannschaften[$row['ID']] = $row;
         }
         $my_script_txt = <<< EOT
           <script language="javascript" type="text/javascript">
@@ -339,7 +313,7 @@ EOT;
                break;
               }
               case 'p': {   // Platzwette Tipp1 M1 Tipp2 Tipp 3 Tipp4 irrelevant ??
-                $html.=$c->td((string)$row['Tipp1']).$c->td((string)$row['Tipp2']).$c->td((string)$row['Tipp3']).$c->td((string)$row['Tipp4']);
+                $html.=$c->td($this->Mannschaften[$row['Tipp1']]['Name']).$c->td((string)$row['Tipp2']).$c->td((string)$row['Tipp3']).$c->td((string)$row['Tipp4']);
                break;
               }
               case 'v': {   // Vergleichwette Tipp1 Vergleichswert Tipp2 Tipp 3 Tipp4 irrelevant ??
