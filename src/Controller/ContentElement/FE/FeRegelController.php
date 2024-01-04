@@ -115,7 +115,7 @@ class FeRegelController extends AbstractFussballController
       $regelurl = strtolower ("regel_$Wettbewerb.php");
       $fi='vendor/pbd-kn/fussball-bundle/regeln/'.$regelurl;
       $regFile = new \File($fi, true);
-      \System::log('PBD FeRegelController getResponse fi '.$fi, __METHOD__, TL_GENERAL);
+      //\System::log('PBD FeRegelController getResponse fi '.$fi, __METHOD__, TL_GENERAL);
       if($regFile->exists()) {
         $html=$regFile->getContent();
         //$regFile->close();

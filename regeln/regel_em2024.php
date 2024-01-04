@@ -5,7 +5,7 @@
     <td>
        <p><br></p>
       <p>Liebe Freunde von www.hoyzer-wetten.de !</p><br />
-      <p>Nun ist es soweit: Das Tipp-Spiel f&uuml;r EM2021 ist fertig !</p>
+      <p>Nun ist es soweit: Das Tipp-Spiel f&uuml;r EM2024 ist fertig !</p>
       <p>Ich hoffe, dass Ihr Lust habt, mitzutippen.</p>
       <p><br />Hier die Spielregeln in K&uuml;rze:</p>
       <p>
@@ -33,7 +33,7 @@
       <br />
       <table class="tablecss">
         <tr><td width="120">Tipp</td><td width="120">Punkte pro Tipp</td><td>Max. erreichbar</td></tr>
-        <tr><td>Weltmeister</td><td> 10</td><td>	10</td></tr>
+        <tr><td>Europameister</td><td> 10</td><td>	10</td></tr>
         <tr><td>Abschneiden Deutschland</td><td> 10</td><td>	 10</td></tr>
         <tr><td>Ergebnis Vorrundenspiele Deutschland</td><td> 1 oder 3 </td><td>3 x 3 = 9</td></tr>
         <tr><td>Platzierung (Gruppenerster/Zweiter) Gruppe A - H </td><td>1 oder 3</td><td>2 x 3 x 8 = 48</td></tr>
