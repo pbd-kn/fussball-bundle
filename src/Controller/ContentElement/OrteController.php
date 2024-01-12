@@ -85,7 +85,6 @@ class OrteController extends AbstractFussballController
         // Adapters
         $this->config = $this->framework->getAdapter(Config::class);
         $this->environment = $this->framework->getAdapter(Environment::class);
-        $this->galleryCreatorAlbumsModel = $this->framework->getAdapter(GalleryCreatorAlbumsModel::class);
         $this->input = $this->framework->getAdapter(Input::class);
         $this->stringUtil = $this->framework->getAdapter(StringUtil::class);
 

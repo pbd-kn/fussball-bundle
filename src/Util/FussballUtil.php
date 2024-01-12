@@ -19,16 +19,16 @@ class FussballUtil
       global   $host,$user, $password, $database;
       $conn = new mysql_dialog();
       $conn->connect($host,$user, $password, $database);
-//  $conn->execute ("SELECT * from hy_config WHERE Name='aktWettbewerb'");
+//  $conn->execute ("SELECT * from tl_hy_config WHERE Name='aktWettbewerb'");
 //  $row = $conn->listen();
 //  $w = $row["Value1"];
-      $conn->execute ("SELECT * from hy_config WHERE Name='Wettbewerb' AND Aktuell = 1 LIMIT 1");
+      $conn->execute ("SELECT * from tl_hy_config WHERE Name='Wettbewerb' AND aktuell = 1 LIMIT 1");
       $a = $conn->listen(); 
-      $Wettbewerb=$a["Value1"];
-      $AnzahlGruppen=$a["Value2"];
-      $Deutschlandgruppe=$a["Value3"];
-      $startDatum=$a["Value4"];
-      $endeDatum=$a["Value5"];
+      $Wettbewerb=$a["value1"];
+      $AnzahlGruppen=$a["value2"];
+      $Deutschlandgruppe=$a["value3"];
+      $startDatum=$a["value4"];
+      $endeDatum=$a["value5"];
       $conn->close();
       return;
     }
@@ -39,14 +39,14 @@ class FussballUtil
       $res=array();
       $conn = new mysql_dialog();
       $conn->connect($host,$user, $password, $database);
-      $sql="SELECT * from hy_config WHERE Name='$Name'"; 
-      $conn->execute ("SELECT * from hy_config WHERE Name='$Name'");
+      $sql="SELECT * from tl_hy_config WHERE Name='$Name'"; 
+      $conn->execute ("SELECT * from tl_hy_config WHERE Name='$Name'");
       $row = $conn->listen();
-      $res["Value1"]=$row["Value1"];
-      $res["Value2"]=$row["Value2"];
-      $res["Value3"]=$row["Value3"];
-      $res["Value4"]=$row["Value4"];
-      $res["Value5"]=$row["Value5"];
+      $res["value1"]=$row["value1"];
+      $res["value2"]=$row["value2"];
+      $res["value3"]=$row["value3"];
+      $res["value4"]=$row["value4"];
+      $res["value5"]=$row["value5"];
       $conn->close();
       return $res;
     }
@@ -102,7 +102,9 @@ class FussballUtil
         return $optarray;
       }
       public function getImagePath($image) {
-        return 'files/hoyzer-wetten/content/flaggen/'.$image;
+        return 'bundles/fussball/assets/flaggen/'.$image;
+        //return 'files/hoyzer-wetten/content/flaggen/'.$image;
+        
       }
 }
 

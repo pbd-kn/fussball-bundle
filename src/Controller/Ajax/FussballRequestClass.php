@@ -53,15 +53,15 @@ class FussballRequestClass extends AbstractController
         $this->insertTagParser=$insertTagParser; 
         $this->translator=$translator;
                 // akt Wettbewerb lesen.
-        $stmt = $this->connection->executeQuery("SELECT * from hy_config WHERE Name='Wettbewerb' AND Aktuell = 1 LIMIT 1");
+        $stmt = $this->connection->executeQuery("SELECT * from tl_hy_config WHERE Name='Wettbewerb' AND aktuell = 1 LIMIT 1");
         $row = $stmt->fetchAssociative();
-        $this->aktWettbewerb['id']=$row['ID'];
-        $this->aktWettbewerb['aktuell']=$row['Aktuell'];
-        $this->aktWettbewerb['aktWettbewerb']=$row['Value1'];
-        $this->aktWettbewerb['aktAnzgruppen']=$row['Value2'];
-        $this->aktWettbewerb['aktDGruppe']=$row['Value3'];
-        $this->aktWettbewerb['aktStartdatum']=$row['Value4'];
-        $this->aktWettbewerb['aktEndedatum']=$row['Value5'];
+        $this->aktWettbewerb['id']=$row['id'];
+        $this->aktWettbewerb['aktuell']=$row['aktuell'];
+        $this->aktWettbewerb['aktWettbewerb']=$row['value1'];
+        $this->aktWettbewerb['aktAnzgruppen']=$row['value2'];
+        $this->aktWettbewerb['aktDGruppe']=$row['value3'];
+        $this->aktWettbewerb['aktStartdatum']=$row['value4'];
+        $this->aktWettbewerb['aktEndedatum']=$row['value5'];
         
     }
     /**
@@ -73,13 +73,13 @@ class FussballRequestClass extends AbstractController
      */
 
 /* erzeugt das Formular und Buttons zur Eingabe eines Wettbewerbs
- * Parameter aktion: auszuführende Aktion wird als Hidden ins Formular übernommen
+ * Parameter aktion: auszufÃ¼hrende Aktion wird als Hidden ins Formular Ã¼bernommen
  *           ID: Wettbewerb Id (-1 kein Wettbewerb ausgewaehlt)
  *
  * Result html
- * hidden("ID", $ID);                    // zur weitergabe bei übernehmen
- * hidden("aktion", $aktion);                    // zur weitergabe bei übernehmen
- * Button Name: uebernehmen Value Übernehmen onClick uebernehmen();
+ * hidden("ID", $ID);                    // zur weitergabe bei Ã¼bernehmen
+ * hidden("aktion", $aktion);                    // zur weitergabe bei Ã¼bernehmen
+ * Button Name: uebernehmen Value Ãœbernehmen onClick uebernehmen();
  * Button Name: Abbrechen Value Abbrechen onClick abbrechen();
  * Inputfelder im result Formular
  * Name: Wettbewerb bei ID=-1 Eingabefeld zur Angabe der Neuanlage sonst Name des Wettbewerbs (read only)
@@ -130,30 +130,29 @@ console.log('url: '+url);
         </script>
 EOT;
       $html.=$my_script_txt;              
-
       $id=$ID;
       if ($id !=-1) {
         // Wettbewerb einlesen
-        $sql="SELECT * from hy_config where ID='$id' LIMIT 1;";
+        $sql="SELECT * from tl_hy_config where ID='$id' LIMIT 1;";
         $debug .= "sql: $sql  ";	
         $stmt = $this->connection->executeQuery(
-            'SELECT * FROM hy_config WHERE ID = ? ',
+            'SELECT * FROM tl_hy_config WHERE ID = ? ',
             [$id],
         );
         /*
         while (($row = $stmt->fetchAssociative()) !== false) {
           echo $row['headline'];
         } 
-        */   
+        */  
         $num_rows = $stmt->rowCount();    
         $debug .= "Anzahl: $num_rows  ";	
         $row = $stmt->fetchAssociative();  // s. Doctrine\DBAL
-        $Name=$row['Value1'];
-        $Gruppen=$row['Value2'];
-        $DGruppe=$row['Value3'];
-        $StartDatum=$row['Value4'];
-        $EndeDatum=$row['Value5'];
-        $html.="Wettbewerb ändern<br>\n";
+        $Name=$row['value1'];
+        $Gruppen=$row['value2'];
+        $DGruppe=$row['value3'];
+        $StartDatum=$row['value4'];
+        $EndeDatum=$row['value5'];
+        $html.="Wettbewerb Ã¤ndern<br>\n";
       } else {
         $html.="Wettbewerb neu eintragen<br>\n";
       }
@@ -163,8 +162,8 @@ EOT;
       $html.= $c->Button(array("onClick"=>"uebernehmen();"),"&Uuml;bernehmen","uebernehmen") . "\n";
       $html.= $c->Button(array("onClick"=>"abbrechen();"),"Abbrechen","Abbrechen") . "<br>\n";
       $html.= $c->start_form("", null,null,array("id"=>"inputForm"));
-      $html.= $c->hidden("ID", $id);                    // zur weitergabe bei übernehmen
-      $html.= $c->hidden("aktion", $aktion);                    // zur weitergabe bei übernehmen
+      $html.= $c->hidden("id", $id);                    // zur weitergabe bei Ã¼bernehmen
+      $html.= $c->hidden("aktion", $aktion);                    // zur weitergabe bei Ã¼bernehmen
   
       $html.= $c->table (array("border"=>1));
       $html.= $c->tr();
@@ -196,13 +195,13 @@ EOT;
   
 
 /* erzeugt das Formular und Buttons zur Eingabe einer Mannschaft
- * Parameter aktion: auszuführende Aktion wird als Hidden ins Formular übernommen
+ * Parameter aktion: auszufÃ¼hrende Aktion wird als Hidden ins Formular Ã¼bernommen
  *           ID: Mannschaft Id (-1 keine Mannschaft ausgewaehlt)
  *
  * Result html
- * hidden("ID", $ID);                    // zur weitergabe bei übernehmen
- * hidden("aktion", $aktion);                    // zur weitergabe bei übernehmen
- * Button Name: uebernehmen Value Übernehmen onClick uebernehmen();
+ * hidden("ID", $ID);                    // zur weitergabe bei Ã¼bernehmen
+ * hidden("aktion", $aktion);                    // zur weitergabe bei Ã¼bernehmen
+ * Button Name: uebernehmen Value Ãœbernehmen onClick uebernehmen();
  * Button Name: Abbrechen Value Abbrechen onClick abbrechen();
  * Inputfelder im result Formular
  * Name: Mannschaft bei ID=-1 Eingabefeld zur Angabe der Neuanlage sonst Name des Mannschaft (read only)
@@ -224,9 +223,9 @@ EOT;
 
     function createNationOption ($conn,$cgi,$name,$selected,$type) {
       if (empty($type)) {
-	    $sql = "select * From hy_nation ORDER BY Nation ASC";
+	    $sql = "select * From tl_hy_nation ORDER BY Nation ASC";
       }else {
-	    $sql = "select * From hy_nation where Type like '$type' ORDER BY Nation ASC";
+	    $sql = "select * From tl_hy_nation where Type like '$type' ORDER BY Nation ASC";
       }
 //echo "sql $sql<br>";
       $stmt = $conn->executeQuery($sql);
@@ -237,14 +236,14 @@ EOT;
       // ersetze 16-bit Values
       $res=$cgi->select($name, $optarray,$selected);
       $search  = array("\xC3\xA4", "\xC3\xB6", "\xC3\xBC", "\xC3\x84", "\xC3\x96","\xC3\x9f");
-      $replace = array('ä', 'ö', 'ü', 'Ä', 'Ö','Ü','ß');
+      $replace = array('Ã¤', 'Ã¶', 'Ã¼', 'Ã„', 'Ã–','Ãœ','ÃŸ');
       $res= str_replace($search, $replace, $res);          
       return $res;
     }
     function createGruppenOption ($cgi,$name,$GruppenArray,$selected) {
       $res=$cgi->select($name,$GruppenArray,$selected);
       $search  = array("\xC3\xA4", "\xC3\xB6", "\xC3\xBC", "\xC3\x84", "\xC3\x96","\xC3\x9f");
-      $replace = array('ä', 'ö', 'ü', 'Ä', 'Ö','Ü','ß');
+      $replace = array('Ã¤', 'Ã¶', 'Ã¼', 'Ã„', 'Ã–','Ãœ','ÃŸ');
       $res= str_replace($search, $replace, $res);          
       return $res;
     }
@@ -313,7 +312,7 @@ EOT;
         $Flagge=$row['Flagge'];
         $flgindex=$row['flgindex'];
         $Gruppe=$row['Gruppe'];
-        $html.="Mannschaft ändern<br>\n";
+        $html.="Mannschaft Ã¤ndern<br>\n";
       } else {
         $html.="Mannschaft neu<br>\n";
       }
@@ -323,16 +322,24 @@ EOT;
       $html.=$c->Button(array("onClick"=>"uebernehmen();"),"&Uuml;bernehmen","uebernehmen") . "\n";
       $html.=$c->Button(array("onClick"=>"abbrechen();"),"Abbrechen","Abbrechen") . "<br>\n";
       $html.=$c->start_form("", null,null,array("id"=>"inputForm"));
-      $html.=$c->hidden("ID", $id);                    // zur weitergabe bei übernehmen
-      $html.=$c->hidden("aktion", $aktion);                    // zur weitergabe bei übernehmen
+      $html.=$c->hidden("ID", $id);                    // zur weitergabe bei Ã¼bernehmen
+      $html.=$c->hidden("aktion", $aktion);                    // zur weitergabe bei Ã¼bernehmen
   
       $html.=$c->table (array("border"=>1));
       $html.=$c->tr();
         $html.=$c->td(array("valign"=>"top"),"Mannschaft");
         $html.=$c->td(array("valign"=>"top"),"Name").$c->td(array("valign"=>"top"),$c->textfield(array("name"=>"name","id"=>"name","value"=>"$Name")))."\n";
   //echo td(array("valign"=>"top"),"Nation") . td(array("valign"=>"top"),textfield(array("name"=>"nation","id"=>"nation","value"=>"$Nation"))) . "\n";
-        $Type="";         // WM oder EM
+        $Type="";         // WM oder EM zeigt nur die entsprechenden Nationen an
         if (strpos(strtolower ($this->aktWettbewerb['aktWettbewerb']),'em')!== false) $Type='%:EU:%';
+        if (strpos(strtolower ($this->aktWettbewerb['aktWettbewerb']),'wm')!== false) $Type='%:WE:%';
+        // %:EU:%  Europa 
+        // %:WE:%  Welt 
+        // %:AS:%  Asien 
+        // %:AF:%  Afrika 
+        // %:SA:%  SÃ¼damerika 
+        // %:MA:%  Mittelamerika 
+        // %:NA:%  Nordamerika 
         $html.=$c->td(array("valign"=>"top"),"Nation").$c->td(array("valign"=>"top"),createNationOption ($this->connection,$c,"nation",$Nation,$Type))."\n";
         //$html.=$c->td(array("valign"=>"top"),"Gruppe").$c->td(array("valign"=>"top"),$c->textfield(array("name"=>"Gruppe","id"=>"name","value"=>"$Gruppe")))."\n";
         $html.=$c->td(array("valign"=>"top"),"Gruppe");
@@ -351,13 +358,13 @@ EOT;
   
 
 /* erzeugt das Formular und Buttons zur Eingabe eines Spielorts
- * Parameter aktion: auszuführende Aktion wird als Hidden ins Formular übernommen
+ * Parameter aktion: auszufÃ¼hrende Aktion wird als Hidden ins Formular Ã¼bernommen
  *           ID: Mannschaft Id (-1 keine Mannschaft ausgewaehlt)
  *
  * Result html
- * hidden("ID", $ID);                    // zur weitergabe bei übernehmen
- * hidden("aktion", $aktion);            // zur weitergabe bei übernehmen
- * Button Name: uebernehmen Value Übernehmen onClick uebernehmen();
+ * hidden("ID", $ID);                    // zur weitergabe bei Ã¼bernehmen
+ * hidden("aktion", $aktion);            // zur weitergabe bei Ã¼bernehmen
+ * Button Name: uebernehmen Value Ãœbernehmen onClick uebernehmen();
  * Button Name: Abbrechen Value Abbrechen onClick abbrechen();
  * Inputfelder im result Formular
  * Name: ID bei ID=-1 Eingabefeld zur Angabe der Neuanlage sonst ID des Orts (read only)
@@ -435,7 +442,7 @@ EOT;
         $row = $stmt->fetchAssociative();  // s. Doctrine\DBAL
         $ort=$row['Ort'];
         $beschreibung=$row['Beschreibung'];
-        $html.="Ort ändern<br>\n";
+        $html.="Ort Ã¤ndern<br>\n";
       } else {
         $html.="Ort neu<br>\n";
       }
@@ -445,8 +452,8 @@ EOT;
       $html.=$c->Button(array("onClick"=>"uebernehmen();"),"&Uuml;bernehmen","uebernehmen") . "\n";
       $html.=$c->Button(array("onClick"=>"abbrechen();"),"Abbrechen","Abbrechen") . "<br>\n";
       $html.=$c->start_form("", null,null,array("id"=>"inputForm"));
-      $html.=$c->hidden("ID", $id);                    // zur weitergabe bei übernehmen
-      $html.=$c->hidden("aktion", $aktion);                    // zur weitergabe bei übernehmen
+      $html.=$c->hidden("ID", $id);                    // zur weitergabe bei Ã¼bernehmen
+      $html.=$c->hidden("aktion", $aktion);                    // zur weitergabe bei Ã¼bernehmen
   
       $html.=$c->table (array("border"=>1));
       $html.=$c->tr();
@@ -462,14 +469,14 @@ EOT;
   }
 
 /* erzeugt das Formular und Buttons zur Eingabe/Veraenderung einer Gruppe
- * Neueingabe geht nur über alle löschen und neu initialisieren
- * Parameter aktion: auszuführende Aktion wird als Hidden ins Formular übernommen
+ * Neueingabe geht nur Ã¼ber alle lÃ¶schen und neu initialisieren
+ * Parameter aktion: auszufÃ¼hrende Aktion wird als Hidden ins Formular Ã¼bernommen
  *           ID: Mannschaft Id (-1 keine Mannschaft ausgewaehlt)
  *
  * Result html
- * hidden("ID", $ID);                    // zur weitergabe bei übernehmen
- * hidden("aktion", $aktion);            // zur weitergabe bei übernehmen
- * Button Name: uebernehmen Value Übernehmen onClick uebernehmen();
+ * hidden("ID", $ID);                    // zur weitergabe bei Ã¼bernehmen
+ * hidden("aktion", $aktion);            // zur weitergabe bei Ã¼bernehmen
+ * Button Name: uebernehmen Value Ãœbernehmen onClick uebernehmen();
  * Button Name: Abbrechen Value Abbrechen onClick abbrechen();
  * Inputfelder im result Formular
  * name aktion
@@ -558,9 +565,9 @@ EOT;
         $Gegentore=$row['Gegentore'];
         $Differenz=$row['Differenz'];
         $Punkte=$row['Punkte'];
-        $html.="Gruppe ändern<br>\n";
+        $html.="Gruppe Ã¤ndern<br>\n";
       } else {
-        $html.="Gruppe neu, Bitte alle Gruppen löschen und neu aufsetzen<br>\n";
+        $html.="Gruppe neu, Bitte alle Gruppen lÃ¶schen und neu aufsetzen<br>\n";
         $html = utf8_encode($html);
 	    return new JsonResponse(['data' => $html,'debug'=>$debug]); 
       }
@@ -570,8 +577,8 @@ EOT;
       $html.=$c->Button(array("onClick"=>"uebernehmen();"),"&Uuml;bernehmen","uebernehmen") . "\n";
       $html.=$c->Button(array("onClick"=>"abbrechen();"),"Abbrechen","Abbrechen") . "<br>\n";
       $html.=$c->start_form("", null,null,array("id"=>"inputForm"));
-      $html.=$c->hidden("ID", $id);                    // zur weitergabe bei übernehmen
-      $html.=$c->hidden("aktion", $aktion);                    // zur weitergabe bei übernehmen
+      $html.=$c->hidden("ID", $id);                    // zur weitergabe bei Ã¼bernehmen
+      $html.=$c->hidden("aktion", $aktion);                    // zur weitergabe bei Ã¼bernehmen
         $html.= $c->td(array("valign"=>"top"),$c->textfield(array("name"=>"M1","readonly"=>true,"value"=>"$M1"))) . "\n";
   
       $html.=$c->table (array("border"=>1));
@@ -599,13 +606,13 @@ EOT;
   }
   
 /* erzeugt das Formular und Buttons zur Eingabe eines Spiels
- * Parameter aktion: auszuführende Aktion wird als Hidden ins Formular übernommen
+ * Parameter aktion: auszufÃ¼hrende Aktion wird als Hidden ins Formular Ã¼bernommen
  *           ID: Mannschaft Id (-1 keine Mannschaft ausgewaehlt)
  *
  * Result html
- * hidden("ID", $ID);                    // zur weitergabe bei übernehmen
- * hidden("aktion", $aktion);            // zur weitergabe bei übernehmen
- * Button Name: uebernehmen Value Übernehmen onClick uebernehmen();
+ * hidden("ID", $ID);                    // zur weitergabe bei Ã¼bernehmen
+ * hidden("aktion", $aktion);            // zur weitergabe bei Ã¼bernehmen
+ * Button Name: uebernehmen Value Ãœbernehmen onClick uebernehmen();
  * Button Name: Abbrechen Value Abbrechen onClick abbrechen();
  * Inputfelder im result Formular
  * Name: ID bei ID=-1 Eingabefeld zur Angabe der Neuanlage sonst ID des Spiels (read only)
@@ -640,7 +647,7 @@ EOT;
       }
       $res=$cgi->select($name, $optarray,$selected);
       $search  = array("\xC3\xA4", "\xC3\xB6", "\xC3\xBC", "\xC3\x84", "\xC3\x96","\xC3\x9f");
-      $replace = array("ä", 'ö', 'ü', 'Ä', 'Ö','Ü','ß');
+      $replace = array("Ã¤", 'Ã¶', 'Ã¼', 'Ã„', 'Ã–','Ãœ','ÃŸ');
       $res= str_replace($search, $replace, $res);          
       return $res;
     }
@@ -659,7 +666,7 @@ EOT;
     function createGruppenOption ($cgi,$name,$GruppenArray,$selected) {
       $res=$cgi->select($name,$GruppenArray,$selected);
       $search  = array("\xC3\xA4", "\xC3\xB6", "\xC3\xBC", "\xC3\x84", "\xC3\x96","\xC3\x9f");
-      $replace = array('ä', 'ö', 'ü', 'Ä', 'Ö','Ü','ß');
+      $replace = array('Ã¤', 'Ã¶', 'Ã¼', 'Ã„', 'Ã–','Ãœ','ÃŸ');
       $res= str_replace($search, $replace, $res);          
       return $res;
     }
@@ -740,7 +747,7 @@ EOT;
         $Uhrzeit=$row['Uhrzeit'];
         $T1=$row['T1'];
         $T2=$row['T2'];
-        $html.="Spiel ändern<br>\n";
+        $html.="Spiel Ã¤ndern<br>\n";
       } else {
         // Spielnummer neu setzen
         $html.="Spiel neu<br>\n";
@@ -760,8 +767,8 @@ EOT;
       $html.=$c->Button(array("onClick"=>"uebernehmen();"),"&Uuml;bernehmen","uebernehmen") . "\n";
       $html.=$c->Button(array("onClick"=>"abbrechen();"),"Abbrechen","Abbrechen") . "<br>\n";
       $html.=$c->start_form("", null,null,array("id"=>"inputForm"));
-      $html.=$c->hidden("ID", $id);                    // zur weitergabe bei übernehmen
-      $html.=$c->hidden("aktion", $aktion);                    // zur weitergabe bei übernehmen
+      $html.=$c->hidden("ID", $id);                    // zur weitergabe bei Ã¼bernehmen
+      $html.=$c->hidden("aktion", $aktion);                    // zur weitergabe bei Ã¼bernehmen
 
       $html.=$c->table (array("border"=>1));
       $html.=$c->tr();
@@ -828,7 +835,7 @@ EOT;
       }
       $res=$cgi->select($name, $optarray,$selected);
       $search  = array("\xC3\xA4", "\xC3\xB6", "\xC3\xBC", "\xC3\x84", "\xC3\x96","\xC3\x9f");
-      $replace = array("ä", 'ö', 'ü', 'Ä', 'Ö','Ü','ß');
+      $replace = array("Ã¤", 'Ã¶', 'Ã¼', 'Ã„', 'Ã–','Ãœ','ÃŸ');
       $res= str_replace($search, $replace, $res);          
       return $res;
     }
@@ -859,7 +866,7 @@ EOT;
       }
       $res=$cgi->select($name, $optarray,$selected);
       $search  = array("\xC3\xA4", "\xC3\xB6", "\xC3\xBC", "\xC3\x84", "\xC3\x96","\xC3\x9f");
-      $replace = array("ä", 'ö', 'ü', 'Ä', 'Ö','Ü','ß');
+      $replace = array("Ã¤", 'Ã¶', 'Ã¼', 'Ã„', 'Ã–','Ãœ','ÃŸ');
       $res= str_replace($search, $replace, $res);          
       return $res;
     }
@@ -867,7 +874,7 @@ EOT;
     function createGruppenOption ($cgi,$name,$GruppenArray,$selected) {
       $res=$cgi->select($name,$GruppenArray,$selected);
       $search  = array("\xC3\xA4", "\xC3\xB6", "\xC3\xBC", "\xC3\x84", "\xC3\x96","\xC3\x9f");
-      $replace = array('ä', 'ö', 'ü', 'Ä', 'Ö','Ü','ß');
+      $replace = array('Ã¤', 'Ã¶', 'Ã¼', 'Ã„', 'Ã–','Ãœ','ÃŸ');
       $res= str_replace($search, $replace, $res);          
       return $res;
     }
@@ -880,10 +887,10 @@ EOT;
 	  if ($ID == -1) { $str =  "<center><h2>Wette eintragen</h2></center><br>\n";
 	  } else { $str =  "<center><h2>Wette bearbeiten</h2></center><br>\n";
 	  }
-      $str .= $cgi->Button(array("onClick"=>"uebernehmen();"),"&Uuml;bernehmen","Übernehmen") . "\n";
+      $str .= $cgi->Button(array("onClick"=>"uebernehmen();"),"&Uuml;bernehmen","Ãœbernehmen") . "\n";
       $str .= $cgi->Button(array("onClick"=>"abbrechen();"),"Abbrechen","Abbrechen") . "<br>\n";
       $str .= $cgi->start_form("", null,null,array("id"=>"inputForm"));
-      $str .= $cgi->hidden("ID", $ID);                    // zur weitergabe bei übernehmen
+      $str .= $cgi->hidden("ID", $ID);                    // zur weitergabe bei Ã¼bernehmen
       $str .= $cgi->table (array("border"=>1));
       $str .= $cgi->tr();
       $str .= $cgi->td(array("valign"=>"top"),"Art");
@@ -1031,8 +1038,8 @@ EOT;
       $debug.='id: '.$id.' aktion: '.$aktion.' Type: '.$Type;
 // create output
       $html.=$c->start_form("", null,null,array("id"=>"inputForm"));
-      $html.=$c->hidden("ID", $id);                    // zur weitergabe bei übernehmen
-      $html.=$c->hidden("aktion", $aktion);                    // zur weitergabe bei übernehmen
+      $html.=$c->hidden("ID", $id);                    // zur weitergabe bei Ã¼bernehmen
+      $html.=$c->hidden("aktion", $aktion);                    // zur weitergabe bei Ã¼bernehmen
       if ($aktion == 'n') {
         // neue Wette
         $debug.=' Create Neue Wette TYPE |'.$Type.'|';
@@ -1121,11 +1128,11 @@ EOT;
 	  } else {
         $str.="<center><h3>Teilnehmer bearbeiten</h3></center><br>\n";
 	  }
-      $str.=$cgi->Button(array("onClick"=>"uebernehmen();"),"&Uuml;bernehmen","Übernehmen") . "\n";
+      $str.=$cgi->Button(array("onClick"=>"uebernehmen();"),"&Uuml;bernehmen","Ãœbernehmen") . "\n";
       $str.=$cgi->Button(array("onClick"=>"abbrechen();"),"Abbrechen","Abbrechen") . "<br>\n";
       $str.=$cgi->start_form("", null,null,array("id"=>"inputForm"));
-      $str.=$cgi->hidden("ID", $ID);                    // zur weitergabe bei übernehmen
-      $str.=$cgi->hidden("aktion", $aktion);            // zur weitergabe bei übernehmen
+      $str.=$cgi->hidden("ID", $ID);                    // zur weitergabe bei Ã¼bernehmen
+      $str.=$cgi->hidden("aktion", $aktion);            // zur weitergabe bei Ã¼bernehmen
       $str.=$cgi->hidden("Art", $row['Art']);           // zuwas das dient weiss ich noch nicht
       $str.=$cgi->table (array("border"=>1));
       $str.=$cgi->tr();
@@ -1205,6 +1212,132 @@ EOT;
 	  return new JsonResponse(['data' => $html,'debug'=>$debug]); 
   }
 
+    /**
+     * @throws \Exception
+     *
+     * @Route("/fussball/anzeigenation/{aktion}/{ID}", 
+     * name="FussballRequestClass::class\anzeigenation", 
+     * defaults={"_scope" = "frontend"})
+     */
+
+  public function anzeigenation(string $aktion, int $ID=-1)
+  {
+    function displayNation($cgi,$aktion,$row) {
+  	  $ID=$row['ID'];
+	  $Nation=$row['Nation'];
+      $Type=$row['Type'];
+      $Alfa2=$row['Alfa2'];
+      $Alfa3=$row['Alfa3'];
+      $Domain=$row['Domain'];
+      $Image=$row['Image'];
+      $str="";
+	  if ($ID == -1) {
+        $str.="<center><h3>Neue Nation eintragen</h3></center><br>\n";
+	  } else {
+        $str.="<center><h3>Nation bearbeiten</h3></center><br>\n";
+	  }
+      $str.=$cgi->Button(array("onClick"=>"uebernehmen();"),"&Uuml;bernehmen","Ãœbernehmen") . "\n";
+      $str.=$cgi->Button(array("onClick"=>"abbrechen();"),"Abbrechen","Abbrechen") . "<br>\n";
+      $str.=$cgi->start_form("", null,null,array("id"=>"inputForm"));
+      $str.=$cgi->hidden("ID", $ID);                    // zur weitergabe bei Ã¼bernehmen
+      $str.=$cgi->hidden("aktion", $aktion);            // zur weitergabe bei Ã¼bernehmen
+//      $str.=$cgi->hidden("Art", $row['Art']);           // zuwas das dient weiss ich noch nicht
+      $str.=$cgi->table (array("border"=>1));
+      $str.=$cgi->tr();
+      $str.=$cgi->td(array("valign"=>"top"),"ID");
+      $str.=$cgi->td(array("valign"=>"top"),$cgi->textfield(array("disabled"=>"true","name"=>"ID","id"=>"ID","value"=>"$ID","size"=>"4"))) . "\n";
+      $str.=$cgi->end_tr() . $cgi->tr()."\n";;
+      $str.=$cgi->td(array("valign"=>"top"),"Nation");
+      $str.=$cgi->td(array("valign"=>"top"),$cgi->textfield(array("placeholder"=>"Nation Name eindeutig","name"=>"Nation","id"=>"Nation","value"=>"$Nation"))) . "\n";
+      $str.=$cgi->td(array("valign"=>"top"),"Type");
+      $titleType ="Kennzeichnung der Nation mehrfach Angaben mÃ¶glich\n";
+      $titleType.="%:EU:%  Europa wird bei Europameisterschaften angezeigt\n"; 
+      $titleType.="%:WE:%  Welt  wird bei Weltmeisterschaften angezeigt\n";
+      $titleType.="%:AS:%  Asien\n"; 
+      $titleType.="%:AF:%  Afrika\n"; 
+      $titleType.="%:SA:%  SÃ¼damerika\n"; 
+      $titleType.="%:MA:%  Mittelamerika\n"; 
+      $titleType.="%:NA:%  Nordamerika\n"; 
+      $str.=$cgi->td(array("valign"=>"top"),$cgi->textfield(array("title"=>$titleType,"name"=>"Type","id"=>"Type","value"=>"$Type"))) . "\n";
+      $str.=$cgi->end_tr() . $cgi->tr()."\n";;
+      $str.=$cgi->td(array("valign"=>"top"),"Alfa2");
+      $str.=$cgi->td(array("valign"=>"top"),$cgi->textfield(array("name"=>"Alfa2","id"=>"Alfa2","value"=>"$Alfa2"))) . "\n";
+      $str.=$cgi->td(array("valign"=>"top"),"Alfa3");
+      $str.=$cgi->td(array("valign"=>"top"),$cgi->textfield(array("name"=>"Alfa3","id"=>"Alfa3","value"=>"$Alfa3"))) . "\n";
+      $str.=$cgi->end_tr() . $cgi->tr(). "\n";;
+      $str.=$cgi->td(array("valign"=>"top"),"Domain");
+      $str.=$cgi->td(array("valign"=>"top"),$cgi->textfield(array("name"=>"Domain","id"=>"Domain","value"=>"$Domain"))) . "\n";
+      $str.=$cgi->td(array("valign"=>"top"),"Image");
+      $str.=$cgi->td(array("valign"=>"top"),$cgi->textfield(array("placeholder"=>"Imagename aus /assets/flaggen evtl. hochladen","name"=>"Image","id"=>"Image","value"=>"$Image"))) . "\n";
+      $str.=$cgi->end_tr() . "\n";;
+      $str.=$cgi->end_table() . "\n";;
+      $str.=$cgi->end_form();
+      return $str;
+    }
+      $c=$this->cgiUtil;
+      $id=$ID;
+
+      $html="";      // gerenderte
+      $debug="";     //  debuginfo
+      $my_script_txt = <<< EOT
+        <script language="javascript" type="text/javascript">
+        function uebernehmen() {     /* neuer Nation */
+          var _par = jQuery("#inputForm :input").serialize();   // ich habe den Eindruck nur so bekomme ich die Werte
+console.log('Nation uebernehmen: '+_par);
+          var _inputArr = _par.split("&");
+          let myA=[];
+          for (var x = 0; x < _inputArr.length; x++) {
+            var _kv = _inputArr[x].split("=");
+            myA[_kv[0]] = _kv[1];
+            console.log(_kv);
+          }
+          var url =  '/fussball/bearbeitenation/'+myA['aktion']+'/'+myA['ID']+'/'+myA['Nation']+'/'+myA['Type']+'/'+myA['Alfa2']+'/'+myA['Alfa3']+'/'+myA['Domain']+'/'+myA['Image'];
+console.log('url: '+url);
+          jQuery.get(url, function(data, status){
+console.log('res da ');
+             errortxt=data['error'];
+             if (errortxt != '') {
+console.log('error: '+errortxt);
+               jQuery("#result").html(errortxt);
+             } else {
+               //location.reload();
+               jQuery("#result").html("");
+               jQuery("#eingabe").html(data['data']);
+             }
+          });
+
+        }
+        function abbrechen() {
+          location.reload();
+        }
+        </script>
+EOT;
+      $html.=$my_script_txt;              
+
+      if (strtolower($aktion) == 'n') {
+      // neue Nation
+	    $Row = array();
+	    $Row['ID'] = -1;
+	    $Row['Nation'] = "";
+	    $Row['Type'] = ':WE:';
+	    $Row['Alfa2'] = -1;
+	    $Row['Alfa3'] = -1;                
+	    $Row['Domain'] = -1;                
+	    $Row['Image'] = "";                
+	    $html.= displayNation($c,$aktion,$Row);
+      } 
+      if ($aktion == 'u') { // bearbeiten	
+	    // Besorge Nationdaten
+        $sql="SELECT *  FROM tl_hy_nation Where ID = $ID;"; 
+
+        $debug .= "sql: $sql  ";	
+        $stmt = $this->connection->executeQuery($sql);
+        $Row = $stmt->fetchAssociative();
+        $html.=displayNation($c,$aktion,$Row);
+      }
+      $html = utf8_encode($html);
+	  return new JsonResponse(['data' => $html,'debug'=>$debug]); 
+  }
   
     /**
      * @throws \Exception
@@ -1265,19 +1398,19 @@ EOT;
       $debug.=' Datum checked';
       if ($aktion == "u" ) {   // Wettbewerb uebernehmen
         $value = "SET ";
-        $value .= "Value2='" . $anzahlGruppen ."' ," ; 
-        $value .= "Value3='" . $deutschlandGruppe ."' ," ;
-        $value .= "Value4='" . $startDatum ."' ," ;
-        $value .= "Value5='" . $endeDatum ."' " ;
-        $sql = "update hy_config $value where Name='Wettbewerb' AND Value1='$Wettbewerb'";
+        $value .= "value2='" . $anzahlGruppen ."' ," ; 
+        $value .= "value3='" . $deutschlandGruppe ."' ," ;
+        $value .= "value4='" . $startDatum ."' ," ;
+        $value .= "value5='" . $endeDatum ."' " ;
+        $sql = "update tl_hy_config $value where Name='Wettbewerb' AND value1='$Wettbewerb'";
 //echo "sql: $sql<br>";	
         $cnt = $this->connection->executeStatement($sql);
 	    $html.="Wettbewerb $Wettbewerb  Anzahl Gruppen $anzahlGruppen Deutschlandgruppe $deutschlandGruppe start $startDatum ende $endeDatum neu gesetzt";
         $html = utf8_encode($html);
         return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
       } elseif ($aktion == "n" ) {   // Neuer Wettbewerb
-    // zuerst Prüfen ob schon vorhanden
-        $sql = "select ID,Name,Value1 From hy_config where Name='Wettbewerb' AND Value1='$Wettbewerb'";
+    // zuerst PrÃ¼fen ob schon vorhanden
+        $sql = "select ID,Name,Value1 From tl_hy_config where Name='Wettbewerb' AND value1='$Wettbewerb'";
 //echo "<br>sql: $sql<br>";
         $stmt = $this->connection->executeQuery($sql);
         $anz = $stmt->rowCount();
@@ -1298,8 +1431,8 @@ EOT;
         } else {
         // als aktuellen Wettbewerb entfernen
           $value = "SET ";
-          $value .= "Aktuell=0" ; 
-	      $sql = "update hy_config $value;";
+          $value .= "aktuell=0" ; 
+	      $sql = "update tl_hy_config $value;";
 //echo "sql: $sql<br>";	
           $cnt = $this->connection->executeQuery($sql);
           $value = "( ";
@@ -1311,7 +1444,7 @@ EOT;
           $value .= "'" . $startDatum ."' ," ;
           $value .= "'" . $endeDatum ."' " ;
           $value .= ")" ; 
-	      $sql="INSERT INTO hy_config(Name,Aktuell,Value1,Value2,Value3,Value4,Value5) VALUES $value";
+	      $sql="INSERT INTO tl_hy_config(Name,aktuell,value1,value2,value3,value4,value5) VALUES $value";
 //echo "sql: $sql<br>";
 	      //$conn->printerror=true;
           $cnt = $this->connection->executeQuery($sql);
@@ -1320,13 +1453,13 @@ EOT;
           return new JsonResponse(['dir'=>__DIR__,'data' => $html,'debug'=>$debug]); 
         }
       } elseif ($aktion == "d" ) {   // Wettbewerb loeschen
-        $sql = "select * From hy_config where Name='Wettbewerb' AND ID='$id'";
+        $sql = "select * From tl_hy_config where Name='Wettbewerb' AND ID='$id'";
 //echo "sql: $sql<br>";	
         $stmt = $this->connection->executeQuery($sql);
         $row = $stmt->fetchAssociative();  // s. Doctrine\DBAL
-        $wb=$row['Value1']; 
+        $wb=$row['value1']; 
         //echo "noch d (loeschen) nicht realisiert ID $id Wettbewerb $wb<br>";
-        $tbs = array("hy_wetten","hy_wetteaktuell","hy_teilnehmer","hy_spiele","hy_orte","hy_mannschaft","hy_gruppen","hy_flagge","hy_config");
+        $tbs = array("hy_wetteaktuell","hy_teilnehmer","hy_spiele","hy_orte","hy_mannschaft","hy_gruppen","hy_flagge");
         foreach ($tbs as $k=>$tab) {
           $sql="DELETE FROM $tab WHERE wettbewerb ='$wb';";
 //echo "sql: $sql<br>";	
@@ -1334,17 +1467,17 @@ EOT;
           //$cnt=$conn->affected();
           $html.="in Tabelle $tab betroffene Saetze $cnt<br>";
         }
-        $sql="DELETE FROM hy_config WHERE Value1 ='$wb';";
+        $sql="DELETE FROM tl_hy_config WHERE value1 ='$wb';";
 //echo "sql: $sql<br>";	
         $cnt = $this->connection->executeStatement($sql);
         //$cnt=$conn->affected();
-        $html.="in Tabelle hy_config betroffene Saetze $cnt<br>";
-        $html.="<br><strong>!! Achtung evtl neuen aktuellen Wettbewerb wählen !! </strong><br><br>";
+        $html.="in Tabelle tl_hy_config betroffene Saetze $cnt<br>";
+        $html.="<br><strong>!! Achtung evtl neuen aktuellen Wettbewerb wÃ¤hlen !! </strong><br><br>";
         $html = utf8_encode($html);
         return new JsonResponse(['dir'=>__DIR__,'data' => $html,'debug'=>$debug]); 
       } elseif ($aktion == "a" ) {   // setze akt Wettbewerb
       // selektierter Wettbewerb
-        $sql = "select * From hy_config where Name='Wettbewerb' AND ID='$id'";
+        $sql = "select * From tl_hy_config where Name='Wettbewerb' AND ID='$id'";
 //echo "<br>sql: $sql<br>";
         $stmt = $this->connection->executeQuery($sql);
         $anz = $stmt->rowCount();
@@ -1355,13 +1488,13 @@ EOT;
         return new JsonResponse(['dir'=>__DIR__,'data' => $html,'debug'=>$debug]); 
         }
         $value = "SET ";
-        $value .= "Aktuell=0" ; 
-	    $sql = "update hy_config $value;";
+        $value .= "aktuell=0" ; 
+	    $sql = "update tl_hy_config $value;";
 //echo "sql: $sql<br>";	
         $cnt = $this->connection->executeStatement($sql);
         $value = "SET ";
-        $value .= "Aktuell=1" ; 
-	    $sql = "update hy_config $value where Name='Wettbewerb' AND ID='$id';";
+        $value .= "aktuell=1" ; 
+	    $sql = "update tl_hy_config $value where Name='Wettbewerb' AND ID='$id';";
 //echo "sql: $sql<br>";	
         $cnt = $this->connection->executeStatement($sql);
         $html.="neuer aktueller Wettbewerb bitte F5 dr&uuml;cken<br>";
@@ -1403,7 +1536,7 @@ EOT;
     $debug.=" id: $id, Wettbewerb: $Wettbewerb, name: $name, nation $nation, nation $Gruppe";
     if ($aktion == "u" || $aktion == "n") { 
       // flagge lesen
-      $sql = "select * from hy_nation $value where Nation='$nation'";
+      $sql = "select * from tl_hy_nation $value where Nation='$nation'";
       $stmt = $this->connection->executeQuery($sql);
       $debug.="sql: $sql<br>";	
       $anz = $stmt->rowCount();
@@ -1414,7 +1547,7 @@ EOT;
 	    $fl =   $rownati['Image'];
 	    $flid = $rownati['ID'];
       } else {         // default Deutschland
-        $sql = "select * from hy_nation $value where Nation='Deutschland'";
+        $sql = "select * from tl_hy_nation $value where Nation='Deutschland'";
         $stmt = $this->connection->executeQuery($sql);
         $rownati = $stmt->fetchAssociative();
 	    $fl =   $rownati['Image'];
@@ -1460,6 +1593,91 @@ EOT;
       $cnt = $this->connection->executeStatement($sql);
       //$html.="in Tabelle hy_mannschaft betroffene Saetze $cnt<br>";
 	  $html.="Mannschaft gel&ouml;scht";
+      $html = utf8_encode($html);
+      return new JsonResponse(['data' => $html,'error'=>$errortxt,'debug'=>$debug]); 
+    }
+    $html.="fehlerhafte Aktion $aktion<br>";
+    $errortxt.="fehlerhafte Aktion $aktion<br>";
+    $errortxt = utf8_encode($errortxt);
+    return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+  } 
+    /**
+     * @throws \Exception
+     * @throws DoctrineDBALException
+     *
+     * @Route("/fussball/bearbeitenation/{aktion}/{ID}/{Nation}/{Type}/{Alfa2}/{Alfa3}/{Domain}/{Image}", 
+     * name="FussballRequestClass::class\bearbeitenation", 
+     * defaults={"_scope" = "frontend"})
+     */
+
+  public function bearbeitenation(string $aktion,int $ID=-1,string $Nation='',string $Type='',string $Alfa2='',string $Alfa3='',string $Domain='',string $Image='')
+  {
+    if (!isset($aktion)) {
+      $html.="fehlerhafte Aktion empty<br>";
+      $errortxt.="fehlerhafte Aktion empty<br>";
+      $errortxt = utf8_encode($errortxt);
+      return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+    }
+    $c=$this->cgiUtil;
+    $id = $ID;
+    $html="";
+    $debug="aktion: $aktion";
+    $errortxt="";
+    $Wettbewerb = $this->aktWettbewerb['aktWettbewerb'];
+    $Nation = trim($Nation);
+    $Type = trim($Type);
+    $Alfa2 = trim($Alfa2);
+    $Alfa3 = trim($Alfa3);
+    $Domain = trim($Domain);
+    $Image = trim($Image);
+    $debug.=" id: $id, Wettbewerb: $Wettbewerb, Nation $Nation, Type $Type, Alfa2 $Alfa2, Alfa3 $Alfa3, Domain $Domain, Image $Image";
+    if ($aktion == "u" || $aktion == "n") { 
+      if ($aktion == "n" ) {   // neueintrag
+        if (empty($Nation)||empty($Type)||empty($Image)) {
+          $errortxt.="Nation/ Type/ Image Eingabe notwendig";
+          $errortxt = utf8_encode($errortxt);
+          return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+        }
+        $sql="SELECT Nation FROM tl_hy_nation WHERE Nation='$Nation'"; 
+        $stmt = $this->connection->executeQuery($sql);
+        $debug.="sql: $sql<br>";	
+        $anz = $stmt->rowCount();
+        if ($anz > 0) {
+          $errortxt.="Nation $Nation existiert bereits";
+          $errortxt = utf8_encode($errortxt);
+          return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+        }
+        $sql="INSERT INTO tl_hy_nation(Nation,Type,Alfa2,Alfa3,Domain,Image) VALUES ('$Nation','$Type','$Alfa2','$Alfa3','$Domain','$Image');";
+        $debug.="sql: $sql<br>";	
+        $cnt = $this->connection->executeStatement($sql);
+        $html.=" Nation: $Nation, Type: $Type, Alfa2: $Alfa2, Alfa3: $Alfa3, Domain: $Domain, Image: $Image";
+        $html = utf8_encode($html);
+        return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+      }
+      if ($aktion == "u" ) {   // Nation uebernehmen
+
+        $value = "SET ";
+        $value .= "Nation='" . $Nation ."' ," ;
+        $value .= "Type='" . $Type ."' ," ;
+        $value .= "Alfa2='" . $Alfa2 ."' ," ;
+        $value .= "Alfa3='" . $Alfa3 ."' ," ;
+        $value .= "Domain='" . $Domain ."' ," ;
+        $value .= "Image='" . $Image ."' " ;
+
+	    $sql = "update tl_hy_nation $value where ID='$id'";
+//echo "sql: $sql<br>";	
+        $cnt = $this->connection->executeStatement($sql);
+        $html.=" Nation: $Nation, Type: $Type, Alfa2: $Alfa2, Alfa3: $Alfa3, Domain: $Domain, Image: $Image";
+        $html = utf8_encode($html);
+
+        return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+      }
+    }
+    if ($aktion == "d" ) {   // Mannschaft loeschen
+	  $sql = "Delete from tl_hy_nation WHERE ID='$id' LIMIT 1";
+      $cnt = $this->connection->executeStatement($sql);
+      //$html.="in Tabelle tl_hy_nation betroffene Saetze $cnt<br>";
+	  $html.="Nation gel&ouml;scht";
       $html = utf8_encode($html);
       return new JsonResponse(['data' => $html,'error'=>$errortxt,'debug'=>$debug]); 
     }
@@ -1552,7 +1770,7 @@ EOT;
     function replace16Bit($str) {
       // ersetze 16-bit Values
       $search  = array("\xC3\xA4", "\xC3\xB6", "\xC3\xBC", "\xC3\x84", "\xC3\x96","\xC3\x9f");
-      $replace = array('ä', 'ö', 'ü', 'Ä', 'Ö','Ü','ß');
+      $replace = array('Ã¤', 'Ã¶', 'Ã¼', 'Ã„', 'Ã–','Ãœ','ÃŸ');
       $str= str_replace($search, $replace, $str);     
       return $str;     
     }    
@@ -1570,9 +1788,9 @@ EOT;
     $Wettbewerb = $this->aktWettbewerb['aktWettbewerb'];
     if ($aktion == "u") {
       if ($ID<0) {
-        $html.="unzulässige ID $ID<br>";
+        $html.="unzulÃ¤ssige ID $ID<br>";
         $html = utf8_encode($html);
-        $errortxt.="unzulässige ID $ID<br><br>";
+        $errortxt.="unzulÃ¤ssige ID $ID<br><br>";
         $errortxt = utf8_encode($errortxt);
         return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
       }
@@ -1585,7 +1803,7 @@ EOT;
       $html = utf8_encode($html);
       return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
     } 
-    if ($aktion == "a") {              // alle Gruppeneintraege löschen und aus den Spielen neu aufbauen
+    if ($aktion == "a") {              // alle Gruppeneintraege lÃ¶schen und aus den Spielen neu aufbauen
        $sql="SELECT * FROM hy_gruppen WHERE Wettbewerb='$Wettbewerb'";
        $stmt = $this->connection->executeQuery($sql);
        $Update=0;
@@ -1664,7 +1882,7 @@ EOT;
            $sql="INSERT INTO hy_gruppen(Wettbewerb,Gruppe,M1,Platz,Spiele,Sieg,Unentschieden,Niederlage,Tore,Gegentore,Differenz,Punkte) VALUES $value";
            //$debug.="'|' insert sql: $sql '|' ";	
            $cnt = $this->connection->executeStatement($sql);
-	       $html.="Eingefügt  Gruppe $Gruppe M1 $M1 ";
+	       $html.="EingefÃ¼gt  Gruppe $Gruppe M1 $M1 ";
          }
        }
        $debug.="!!!!!!!!!!!!!Platz bestimmen !!!!!!!!!!!!!!!!!!!!!\n";
@@ -1701,12 +1919,12 @@ EOT;
            */
            // dient zum sortieren
            /* GRUPPENwertung Platz
-             a) Für die Tabellenplatzierung sind die erspielten Punkte entscheidend. 
-             b) Bei Punktgleichheit entscheidet zunächst das Torverhältnis/Differenz und 
-             c) schließlich die höhere Anzahl der erzielten Tore. 
-             Wenn zwei oder mehrere Mannschaften in den drei erwähnten Kriterien gleich abschneiden, entscheiden folgende Kriterien: 
+             a) FÃ¼r die Tabellenplatzierung sind die erspielten Punkte entscheidend. 
+             b) Bei Punktgleichheit entscheidet zunÃ¤chst das TorverhÃ¤ltnis/Differenz und 
+             c) schlieÃŸlich die hÃ¶here Anzahl der erzielten Tore. 
+             Wenn zwei oder mehrere Mannschaften in den drei erwÃ¤hnten Kriterien gleich abschneiden, entscheiden folgende Kriterien: 
              1. Punkte im direkten Vergleich 
-             2. Torverhältnis/Differenz im direkten Vergleich 
+             2. TorverhÃ¤ltnis/Differenz im direkten Vergleich 
              3. Anzahl der erzielten Tore im direkten Vergleich 
              4. Fair-Play-Wertung 
              5. Losentscheid
@@ -1830,7 +2048,7 @@ EOT;
 
       if ($aktion == "n" ) {   // neueintrag
         // check spielnummer
-    // zuerst Prüfen ob schon vorhanden
+    // zuerst PrÃ¼fen ob schon vorhanden
         $sql = "select Nr From hy_spiele where Wettbewerb='$Wettbewerb' AND Nr='$Nr'";
 //echo "<br>sql: $sql<br>";
         $stmt = $this->connection->executeQuery($sql);
@@ -2002,7 +2220,7 @@ $debug.=" sql: $sql\n";
       //$html = utf8_encode($html);
       return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
     }
-    if ($aktion == "u" ) {   // alle Wetten updaten, d.h. die Werte tipp1 Tipp2 Tipp3 abhängig vom aktuellen Stand neu eintragen
+    if ($aktion == "u" ) {   // alle Wetten updaten, d.h. die Werte tipp1 Tipp2 Tipp3 abhÃ¤ngig vom aktuellen Stand neu eintragen
       // zuerst alle Wetten zum Wettbewerb einlesen
       $sql="SELECT * FROM `hy_wetten` WHERE  Wettbewerb='$Wettbewerb' ORDER By 'Art'";
       $stmt = $this->connection->executeQuery($sql);

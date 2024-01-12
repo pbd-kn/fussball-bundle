@@ -39,15 +39,6 @@ use Doctrine\DBAL\Exception as DoctrineDBALException;
 use Contao\Pagination;
 use PBDKN\FussballBundle\Util\CgiUtil;
 use PBDKN\FussballBundle\Util\FussballUtil;
-/*
-use Markocupic\GalleryCreatorBundle\Model\GalleryCreatorAlbumsModel;
-use Markocupic\GalleryCreatorBundle\Model\GalleryCreatorPicturesModel;
-use Markocupic\GalleryCreatorBundle\Util\AlbumUtil;
-use Markocupic\GalleryCreatorBundle\Util\MarkdownUtil;
-use Markocupic\GalleryCreatorBundle\Util\PictureUtil;
-use Markocupic\GalleryCreatorBundle\Util\SecurityUtil;
-vergl. auch AbstractGalleryCreator
-*/
 abstract class AbstractFussballController extends AbstractContentElementController
 {
     protected CgiUtil $cgiUtil;
@@ -69,15 +60,16 @@ abstract class AbstractFussballController extends AbstractContentElementControll
         $this->insertTagParser = $dependencyAggregate->insertTagParser;
         $this->htmlDecoder = $dependencyAggregate->htmlDecoder;
                 // akt Wettbewerb lesen.
-        $stmt = $this->connection->executeQuery("SELECT * from hy_config WHERE Name='Wettbewerb' AND Aktuell = 1 LIMIT 1");
-        $row = $stmt->fetchAssociative();
-        $this->aktWettbewerb['id']=$row['ID'];
-        $this->aktWettbewerb['aktuell']=$row['Aktuell'];
-        $this->aktWettbewerb['aktWettbewerb']=$row['Value1'];
-        $this->aktWettbewerb['aktAnzgruppen']=$row['Value2'];
-        $this->aktWettbewerb['aktDGruppe']=$row['Value3'];
-        $this->aktWettbewerb['aktStartdatum']=$row['Value4'];
-        $this->aktWettbewerb['aktEndedatum']=$row['Value5'];
+        $stmt = $this->connection->executeQuery("SELECT * from tl_hy_config WHERE Name='Wettbewerb' AND aktuell = 1 LIMIT 1");
+        $num_rows = $stmt->rowCount(); 
+          $row = $stmt->fetchAssociative();
+          $this->aktWettbewerb['id']=$row['id'];
+          $this->aktWettbewerb['aktuell']=$row['aktuell'];
+          $this->aktWettbewerb['aktWettbewerb']=$row['value1'];
+          $this->aktWettbewerb['aktAnzgruppen']=$row['value2'];
+          $this->aktWettbewerb['aktDGruppe']=$row['value3'];
+          $this->aktWettbewerb['aktStartdatum']=$row['value4'];
+          $this->aktWettbewerb['aktEndedatum']=$row['value5'];
     }
 
 }

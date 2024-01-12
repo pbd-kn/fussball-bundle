@@ -140,9 +140,9 @@ class FeSpieleController extends AbstractFussballController
         $sql .= " hy_spiele.T2 as 'T2'";
         $sql .= " FROM hy_spiele";
         $sql .= " LEFT JOIN hy_mannschaft AS mannschaft1 ON hy_spiele.M1 = mannschaft1.ID";
-        $sql .= " LEFT JOIN hy_nation AS flagge1 ON flagge1.ID = mannschaft1.flgindex";
+        $sql .= " LEFT JOIN tl_hy_nation AS flagge1 ON flagge1.ID = mannschaft1.flgindex";
         $sql .= " LEFT JOIN hy_mannschaft AS mannschaft2 ON hy_spiele.M2 = mannschaft2.ID";
-        $sql .= " LEFT JOIN hy_nation AS flagge2 ON flagge2.ID = mannschaft2.flgindex";
+        $sql .= " LEFT JOIN tl_hy_nation AS flagge2 ON flagge2.ID = mannschaft2.flgindex";
         $sql .= " LEFT JOIN hy_orte ON hy_spiele.Ort = hy_orte.ID";
         $sql .= " WHERE hy_spiele.Wettbewerb  ='".$this->aktWettbewerb['aktWettbewerb']."'";
         $sql .= " ORDER BY hy_spiele.Datum ASC , hy_spiele.Uhrzeit ASC ;";

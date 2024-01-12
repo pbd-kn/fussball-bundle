@@ -130,7 +130,7 @@ class FeWettenController extends AbstractFussballController
         $sql .= " hy_gruppen.Punkte as 'Punkte'";
         $sql .= " FROM hy_gruppen";
         $sql .= " LEFT JOIN hy_mannschaft AS mannschaft1 ON hy_gruppen.M1 = mannschaft1.ID";
-        $sql .= " LEFT JOIN hy_nation AS flagge1 ON flagge1.ID = mannschaft1.flgindex";
+        $sql .= " LEFT JOIN tl_hy_nation AS flagge1 ON flagge1.ID = mannschaft1.flgindex";
         $sql .= " WHERE hy_gruppen.Wettbewerb  ='$Wettbewerb' "; 
         if ($strWhere != '') $sql .= $strWhere;             
         $sql .= " ORDER BY hy_gruppen.Gruppe ASC , hy_gruppen.Platz ASC ;";
@@ -232,9 +232,9 @@ class FeWettenController extends AbstractFussballController
                 $sql .= " flagge2.Image as 'Flagge2'";
                 $sql .= " FROM hy_spiele";
                 $sql .= " LEFT JOIN hy_mannschaft AS mannschaft1 ON hy_spiele.M1 = mannschaft1.ID";
-                $sql .= " LEFT JOIN hy_nation AS flagge1 ON flagge1.ID = mannschaft1.flgindex";
+                $sql .= " LEFT JOIN tl_hy_nation AS flagge1 ON flagge1.ID = mannschaft1.flgindex";
                 $sql .= " LEFT JOIN hy_mannschaft AS mannschaft2 ON hy_spiele.M2 = mannschaft2.ID";
-                $sql .= " LEFT JOIN hy_nation AS flagge2 ON flagge2.ID = mannschaft2.flgindex";
+                $sql .= " LEFT JOIN tl_hy_nation AS flagge2 ON flagge2.ID = mannschaft2.flgindex";
                 $sql .= " WHERE hy_spiele.ID='".$row['Tipp1']."'";
                 $stmt = $this->connection->executeQuery($sql);
                 $rowsp = $stmt->fetchAssociative();

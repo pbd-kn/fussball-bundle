@@ -86,12 +86,11 @@ class WettbewerbController extends AbstractFussballController
         // Adapters
         $this->config = $this->framework->getAdapter(Config::class);
         $this->environment = $this->framework->getAdapter(Environment::class);
-        $this->galleryCreatorAlbumsModel = $this->framework->getAdapter(GalleryCreatorAlbumsModel::class);
         $this->input = $this->framework->getAdapter(Input::class);
         $this->stringUtil = $this->framework->getAdapter(StringUtil::class);
 
         // alle Wettbewerbe einlesen
-        $sql = "select ID,Aktuell,Name,Value1,Value2,Value3,Value4,Value5 From hy_config where Name='Wettbewerb' ORDER BY Name ASC";
+        $sql = "select ID,aktuell,Name,value1,value2,value3,value4,value5 From tl_hy_config where Name='Wettbewerb' ORDER BY Name ASC";
         $stmt = $this->connection->executeQuery($sql);
         $num_rows = $stmt->rowCount();    
         while (($row = $stmt->fetchAssociative()) !== false) {
@@ -187,13 +186,13 @@ EOT;
         $html.=$c->tbody();
         
         foreach ($this->Wettbewerbe as $k=>$row) {
-          $Wb=$row["Value1"];
-          $AG=$row["Value2"];
-          $DG=$row["Value3"];
+          $Wb=$row["value1"];
+          $AG=$row["value2"];
+          $DG=$row["value3"];
           if (empty($DG)) $DG="";
-          $sD=$row["Value4"];
-          $eD=$row["Value5"];
-          $akt=$row['Aktuell'];
+          $sD=$row["value4"];
+          $eD=$row["value5"];
+          $akt=$row['aktuell'];
           $html.=$c->tr();
             $html.=$c->td();
 	          $html.=$c->Button(array("onClick"=>"wettbewerbBearbeiten(this);","title"=>"Wettbewerb bearbeiten"),'B',$row['ID'])."\n";
