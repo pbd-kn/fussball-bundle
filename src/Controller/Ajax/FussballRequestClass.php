@@ -2366,7 +2366,7 @@ $debug.=" sql: $sql\n";
           $errortxt = utf8_encode($errortxt);
           return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
         }
-        $value = "SET Wettbewerb='$Wettbewerb' ,Kurzname='$Kurzname' Name='$Name' Email='$Email'" ; 
+        $value = "SET Wettbewerb='$Wettbewerb' ,Kurzname='$Kurzname', Name='$Name', Email='$Email'" ; 
 	    $sql = "UPDATE hy_teilnehmer $value where ID='$id'";
         $debug.="UPDATE Teilnehmer sql: $sql<br>";	
         $cnt = $this->connection->executeStatement($sql);
