@@ -150,6 +150,7 @@ class VWTeilnehmerController extends AbstractFussballController
       }
       function createAllMannschaftOption ($conn,$cgi,$Wettbewerb,$name,$selected) {
         // selected ist der Index der Mannschaft
+        $debug="";
         $html='';
 	    $sql = "select ID,Name From tl_hy_mannschaft where Wettbewerb='$Wettbewerb' ORDER BY Name ASC";
         $debug.="erzeuge createAllMannschaftOption<br>sql: $sql<br>";
@@ -266,7 +267,6 @@ class VWTeilnehmerController extends AbstractFussballController
   	        $sql =  "SELECT tl_hy_mannschaft.Name as 'M1Name',tl_hy_mannschaft.ID as 'M1Ind' FROM tl_hy_mannschaft WHERE Wettbewerb ='".$Wettbewerb."' AND ID=".$w['Tipp1'].";";
             $stmt = $conn->executeQuery($sql); 
             $row = $stmt->fetchAssociative();
-            $erster=$row['M1Name'];
 	        $str.=$cgi->td($row['M1Name']);
 	        $s1=createAllMannschaftOption ($conn,$cgi,$Wettbewerb,"W1$wettindex",$W1);
 	        $str.=$cgi->td($W1 . $s1);
