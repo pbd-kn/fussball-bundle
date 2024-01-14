@@ -2370,7 +2370,7 @@ $debug.=" sql: $sql\n";
 	    $sql = "UPDATE hy_teilnehmer $value where ID='$id'";
         $debug.="UPDATE Teilnehmer sql: $sql<br>";	
         $cnt = $this->connection->executeStatement($sql);
-	    $html.="Teilnehmer " . $_GET['Kurzname'] . " ge&auml;ndert";
+	    $html.="Teilnehmer " . $Kurzname . " ge&auml;ndert";
       }
       $html = utf8_encode($html);
       return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
