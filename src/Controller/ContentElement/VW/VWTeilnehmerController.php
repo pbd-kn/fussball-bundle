@@ -118,6 +118,7 @@ class VWTeilnehmerController extends AbstractFussballController
     protected function getResponse(Template $template, ContentModel $model, Request $request): ?Response
     {
       function createMannschaftOption ($conn,$cgi,$Wettbewerb,$name,$selected,$gruppe) {
+        $debug="";
   	    $sql =  "select ";
 	    $sql .= " gruppen.ID AS ID,";
 	    $sql .= " gruppen.Gruppe AS Gruppe,";
