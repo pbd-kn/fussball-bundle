@@ -255,7 +255,7 @@ EOT;
       $Name="";
       $Nation="";
       $Flagge="";
-      $flgindex=-1;
+      $Gruppe="";
       $html="";      // gerenderte
       $debug="";     //  debuginfo
       $my_script_txt = <<< EOT
@@ -296,7 +296,7 @@ EOT;
       $id=$ID;
       if ($id !=-1) {
         // Mannschaft einlesen
-        $sql="SELECT * from hy_mannschaft where ID='$id' LIMIT 1;";
+        $sql="SELECT * from tl_hy_mannschaft where ID='$id' LIMIT 1;";
         $debug .= "sql: $sql  ";	
         $stmt = $this->connection->executeQuery($sql);
         /*
@@ -310,13 +310,12 @@ EOT;
         $Name=$row['Name'];
         $Nation=$row['Nation'];
         $Flagge=$row['Flagge'];
-        $flgindex=$row['flgindex'];
         $Gruppe=$row['Gruppe'];
         $html.="Mannschaft ändern<br>\n";
       } else {
         $html.="Mannschaft neu<br>\n";
       }
-      $debug.='id: '.$id.' Name: '.$Name.' Nation: '.$Nation.' Flagge: '.$Flagge.' flgindex: '.$flgindex .' Gruppe: '.$Gruppe;
+      $debug.='id: '.$id.' Name: '.$Name.' Nation: '.$Nation.' Flagge: '.$Flagge.' Gruppe: '.$Gruppe;
 
 // create output
       $html.=$c->Button(array("onClick"=>"uebernehmen();"),"&Uuml;bernehmen","uebernehmen") . "\n";
@@ -639,7 +638,7 @@ EOT;
   {  
     function createMannschaftOption ($conn,$cgi,$Wettbewerb,$name,$selected) {
       // selected ist der Index der Mannschaft
-	  $sql = "select ID,Name From hy_mannschaft where Wettbewerb='$Wettbewerb' ORDER BY Name ASC";
+	  $sql = "select ID,Name From tl_hy_mannschaft where Wettbewerb='$Wettbewerb' ORDER BY Name ASC";
       $stmt = $conn->executeQuery($sql);
       $optarray= array();
       while (($row = $stmt->fetchAssociative()) !== false) {
@@ -814,16 +813,14 @@ EOT;
 	  $sql .= " spiele.M1 as 'M1Ind',";
       $sql .= " mannschaft1.Nation as 'M1',";
       $sql .= " mannschaft1.Name as 'M1Name',";
-      $sql .= " flagge1.Image as 'Flagge1',";
+      $sql .= " mannschaft1.Flagge as 'Flagge1',";
       $sql .= " spiele.M2 as 'M2Ind',";
       $sql .= " mannschaft2.Nation as 'M2',";
       $sql .= " mannschaft2.Name as 'M2Name',";
-      $sql .= " flagge2.Image as 'Flagge2'";
+      $sql .= " mannschaft2.Flagge as 'Flagge2'";
       $sql .= " FROM hy_spiele as spiele";
-      $sql .= " LEFT JOIN hy_mannschaft AS mannschaft1 ON spiele.M1 = mannschaft1.ID";
-      $sql .= " LEFT JOIN hy_flagge AS flagge1 ON flagge1.ID = mannschaft1.flgindex";
-      $sql .= " LEFT JOIN hy_mannschaft AS mannschaft2 ON spiele.M2 = mannschaft2.ID";
-      $sql .= " LEFT JOIN hy_flagge AS flagge2 ON flagge2.ID = mannschaft2.flgindex";
+      $sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft1 ON spiele.M1 = mannschaft1.ID";
+      $sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft2 ON spiele.M2 = mannschaft2.ID";
       $sql .= " WHERE spiele.Wettbewerb  ='$Wettbewerb'";
       $sql .= " ORDER BY spiele.Nr ASC , spiele.Datum ASC, spiele.Uhrzeit ASC ;";
 //echo "create Spiele option sql: $sql<br>";	
@@ -848,10 +845,9 @@ EOT;
 	  $sql .= " gruppen.Platz as Platz,";
       $sql .= " mannschaft1.Nation as 'M1',";
       $sql .= " mannschaft1.Name as 'M1Name',";
-      $sql .= " flagge1.Image as 'Flagge1'";
+      $sql .= " mannschaft1.Flagge as 'Flagge1'";
 	  $sql .= " FROM hy_gruppen as gruppen";
-      $sql .= " LEFT JOIN hy_mannschaft AS mannschaft1 ON gruppen.M1 = mannschaft1.ID";
-      $sql .= " LEFT JOIN hy_flagge AS flagge1 ON flagge1.ID = mannschaft1.flgindex";
+      $sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft1 ON gruppen.M1 = mannschaft1.ID";
       $sql .= " WHERE gruppen.Wettbewerb  ='$Wettbewerb'";
       if ($gruppe != -1) {
 	    $sql .= " AND gruppen.Gruppe = '$gruppe'";
@@ -1459,7 +1455,7 @@ EOT;
         $row = $stmt->fetchAssociative();  // s. Doctrine\DBAL
         $wb=$row['value1']; 
         //echo "noch d (loeschen) nicht realisiert ID $id Wettbewerb $wb<br>";
-        $tbs = array("hy_wetteaktuell","hy_teilnehmer","hy_spiele","hy_orte","hy_mannschaft","hy_gruppen","hy_flagge");
+        $tbs = array("hy_wetteaktuell","hy_teilnehmer","hy_spiele","hy_orte","tl_hy_mannschaft","hy_gruppen");
         foreach ($tbs as $k=>$tab) {
           $sql="DELETE FROM $tab WHERE wettbewerb ='$wb';";
 //echo "sql: $sql<br>";	
@@ -1536,25 +1532,25 @@ EOT;
     $debug.=" id: $id, Wettbewerb: $Wettbewerb, name: $name, nation $nation, nation $Gruppe";
     if ($aktion == "u" || $aktion == "n") { 
       // flagge lesen
-      $sql = "select * from tl_hy_nation $value where Nation='$nation'";
+      $sql = "select * from tl_hy_nation where Nation='$nation'";
       $stmt = $this->connection->executeQuery($sql);
       $debug.="sql: $sql<br>";	
       $anz = $stmt->rowCount();
-      $fl="";
-      $flid="";
+      $flagge="";
+//      $flid="";
       if ($anz > 0) {
         $rownati = $stmt->fetchAssociative();
-	    $fl =   $rownati['Image'];
-	    $flid = $rownati['ID'];
+	    $flagge =   $rownati['Image'];
+//	    $flid = $rownati['ID'];
       } else {         // default Deutschland
-        $sql = "select * from tl_hy_nation $value where Nation='Deutschland'";
+        $sql = "select * from tl_hy_nation where Nation='Deutschland'";
         $stmt = $this->connection->executeQuery($sql);
         $rownati = $stmt->fetchAssociative();
-	    $fl =   $rownati['Image'];
-	    $flid = $rownati['ID'];
+	    $flagge =   $rownati['Image'];
+//	    $flid = $rownati['ID'];
       }
       if ($aktion == "n" ) {   // neueintrag
-        $sql="SELECT name FROM hy_mannschaft WHERE name='$name' AND Wettbewerb ='$Wettbewerb'"; 
+        $sql="SELECT name FROM tl_hy_mannschaft WHERE name='$name' AND Wettbewerb ='$Wettbewerb'"; 
         $stmt = $this->connection->executeQuery($sql);
         $debug.="sql: $sql<br>";	
         $anz = $stmt->rowCount();
@@ -1563,10 +1559,10 @@ EOT;
           $errortxt = utf8_encode($errortxt);
           return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
         }
-        $sql="INSERT INTO hy_mannschaft(Wettbewerb,Name,Nation,Flagge,flgindex,Gruppe) VALUES ('$Wettbewerb','$name','$nation','$fl',$flid,'$Gruppe');";
+        $sql="INSERT INTO tl_hy_mannschaft(Wettbewerb,Name,Nation,Flagge,Gruppe) VALUES ('$Wettbewerb','$name','$nation','$flagge','$Gruppe');";
         $debug.="sql: $sql<br>";	
         $cnt = $this->connection->executeStatement($sql);
-	    $html.="Wettbewerb $Wettbewerb  Mannschaft $name Nation $nation Flagge $fl flgindex $flid neu gesetzt";
+	    $html.="Wettbewerb $Wettbewerb  Mannschaft $name Nation $nation Flagge $flagge  $flid neu gesetzt";
         $html = utf8_encode($html);
         return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
       }
@@ -1575,23 +1571,22 @@ EOT;
         $value = "SET ";
         $value .= "Name='" . $name ."' ," ; 
         $value .= "Nation='" . $nation ."' ," ;
-        $value .= "Flagge='" . $fl ."' ," ;
-        $value .= "Gruppe='" . $Gruppe ."' ," ;
-        $value .= "flgIndex='" . $flid ."' " ;
+        $value .= "Flagge='" . $flagge ."' ," ;
+        $value .= "Gruppe='" . $Gruppe ."' " ;
 
-	    $sql = "update hy_mannschaft $value where ID='$id'";
+	    $sql = "update tl_hy_mannschaft $value where ID='$id'";
 //echo "sql: $sql<br>";	
         $cnt = $this->connection->executeStatement($sql);
-	    $html.="Wettbewerb $Wettbewerb  Mannschaft $name Nation $nation Flagge $fl flgindex $flid bearbeitet";
+	    $html.="Wettbewerb $Wettbewerb  Mannschaft $name Nation $nation Flagge $flagge bearbeitet";
         $html = utf8_encode($html);
 
         return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
       }
     }
     if ($aktion == "d" ) {   // Mannschaft loeschen
-	  $sql = "Delete from hy_mannschaft WHERE ID='$id' LIMIT 1";
+	  $sql = "Delete from tl_hy_mannschaft WHERE ID='$id' LIMIT 1";
       $cnt = $this->connection->executeStatement($sql);
-      //$html.="in Tabelle hy_mannschaft betroffene Saetze $cnt<br>";
+      //$html.="in Tabelle tl_hy_mannschaft betroffene Saetze $cnt<br>";
 	  $html.="Mannschaft gel&ouml;scht";
       $html = utf8_encode($html);
       return new JsonResponse(['data' => $html,'error'=>$errortxt,'debug'=>$debug]); 
@@ -1739,10 +1734,10 @@ EOT;
         return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
       }
     }
-    if ($aktion == "d" ) {   // Mannschaft loeschen
+    if ($aktion == "d" ) {   // Ort loeschen
 	  $sql = "Delete from hy_orte WHERE ID='$id' LIMIT 1";
       $cnt = $this->connection->executeStatement($sql);
-      //$html.="in Tabelle hy_mannschaft betroffene Saetze $cnt<br>";
+      //$html.="in Tabelle hy_orte betroffene Saetze $cnt<br>";
 	  $html.="Ort gel&ouml;scht";
       $html = utf8_encode($html);
       return new JsonResponse(['data' => $html,'error'=>$errortxt,'debug'=>$debug]); 
@@ -1820,7 +1815,7 @@ EOT;
 	   $debug.="sql: $sql Anzahl vorhandener Gruppen $num_rows: $num_rows Update |$Update|\n";
        $Mannschaften=[] ;
         // alle aktuellen Mannschaften einlesen
-       $sql="SELECT * FROM hy_mannschaft WHERE Wettbewerb='".$this->aktWettbewerb['aktWettbewerb']."' ORDER BY ID"; 
+       $sql="SELECT * FROM tl_hy_mannschaft WHERE Wettbewerb='".$this->aktWettbewerb['aktWettbewerb']."' ORDER BY ID"; 
        $stmt = $this->connection->executeQuery($sql);
        $num_rows = $stmt->rowCount();    
        while (($row = $stmt->fetchAssociative()) !== false) {
@@ -2101,10 +2096,10 @@ $debug.=" sql: $sql\n";
         return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
       }
     }
-    if ($aktion == "d" ) {   // Mannschaft loeschen
+    if ($aktion == "d" ) {   // Spiel loeschen
 	  $sql = "Delete from hy_spiele WHERE ID='$id' LIMIT 1";
       $cnt = $this->connection->executeStatement($sql);
-      //$html.="in Tabelle hy_mannschaft betroffene Saetze $cnt<br>";
+      //$html.="in Tabelle hy_spiele betroffene Saetze $cnt<br>";
 	  $html.="Spiel $id Nr $Nr gel&ouml;scht";
       $html = utf8_encode($html);
       return new JsonResponse(['data' => $html,'error'=>$errortxt,'debug'=>$debug]); 
@@ -2238,8 +2233,8 @@ $debug.=" sql: $sql\n";
           // Spiel einlesen Tipp1 ist die Spielnummer
           $sql  = "SELECT mannschaft1.ID as 'M1Ind',mannschaft2.ID as 'M2Ind',hy_spiele.T1 as 'T1',hy_spiele.T2 as 'T2'";
           $sql .= " FROM hy_spiele";
-          $sql .= " LEFT JOIN hy_mannschaft AS mannschaft1 ON hy_spiele.M1 = mannschaft1.ID";
-          $sql .= " LEFT JOIN hy_mannschaft AS mannschaft2 ON hy_spiele.M2 = mannschaft2.ID";
+          $sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft1 ON hy_spiele.M1 = mannschaft1.ID";
+          $sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft2 ON hy_spiele.M2 = mannschaft2.ID";
           $sql .= " WHERE hy_spiele.Wettbewerb  ='".$Wettbewerb."' AND hy_spiele.ID=".$w['Tipp1'].";";
           $stmt = $this->connection->executeQuery($sql);
           $num_rows = $stmt->rowCount();    
@@ -2262,7 +2257,7 @@ $debug.=" sql: $sql\n";
 	    if ($Art == 'g') {    // Gruppen erster / Zweiter / Dritter
           // gruppe einlesen nach Platz sortiert Tipp1 ist die Gruppe (A,B...Achtel 1..)
           $sql= "SELECT Platz,mannschaft1.Name as 'M1Name' ,mannschaft1.ID as 'M1Ind' FROM  `hy_gruppen`"; 
-          $sql.=" LEFT JOIN hy_mannschaft AS mannschaft1 ON hy_gruppen.M1 = mannschaft1.ID"; 
+          $sql.=" LEFT JOIN tl_hy_mannschaft AS mannschaft1 ON hy_gruppen.M1 = mannschaft1.ID"; 
           $sql.=" WHERE hy_gruppen.wettbewerb='".$Wettbewerb."' AND hy_gruppen.Gruppe='".$w['Tipp1']."' ORDER BY Platz";
           $stmt = $this->connection->executeQuery($sql); 
           $Pl=array();
@@ -2282,7 +2277,7 @@ $debug.=" sql: $sql\n";
     if ($aktion == "d" ) {   // Wette loeschen
 	  $sql = "Delete from hy_wetten WHERE ID='$id' LIMIT 1";
       $cnt = $this->connection->executeStatement($sql);
-      //$html.="in Tabelle hy_mannschaft betroffene Saetze $cnt<br>";
+      //$html.="in Tabelle hy_wetten betroffene Saetze $cnt<br>";
 	  $html.="Wette $id Nr $Nr gel&ouml;scht";
 	  $sql = "Delete from hy_wetteaktuell WHERE Wette='$id'";
       $cnt = $this->connection->executeStatement($sql);
@@ -2384,7 +2379,7 @@ $debug.=" sql: $sql\n";
       $tid=$id;
 	  $sql = "Delete from hy_teilnehmer WHERE ID=$tid LIMIT 1";
       $cnt = $this->connection->executeStatement($sql);
-      //$html.="in Tabelle hy_mannschaft betroffene Saetze $cnt<br>";
+      //$html.="in Tabelle hy_teilnehmer betroffene Saetze $cnt<br>";
 	  $html.="Teilnehmer gel&ouml;scht";                     // eigentlich muessen auch noch die Teilnehmerwetten in hy_wetteaktuell
                                                              // geloescht werden
 	  $sql = "Delete from hy_wetteaktuell where Wettbewerb = '$Wettbewerb' AND Teilnehmer =$tid";

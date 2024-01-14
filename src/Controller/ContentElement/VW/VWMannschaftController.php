@@ -122,7 +122,7 @@ class VWMannschaftController extends AbstractFussballController
         $c=$this->cgiUtil;
         $html="";
         // alle aktuellen Mannschaften einlesen
-        $sql="SELECT * FROM hy_mannschaft WHERE Wettbewerb='".$this->aktWettbewerb['aktWettbewerb']."' ORDER BY Name"; 
+        $sql="SELECT * FROM tl_hy_mannschaft WHERE Wettbewerb='".$this->aktWettbewerb['aktWettbewerb']."' ORDER BY Name"; 
         $stmt = $this->connection->executeQuery($sql);
         $num_rows = $stmt->rowCount();    
         while (($row = $stmt->fetchAssociative()) !== false) {

@@ -125,10 +125,9 @@ class VWTeilnehmerController extends AbstractFussballController
         $sql .= " mannschaft1.Nation as 'M1',";
         $sql .= " mannschaft1.Name as 'M1Name',";
         $sql .= " mannschaft1.ID as 'M1Ind',";
-        $sql .= " flagge1.Image as 'Flagge1'";
+        $sql .= " mannschaft1.Flagge as 'Flagge1'";
 	    $sql .= " FROM hy_gruppen as gruppen";
-        $sql .= " LEFT JOIN hy_mannschaft AS mannschaft1 ON gruppen.M1 = mannschaft1.ID";
-        $sql .= " LEFT JOIN hy_flagge AS flagge1 ON flagge1.ID = mannschaft1.flgindex";
+        $sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft1 ON gruppen.M1 = mannschaft1.ID";
         $sql .= " WHERE gruppen.Wettbewerb  ='$Wettbewerb'";
         if ($gruppe != -1) {
 	      $sql .= " AND gruppen.Gruppe = '$gruppe'";
@@ -151,7 +150,7 @@ class VWTeilnehmerController extends AbstractFussballController
       function createAllMannschaftOption ($conn,$cgi,$Wettbewerb,$name,$selected) {
         // selected ist der Index der Mannschaft
         $html='';
-	    $sql = "select ID,Name From hy_mannschaft where Wettbewerb='$Wettbewerb' ORDER BY Name ASC";
+	    $sql = "select ID,Name From tl_hy_mannschaft where Wettbewerb='$Wettbewerb' ORDER BY Name ASC";
         $debug.="erzeuge createAllMannschaftOption<br>sql: $sql<br>";
         $stmt = $conn->executeQuery($sql);
         $anz = $stmt->rowCount();
@@ -237,8 +236,8 @@ class VWTeilnehmerController extends AbstractFussballController
             $sql .= " mannschaft1.Name as 'M1Name',";
             $sql .= " mannschaft2.Name as 'M2Name'";
             $sql .= " FROM hy_spiele";
-            $sql .= " LEFT JOIN hy_mannschaft AS mannschaft1 ON hy_spiele.M1 = mannschaft1.ID";
-            $sql .= " LEFT JOIN hy_mannschaft AS mannschaft2 ON hy_spiele.M2 = mannschaft2.ID";            
+            $sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft1 ON hy_spiele.M1 = mannschaft1.ID";
+            $sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft2 ON hy_spiele.M2 = mannschaft2.ID";            
             $sql .= " WHERE hy_spiele.Wettbewerb  ='".$Wettbewerb."' AND hy_spiele.ID=".$w['Tipp1'].";";
             $stmt = $conn->executeQuery($sql);
             $num_rows = $stmt->rowCount();    
@@ -263,7 +262,7 @@ class VWTeilnehmerController extends AbstractFussballController
             $str.=$cgi->hidden("W2$wettindex", -1);                    // zur weitergabe bei übernehmen
             $str.=$cgi->hidden("W3$wettindex", -1);                    // zur weitergabe bei übernehmen
 	        //$str.=$cgi->td($w['Tipp1'].'abc');
-  	        $sql =  "SELECT hy_mannschaft.Name as 'M1Name',hy_mannschaft.ID as 'M1Ind' FROM hy_mannschaft WHERE Wettbewerb ='".$Wettbewerb."' AND ID=".$w['Tipp1'].";";
+  	        $sql =  "SELECT tl_hy_mannschaft.Name as 'M1Name',tl_hy_mannschaft.ID as 'M1Ind' FROM tl_hy_mannschaft WHERE Wettbewerb ='".$Wettbewerb."' AND ID=".$w['Tipp1'].";";
             $stmt = $conn->executeQuery($sql); 
             $row = $stmt->fetchAssociative();
             $erster=$row['M1Name'];
@@ -276,7 +275,7 @@ class VWTeilnehmerController extends AbstractFussballController
 
             // gruppe einlesen nach Platz sortiert
             $sql= "SELECT Platz,mannschaft1.Name as 'M1Name' ,mannschaft1.ID as 'M1Ind' FROM  `hy_gruppen`"; 
-            $sql.=" LEFT JOIN hy_mannschaft AS mannschaft1 ON hy_gruppen.M1 = mannschaft1.ID"; 
+            $sql.=" LEFT JOIN tl_hy_mannschaft AS mannschaft1 ON hy_gruppen.M1 = mannschaft1.ID"; 
             $sql.=" WHERE hy_gruppen.wettbewerb='".$Wettbewerb."' AND hy_gruppen.Gruppe='".$w['Tipp1']."' ORDER BY Platz";
             $stmt = $conn->executeQuery($sql); 
             $Pl=array();

@@ -321,8 +321,8 @@ class FePunkteController extends AbstractFussballController
             $sql .= " mannschaft1.Name as 'M1Name',";
             $sql .= " mannschaft2.Name as 'M2Name'";
             $sql .= " FROM hy_spiele";
-            $sql .= " LEFT JOIN hy_mannschaft AS mannschaft1 ON hy_spiele.M1 = mannschaft1.ID";
-            $sql .= " LEFT JOIN hy_mannschaft AS mannschaft2 ON hy_spiele.M2 = mannschaft2.ID";            
+            $sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft1 ON hy_spiele.M1 = mannschaft1.ID";
+            $sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft2 ON hy_spiele.M2 = mannschaft2.ID";            
             $sql .= " WHERE hy_spiele.Wettbewerb  ='".$Wettbewerb."' AND hy_spiele.ID=".$Tipp1.";";
            //$debug.="Manschaft sql $sql";
             $stmt = $conn->executeQuery($sql);
@@ -348,7 +348,7 @@ class FePunkteController extends AbstractFussballController
 	      if ($Art == 'g') {    // Gruppen erster / Zweiter / Dritter
             // gruppe einlesen nach Platz sortiert
             $sql= "SELECT Platz,mannschaft1.Name as 'M1Name' ,mannschaft1.ID as 'M1Ind' FROM  `hy_gruppen`"; 
-            $sql.=" LEFT JOIN hy_mannschaft AS mannschaft1 ON hy_gruppen.M1 = mannschaft1.ID"; 
+            $sql.=" LEFT JOIN tl_hy_mannschaft AS mannschaft1 ON hy_gruppen.M1 = mannschaft1.ID"; 
             $sql.=" WHERE hy_gruppen.wettbewerb='".$Wettbewerb."' AND hy_gruppen.Gruppe='".$Tipp1."' ORDER BY Platz";
             $stmt = $conn->executeQuery($sql); 
             $num_rows = $stmt->rowCount();    
@@ -376,6 +376,7 @@ class FePunkteController extends AbstractFussballController
     function getWetteR($conn,$cgi,$Wettbewerb,$row,$mannschaften,&$Punkte,&$debug="") {
       if ($debug != "") $deb=true;
       else $deb=false;
+      $str="";
       if ($deb)$debug.="erzeugeZeile $tid wettbewerb $Wettbewerb wetten ".$row['Wette']."<br>"; 
       //$Hywettenindex=$Wind;
       $tid=$row['TlnID'];
@@ -408,8 +409,8 @@ class FePunkteController extends AbstractFussballController
         $sql .= " mannschaft1.Name as 'M1Name'";
         $sql .= ", mannschaft2.Name as 'M2Name'";
         $sql .= " FROM hy_spiele";
-        $sql .= " LEFT JOIN hy_mannschaft AS mannschaft1 ON hy_spiele.M1 = mannschaft1.ID";
-        $sql .= " LEFT JOIN hy_mannschaft AS mannschaft2 ON hy_spiele.M2 = mannschaft2.ID";            
+        $sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft1 ON hy_spiele.M1 = mannschaft1.ID";
+        $sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft2 ON hy_spiele.M2 = mannschaft2.ID";            
         $sql .= " WHERE hy_spiele.Wettbewerb  ='".$Wettbewerb."' AND hy_spiele.ID=".$Tipp1.";";
         $stmt = $conn->executeQuery($sql);
         $row = $stmt->fetchAssociative();
@@ -421,13 +422,15 @@ class FePunkteController extends AbstractFussballController
 		$str.=$cgi->td((string)$Punkte);
       }
 	  if ($Art == 'p') {    // Mannschafts index 
-	    $str.=$cgi->td($mannschaften[$Tipp1]['Name']).$cgi->td($mannschaften[$W1]['Name']);
+	    if ($W1 == -1) $g1=-1; else $g1=$mannschaften[$W1]['Name'];      
+	    if ($Tipp1 == -1) $g2=-1; else $g1=$mannschaften[$Tipp1]['Name'];      
+	    $str.=$cgi->td($g2).$cgi->td($g1);
 	  	$str.=$cgi->td((string)$Punkte);
       }
 	  if ($Art == 'g') {    // Gruppen erster / Zweiter / Dritter
         // gruppe einlesen nach Platz sortiert
         $sql= "SELECT Platz,mannschaft1.Name as 'M1Name' ,mannschaft1.ID as 'M1Ind' FROM  `hy_gruppen`"; 
-        $sql.=" LEFT JOIN hy_mannschaft AS mannschaft1 ON hy_gruppen.M1 = mannschaft1.ID"; 
+        $sql.=" LEFT JOIN tl_hy_mannschaft AS mannschaft1 ON hy_gruppen.M1 = mannschaft1.ID"; 
         $sql.=" WHERE hy_gruppen.wettbewerb='".$Wettbewerb."' AND hy_gruppen.Gruppe='".$Tipp1."' ORDER BY Platz";
         $stmt = $conn->executeQuery($sql); 
         $num_rows = $stmt->rowCount();    
@@ -436,9 +439,10 @@ class FePunkteController extends AbstractFussballController
           $Pl[] = $row;
         }     
 	    $str.=$cgi->td('Gruppe: '.$Tipp1."<br>1) ".$Pl[0]['M1Name']."<br>2) ".$Pl[1]['M1Name']."<br>3) ".$Pl[2]['M1Name']); 
-	    $g1=$mannschaften[$W1]['Name'];
-	    $g2=$mannschaften[$W2]['Name'];
-	    $g3=$mannschaften[$W3]['Name'];
+	    //$str.=$cgi->td("W1: <br>1) ".$W1."<br>2) ".$W2."<br>3) ".$W3); 
+	    if ($W1 == -1) $g1=-1; else $g1=$mannschaften[$W1]['Name'];
+	    if ($W2 == -1) $g2=-1; else $g2=$mannschaften[$W2]['Name'];
+	    if ($W3 == -1) $g3=-1; else $g3=$mannschaften[$W3]['Name'];
 	    $str.=$cgi->td("<br>1) $g1<br>2) $g2<br>3) $g3");   
 	    $str.=$cgi->td((string)$Punkte);
 	  }
@@ -515,7 +519,7 @@ ORDER BY
 
         */
         // alle Mannschaften einlesen
-        $sql="SELECT * FROM `hy_mannschaft` WHERE `Wettbewerb`='wm2022'"; 
+        $sql="SELECT * FROM `tl_hy_mannschaft` WHERE `Wettbewerb`='".$this->aktWettbewerb['aktWettbewerb']."'"; 
         $stmt = $this->connection->executeQuery($sql);
         $num_rows = $stmt->rowCount();    
         //$html.="num_rows $num_rows sql:<br>$sql<br>";

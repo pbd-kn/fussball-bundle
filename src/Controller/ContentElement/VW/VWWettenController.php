@@ -143,7 +143,7 @@ class VWWettenController extends AbstractFussballController
           $this->Wetten[]=$row;
           $this->WettenArten[$row['Art']] = $row['Art'];
         }
-        $sql="SELECT * FROM hy_mannschaft WHERE Wettbewerb ='".$this->aktWettbewerb['aktWettbewerb']."'";
+        $sql="SELECT * FROM tl_hy_mannschaft WHERE Wettbewerb ='".$this->aktWettbewerb['aktWettbewerb']."'";
         $stmt = $this->connection->executeQuery($sql);
         while (($row = $stmt->fetchAssociative()) !== false) {
           $this->Mannschaften[$row['ID']] = $row;
@@ -289,16 +289,14 @@ EOT;
                 $sql .= " hy_spiele.M1 as 'M1Ind',";
                 $sql .= " mannschaft1.Nation as 'M1',";
                 $sql .= " mannschaft1.Name as 'M1Name',";
-                $sql .= " flagge1.Image as 'Flagge1',";
+                $sql .= " mannschaft1.Flagge as 'Flagge1',";
                 $sql .= " hy_spiele.M2 as 'M2Ind',";
                 $sql .= " mannschaft2.Nation as 'M2',";
                 $sql .= " mannschaft2.Name as 'M2Name',";
-                $sql .= " flagge2.Image as 'Flagge2'";
+                $sql .= " mannschaft2.Flagge as 'Flagge2'";
                 $sql .= " FROM hy_spiele";
-                $sql .= " LEFT JOIN hy_mannschaft AS mannschaft1 ON hy_spiele.M1 = mannschaft1.ID";
-                $sql .= " LEFT JOIN tl_hy_nation AS flagge1 ON flagge1.ID = mannschaft1.flgindex";
-                $sql .= " LEFT JOIN hy_mannschaft AS mannschaft2 ON hy_spiele.M2 = mannschaft2.ID";
-                $sql .= " LEFT JOIN tl_hy_nation AS flagge2 ON flagge2.ID = mannschaft2.flgindex";
+                $sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft1 ON hy_spiele.M1 = mannschaft1.ID";
+                $sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft2 ON hy_spiele.M2 = mannschaft2.ID";
                 $sql .= " WHERE hy_spiele.ID='".$row['Tipp1']."'";
                 $stmt = $this->connection->executeQuery($sql);
                 $rowsp = $stmt->fetchAssociative();

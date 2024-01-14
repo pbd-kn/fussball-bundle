@@ -46,21 +46,30 @@ $GLOBALS['TL_LANG']['tl_hy_config']['show'] = ['Zeige Konfiguration', 'Zeige Kon
 /*
  * Fields nation  
  */
-$GLOBALS['TL_LANG']['tl_hy_nation']['edit'] = ['Edit Konfiguration', 'Edit Konfiguration'];
-$GLOBALS['TL_LANG']['tl_hy_nation']['editheader'] = ['Edit Konfiguration Header', 'Edit Konfiguration Header'];
-$GLOBALS['TL_LANG']['tl_hy_nation']['copy'] = ['Copy Konfiguration', 'Copy Konfiguration'];
-$GLOBALS['TL_LANG']['tl_hy_nation']['delete'] = ['Delete Konfiguration', 'Delete Konfiguration'];
-$GLOBALS['TL_LANG']['tl_hy_nation']['show'] = ['Zeige Konfiguration', 'Zeige Konfiguration'];
-
-
-
+$GLOBALS['TL_LANG']['tl_hy_nation']['edit'] = ['Edit Nation', 'Edit Nation'];
+$GLOBALS['TL_LANG']['tl_hy_nation']['editheader'] = ['Edit Nation Header', 'Edit Nation Header'];
+$GLOBALS['TL_LANG']['tl_hy_nation']['copy'] = ['Copy Nation', 'Copy Nation'];
+$GLOBALS['TL_LANG']['tl_hy_nation']['delete'] = ['Delete Nation', 'Delete Nation'];
+$GLOBALS['TL_LANG']['tl_hy_nation']['show'] = ['Zeige Nation', 'Zeige Nation'];
 $GLOBALS['TL_LANG']['tl_hy_nation']['Nation'] = ['Nation', 'Name der Nation'];
-$GLOBALS['TL_LANG']['tl_hy_nation']['Type'] = ['Type des Wettbewerbs', 'Aktueller Wettbewerb'];
-$GLOBALS['TL_LANG']['tl_hy_nation']['value1'] = ['Wettbewerb', 'Art=Wettbewerb Wettbewerb'];
-$GLOBALS['TL_LANG']['tl_hy_nation']['value2'] = ['Anzahl Gruppen', 'Art=Wettbewerb Anzahl Gruppen'];
-$GLOBALS['TL_LANG']['tl_hy_nation']['value3'] = ['Deutschlandgruppe', 'Art=Wettbewerb Deutschlandgruppe'];
-$GLOBALS['TL_LANG']['tl_hy_nation']['value4'] = ['Start', 'Art=Wettbewerb StartDatum yyyy-mm-dd'];
-$GLOBALS['TL_LANG']['tl_hy_nation']['value5'] = ['Wettbewerb', 'Art=Wettbewerb EndDatum yyyy-mm-dd'];
+$GLOBALS['TL_LANG']['tl_hy_nation']['Type'] = ['Type der Nation', 'Zugehörigkeit der Gegend'];
+$GLOBALS['TL_LANG']['tl_hy_nation']['Alfa2'] = ['Alfa2', 'nicht verwendet'];
+$GLOBALS['TL_LANG']['tl_hy_nation']['Ahfa3'] = ['Alfa3', 'nicht verwendet'];
+$GLOBALS['TL_LANG']['tl_hy_nation']['Domain'] = ['Domain', 'Domainkürzel der Nstion'];
+$GLOBALS['TL_LANG']['tl_hy_nation']['Image'] = ['Image', 'Dateiname in der Flagentabelle'];
+/*
+ * Fields mannschaft  
+ */
+$GLOBALS['TL_LANG']['tl_hy_mannschaft']['edit'] = ['Edit Mannschaft', 'Edit Mannschaft'];
+$GLOBALS['TL_LANG']['tl_hy_mannschaft']['editheader'] = ['Edit Mannschaft Header', 'Edit Mannschaft Header'];
+$GLOBALS['TL_LANG']['tl_hy_mannschaft']['copy'] = ['Copy Mannschaft', 'Copy Mannschaft'];
+$GLOBALS['TL_LANG']['tl_hy_mannschaft']['delete'] = ['Delete Mannschaft', 'Delete Mannschaft'];
+$GLOBALS['TL_LANG']['tl_hy_mannschaft']['show'] = ['Zeige Mannschaft', 'Zeige Mannschaft'];
+$GLOBALS['TL_LANG']['tl_hy_mannschaft']['Wettbewerb'] = ['Mannschaft im Wettbewerb', 'Mannschaft im Wettbewerb'];
+$GLOBALS['TL_LANG']['tl_hy_mannschaft']['Name'] = ['Name der Manschaft', 'Name der Manschaft'];
+$GLOBALS['TL_LANG']['tl_hy_mannschaft']['Nation'] = ['Nation', 'Index in die Namenstabelle'];
+$GLOBALS['TL_LANG']['tl_hy_mannschaft']['Flagge'] = ['Flagge', 'Imagename aus Nationentabelle'];
+$GLOBALS['TL_LANG']['tl_hy_mannschaft']['Gruppe'] = ['Gruppe', 'Gruppe in der die Manschaft ist'];
 /*
  * Legends
 

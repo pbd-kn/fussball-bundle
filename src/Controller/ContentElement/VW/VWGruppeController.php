@@ -137,7 +137,7 @@ class VWGruppeController extends AbstractFussballController
         $sql .= " hy_gruppen.M1 as 'M1Ind',";
         $sql .= " mannschaft1.Nation as 'M1',";
         $sql .= " mannschaft1.Name as 'M1Name',";
-        $sql .= " flagge1.Image as 'Flagge1',";
+        $sql .= " mannschaft1.Flagge as 'Flagge1',";
         $sql .= " hy_gruppen.Spiele as 'Spiele',";
         $sql .= " hy_gruppen.Sieg as 'Sieg',";
         $sql .= " hy_gruppen.Unentschieden as 'Unentschieden',";
@@ -148,8 +148,7 @@ class VWGruppeController extends AbstractFussballController
         $sql .= " hy_gruppen.Platz as 'Platz',";
         $sql .= " hy_gruppen.Punkte as 'Punkte'";
         $sql .= " FROM hy_gruppen";
-        $sql .= " LEFT JOIN hy_mannschaft AS mannschaft1 ON hy_gruppen.M1 = mannschaft1.ID";
-        $sql .= " LEFT JOIN tl_hy_nation AS flagge1 ON flagge1.ID = mannschaft1.flgindex";
+        $sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft1 ON hy_gruppen.M1 = mannschaft1.ID";
         $sql .= " WHERE hy_gruppen.Wettbewerb  ='".$this->aktWettbewerb['aktWettbewerb']."'";
         $sql .= " ORDER BY hy_gruppen.Gruppe ASC , hy_gruppen.Platz ASC ;";
 

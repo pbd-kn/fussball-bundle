@@ -71,7 +71,7 @@
       <br />Falls Ihr noch Fragen oder Anregungen habt, meldet Euch bitte.
       <br />
       <br />Gruss
-      <br />Dirk
+      <br />Hoyzer-Team
 	  </p>
     </td>
   </tr>
