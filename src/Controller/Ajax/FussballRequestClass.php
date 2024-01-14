@@ -2314,7 +2314,7 @@ $debug.=" sql: $sql\n";
     $debug="aktion: $aktion";
     $errortxt="";
     $Wettbewerb = $this->aktWettbewerb['aktWettbewerb'];
-    $debug.=" id: $id, Wettbewerb: $Wettbewerb, Ort: $ort, Beschreibung $beschreibung";
+    $debug.=" id: $id, Wettbewerb: $Wettbewerb";
     if ($aktion == "u" || $aktion == "n") { 
       if ($Kurzname=='' || $Kurzname == '-1') {
           $html.="Kurzname fehlerhafter Wert ($Kurzname)<br>";
