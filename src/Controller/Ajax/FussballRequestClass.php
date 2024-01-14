@@ -1119,6 +1119,7 @@ EOT;
 	  $Name=$row['Name'];
       $Email=$row['Email'];
       $Kurzname=$row['Kurzname'];
+      $str="";
 	  if ($ID == -1) {
         $str.="<center><h3>Neuer Teilnehmer eintragen</h3></center><br>\n";
 	  } else {
