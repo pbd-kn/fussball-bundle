@@ -152,7 +152,7 @@ EOT;
         $DGruppe=$row['value3'];
         $StartDatum=$row['value4'];
         $EndeDatum=$row['value5'];
-        $html.="Wettbewerb ändern<br>\n";
+        $html.="Wettbewerb &auml;ndern<br>\n";
       } else {
         $html.="Wettbewerb neu eintragen<br>\n";
       }
@@ -311,7 +311,7 @@ EOT;
         $Nation=$row['Nation'];
         $Flagge=$row['Flagge'];
         $Gruppe=$row['Gruppe'];
-        $html.="Mannschaft ändern<br>\n";
+        $html.="Mannschaft &auml;ndern<br>\n";
       } else {
         $html.="Mannschaft neu<br>\n";
       }
@@ -564,7 +564,7 @@ EOT;
         $Gegentore=$row['Gegentore'];
         $Differenz=$row['Differenz'];
         $Punkte=$row['Punkte'];
-        $html.="Gruppe ändern<br>\n";
+        $html.="Gruppe &auml;ndern<br>\n";
       } else {
         $html.="Gruppe neu, Bitte alle Gruppen löschen und neu aufsetzen<br>\n";
         $html = utf8_encode($html);
@@ -746,7 +746,7 @@ EOT;
         $Uhrzeit=$row['Uhrzeit'];
         $T1=$row['T1'];
         $T2=$row['T2'];
-        $html.="Spiel ändern<br>\n";
+        $html.="Spiel &auml;ndern<br>\n";
       } else {
         // Spielnummer neu setzen
         $html.="Spiel neu<br>\n";
