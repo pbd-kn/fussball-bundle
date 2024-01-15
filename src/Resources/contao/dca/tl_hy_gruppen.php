@@ -31,7 +31,7 @@ declare(strict_types=1);
 /*
  * Table tl_extcss
  */
-$GLOBALS['TL_DCA']['tl_hy_nation'] = [
+$GLOBALS['TL_DCA']['tl_hy_gruppen'] = [
 //        'ctable' => ['tl_extcss_file'],
     // Config
     'config' => [
@@ -65,28 +65,28 @@ $GLOBALS['TL_DCA']['tl_hy_nation'] = [
         ],
         'operations' => [
             'edit' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_hy_nation']['edit'],
+                'label' => &$GLOBALS['TL_LANG']['tl_hy_gruppen']['edit'],
 //                'href' => 'table=tl_extcss_file',
                 'icon' => 'edit.gif',
             ],
             'editheader' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_hy_nation']['editheader'],
+                'label' => &$GLOBALS['TL_LANG']['tl_hy_gruppen']['editheader'],
                 'href' => 'act=edit',
                 'icon' => 'header.gif',
             ],
             'copy' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_hy_nation']['copy'],
+                'label' => &$GLOBALS['TL_LANG']['tl_hy_gruppen']['copy'],
                 'href' => 'act=copy',
                 'icon' => 'copy.gif',
             ],
             'delete' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_hy_nation']['delete'],
+                'label' => &$GLOBALS['TL_LANG']['tl_hy_gruppen']['delete'],
                 'href' => 'act=delete',
                 'icon' => 'delete.gif',
                 'attributes' => 'onclick="if(!confirm(\''.'Loeschen??'.'\'))return false;Backend.getScrollOffset()"',
             ],
             'show' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_hy_nation']['show'],
+                'label' => &$GLOBALS['TL_LANG']['tl_hy_gruppen']['show'],
                 'href' => 'act=show',
                 'icon' => 'show.gif',
             ],
@@ -95,8 +95,8 @@ $GLOBALS['TL_DCA']['tl_hy_nation'] = [
 
 
     'palettes' => [
-        '__selector__' => array('Nation','Type','Alfa2','Alfa3','Domain','Image'),
-		'default' => '{title_legend},Nation;Type;Alfa2;Alfa3;Domain;Image;'
+        '__selector__' => array('Wettbewerb','Gruppe','M1','Platz','Spiele','Sieg','Unentschieden','Niederlage','Tore','Gegentore','Differenz','Punkte' ),
+		'default' => '{title_legend},Wettbewerb;Gruppe;M1;Platz;Spiele;Sieg;Unentschieden;Niederlage;Tore;Gegentore;Differenz;Punkte;'
     ],
     // Fields
     'fields' => [
@@ -106,43 +106,85 @@ $GLOBALS['TL_DCA']['tl_hy_nation'] = [
         'tstamp' => [
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
-        'Nation' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_hy_nation']['Nation'],
+        'Wettbewerb' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_hy_gruppen']['Wettbewerb'],
             'exclude' => true,
             'inputType' => 'text',
             'eval' => ['mandatory' => true, 'maxlength' => 64],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
-        'Type' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_hy_nation']['Type'],
+        'Gruppe' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_hy_gruppen']['Gruppe'],
             'exclude' => true,
             'inputType' => 'text',
             'eval' => ['mandatory' => true, 'maxlength' => 64],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
-        'Alfa2' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_hy_nation']['Alfa2'],
+        'M1' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_hy_gruppen']['M1'],
             'exclude' => true,
             'inputType' => 'text',
             'eval' => ['mandatory' => true, 'maxlength' => 64],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
-        'Alfa3' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_hy_nation']['Alfa3'],
+        'Platz' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_hy_gruppen']['Platz'],
             'exclude' => true,
             'inputType' => 'text',
             'eval' => ['mandatory' => true, 'maxlength' => 64],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
-        'Domain' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_hy_nation']['Domain'],
+        'Spiele' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_hy_gruppen']['Spiele'],
             'exclude' => true,
             'inputType' => 'text',
             'eval' => ['mandatory' => true, 'maxlength' => 64],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
-        'Image' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_hy_nation']['Image'],
+        'Sieg' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_hy_gruppen']['Sieg'],
+            'exclude' => true,
+            'inputType' => 'text',
+            'eval' => ['mandatory' => true, 'maxlength' => 64],
+            'sql' => "varchar(255) NOT NULL default ''",
+        ],
+        'Unentschieden' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_hy_gruppen']['Unentschieden'],
+            'exclude' => true,
+            'inputType' => 'text',
+            'eval' => ['mandatory' => true, 'maxlength' => 64],
+            'sql' => "varchar(255) NOT NULL default ''",
+        ],
+        'Niederlage' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_hy_gruppen']['Niederlage'],
+            'exclude' => true,
+            'inputType' => 'text',
+            'eval' => ['mandatory' => true, 'maxlength' => 64],
+            'sql' => "varchar(255) NOT NULL default ''",
+        ],
+        'Tore' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_hy_gruppen']['Tore'],
+            'exclude' => true,
+            'inputType' => 'text',
+            'eval' => ['mandatory' => true, 'maxlength' => 64],
+            'sql' => "varchar(255) NOT NULL default ''",
+        ],
+        'Gegentore' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_hy_gruppen']['Gegentore'],
+            'exclude' => true,
+            'inputType' => 'text',
+            'eval' => ['mandatory' => true, 'maxlength' => 64],
+            'sql' => "varchar(255) NOT NULL default ''",
+        ],
+        'Differenz' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_hy_gruppen']['Differenz'],
+            'exclude' => true,
+            'inputType' => 'text',
+            'eval' => ['mandatory' => true, 'maxlength' => 64],
+            'sql' => "varchar(255) NOT NULL default ''",
+        ],
+        'Punkte' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_hy_gruppen']['Punkte'],
             'exclude' => true,
             'inputType' => 'text',
             'eval' => ['mandatory' => true, 'maxlength' => 64],

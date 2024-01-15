@@ -428,7 +428,7 @@ EOT;
       $id=$ID;
       if ($id !=-1) {
         // Ort einlesen
-        $sql="SELECT ID,Ort,Beschreibung from hy_orte where ID='$id' LIMIT 1;";
+        $sql="SELECT ID,Ort,Beschreibung from tl_hy_orte where ID='$id' LIMIT 1;";
         $debug .= "sql: $sql  ";	
         $stmt = $this->connection->executeQuery($sql);
         /*
@@ -441,7 +441,7 @@ EOT;
         $row = $stmt->fetchAssociative();  // s. Doctrine\DBAL
         $ort=$row['Ort'];
         $beschreibung=$row['Beschreibung'];
-        $html.="Ort ändern<br>\n";
+        $html.="Ort &auml;ndern<br>\n";
       } else {
         $html.="Ort neu<br>\n";
       }
@@ -489,7 +489,7 @@ EOT;
      * @throws \Exception
      *
      * @Route("/fussball/anzeigegruppe/{aktion}/{ID}", 
-     * name="FussballRequestClass::class\anzeigeort", 
+     * name="FussballRequestClass::class\anzeigegruppe", 
      * defaults={"_scope" = "frontend"})
      */
 
@@ -542,7 +542,7 @@ EOT;
       $id=$ID;
       if ($id !=-1) {
         // Gruppe einlesen
-        $sql="SELECT * from hy_gruppen where ID='$id' LIMIT 1;";
+        $sql="SELECT * from tl_hy_gruppen where ID='$id' LIMIT 1;";
         $debug .= "sql: $sql  ";	
         $stmt = $this->connection->executeQuery($sql);
         /*
@@ -652,7 +652,7 @@ EOT;
     }
     function createOrtOption ($conn,$cgi,$Wettbewerb,$name,$selcted) {
       // selected ist der Index des Ortes
-	  $sql = "select ID,Ort From hy_orte where Wettbewerb='$Wettbewerb' ORDER By Ort ASC";
+	  $sql = "select ID,Ort From tl_hy_orte where Wettbewerb='$Wettbewerb' ORDER By Ort ASC";
 //echo " SQL $sql <br>";	
       $stmt = $conn->executeQuery($sql);
       $optarray= array();
@@ -846,7 +846,7 @@ EOT;
       $sql .= " mannschaft1.Nation as 'M1',";
       $sql .= " mannschaft1.Name as 'M1Name',";
       $sql .= " mannschaft1.Flagge as 'Flagge1'";
-	  $sql .= " FROM hy_gruppen as gruppen";
+	  $sql .= " FROM tl_hy_gruppen as gruppen";
       $sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft1 ON gruppen.M1 = mannschaft1.ID";
       $sql .= " WHERE gruppen.Wettbewerb  ='$Wettbewerb'";
       if ($gruppe != -1) {
@@ -1456,7 +1456,7 @@ EOT;
         $row = $stmt->fetchAssociative();  // s. Doctrine\DBAL
         $wb=$row['value1']; 
         //echo "noch d (loeschen) nicht realisiert ID $id Wettbewerb $wb<br>";
-        $tbs = array("hy_wetteaktuell","hy_teilnehmer","hy_spiele","hy_orte","tl_hy_mannschaft","hy_gruppen");
+        $tbs = array("hy_wetteaktuell","hy_teilnehmer","hy_spiele","tl_hy_orte","tl_hy_mannschaft","tl_hy_gruppen");
         foreach ($tbs as $k=>$tab) {
           $sql="DELETE FROM $tab WHERE wettbewerb ='$wb';";
 //echo "sql: $sql<br>";	
@@ -1715,7 +1715,7 @@ EOT;
         $value .= "'" . $Wettbewerb ."' ," ; 
         $value .= "'" . $ort ."' ," ; 
         $value .= "'" . $beschreibung ."' )" ;
-	    $sql="INSERT INTO hy_orte(Wettbewerb,Ort,Beschreibung) VALUES $value";
+	    $sql="INSERT INTO tl_hy_orte(Wettbewerb,Ort,Beschreibung) VALUES $value";
         $cnt = $this->connection->executeStatement($sql);
 	    $html.="Wettbewerb $Wettbewerb Ort $ort Beschreibung $beschreibung neu gesetzt";
         $html = utf8_encode($html);
@@ -1727,7 +1727,7 @@ EOT;
         $value .= "Ort='" . $ort ."' ," ;
         $value .= "Beschreibung='" . $beschreibung ."' " ;
 
-	    $sql = "update hy_orte $value where ID='$id'";
+	    $sql = "update tl_hy_orte $value where ID='$id'";
 //echo "sql: $sql<br>";	
         $cnt = $this->connection->executeStatement($sql);
 	    $html.="Wettbewerb $Wettbewerb Ort $ort Beschreibung $beschreibung bearbeitet";
@@ -1736,9 +1736,9 @@ EOT;
       }
     }
     if ($aktion == "d" ) {   // Ort loeschen
-	  $sql = "Delete from hy_orte WHERE ID='$id' LIMIT 1";
+	  $sql = "Delete from tl_hy_orte WHERE ID='$id' LIMIT 1";
       $cnt = $this->connection->executeStatement($sql);
-      //$html.="in Tabelle hy_orte betroffene Saetze $cnt<br>";
+      //$html.="in Tabelle tl_hy_orte betroffene Saetze $cnt<br>";
 	  $html.="Ort gel&ouml;scht";
       $html = utf8_encode($html);
       return new JsonResponse(['data' => $html,'error'=>$errortxt,'debug'=>$debug]); 
@@ -1791,7 +1791,7 @@ EOT;
         return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
       }
       $value = "SET Platz=$Platz" ;
-  	  $sql = "update hy_gruppen $value where ID='$id'";
+  	  $sql = "update tl_hy_gruppen $value where ID='$id'";
       $debug.=" sql: $sql\n";	
       $cnt = $this->connection->executeStatement($sql);
 	  $html.="Wettbewerb $Wettbewerb GrupenId $id Platz $Platz";
@@ -1800,7 +1800,7 @@ EOT;
       return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
     } 
     if ($aktion == "a") {              // alle Gruppeneintraege löschen und aus den Spielen neu aufbauen
-       $sql="SELECT * FROM hy_gruppen WHERE Wettbewerb='$Wettbewerb'";
+       $sql="SELECT * FROM tl_hy_gruppen WHERE Wettbewerb='$Wettbewerb'";
        $stmt = $this->connection->executeQuery($sql);
        $Update=0;
        $ExistGruppen=[];
@@ -1868,14 +1868,14 @@ EOT;
            $value .= "Gegentore=$Gegentore ," ;
            $value .= "Differenz=$Differenz ," ;
            $value .= "Punkte=$Punkte " ;
-  	       $sql = "UPDATE hy_gruppen $value  where ID='$Groupid'";
+  	       $sql = "UPDATE tl_hy_gruppen $value  where ID='$Groupid'";
          
            //$debug.="'|' update sql: $sql '|' ";	
            $cnt = $this->connection->executeStatement($sql);
 	       $html.="Update  Gruppe $Gruppe M1 ".$M1." cnt ".$cnt;
          } else {
            $value = "( '$Wettbewerb','$Gruppe',$M1,$Platz,$Spiele,$Sieg,$Unentschieden,$Niederlage,$Tore,$Gegentore,$Differenz,$Punkte)" ;
-           $sql="INSERT INTO hy_gruppen(Wettbewerb,Gruppe,M1,Platz,Spiele,Sieg,Unentschieden,Niederlage,Tore,Gegentore,Differenz,Punkte) VALUES $value";
+           $sql="INSERT INTO tl_hy_gruppen(Wettbewerb,Gruppe,M1,Platz,Spiele,Sieg,Unentschieden,Niederlage,Tore,Gegentore,Differenz,Punkte) VALUES $value";
            //$debug.="'|' insert sql: $sql '|' ";	
            $cnt = $this->connection->executeStatement($sql);
 	       $html.="Eingefügt  Gruppe $Gruppe M1 $M1 ";
@@ -1885,7 +1885,7 @@ EOT;
        //return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]);  
        // Versuch der Platzbestimmung
        // lies alle Gruppen nochmals ein
-       $sql="SELECT * FROM hy_gruppen WHERE Wettbewerb='$Wettbewerb' ORDER BY Gruppe";
+       $sql="SELECT * FROM tl_hy_gruppen WHERE Wettbewerb='$Wettbewerb' ORDER BY Gruppe";
        $stmt = $this->connection->executeQuery($sql);
        $Update=0;
        $ExistGruppen=[];
@@ -1966,7 +1966,7 @@ EOT;
              $Spiele=$row['Spiele'];
              if ($Spiele != -1) {
                $value = "SET Platz=$Platz" ;
-  	           $sql = "update hy_gruppen $value where ID='".$row['ID']."'";
+  	           $sql = "update tl_hy_gruppen $value where ID='".$row['ID']."'";
                $debug.= "Update K $k Spiele $Spiele sql $sql<br>";    
                $cnt = $this->connection->executeStatement($sql);
              }
@@ -2257,9 +2257,9 @@ $debug.=" sql: $sql\n";
         }
 	    if ($Art == 'g') {    // Gruppen erster / Zweiter / Dritter
           // gruppe einlesen nach Platz sortiert Tipp1 ist die Gruppe (A,B...Achtel 1..)
-          $sql= "SELECT Platz,mannschaft1.Name as 'M1Name' ,mannschaft1.ID as 'M1Ind' FROM  `hy_gruppen`"; 
-          $sql.=" LEFT JOIN tl_hy_mannschaft AS mannschaft1 ON hy_gruppen.M1 = mannschaft1.ID"; 
-          $sql.=" WHERE hy_gruppen.wettbewerb='".$Wettbewerb."' AND hy_gruppen.Gruppe='".$w['Tipp1']."' ORDER BY Platz";
+          $sql= "SELECT Platz,mannschaft1.Name as 'M1Name' ,mannschaft1.ID as 'M1Ind' FROM  `tl_hy_gruppen`"; 
+          $sql.=" LEFT JOIN tl_hy_mannschaft AS mannschaft1 ON tl_hy_gruppen.M1 = mannschaft1.ID"; 
+          $sql.=" WHERE tl_hy_gruppen.wettbewerb='".$Wettbewerb."' AND tl_hy_gruppen.Gruppe='".$w['Tipp1']."' ORDER BY Platz";
           $stmt = $this->connection->executeQuery($sql); 
           $Pl=array();
           while (($row = $stmt->fetchAssociative()) !== false) {

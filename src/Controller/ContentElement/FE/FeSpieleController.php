@@ -133,7 +133,7 @@ class FeSpieleController extends AbstractFussballController
         $sql .= " mannschaft2.Name as 'M2Name',";
         $sql .= " mannschaft2.Flagge as 'Flagge2',";
         $sql .= " hy_spiele.Ort as 'OrtInd',";
-        $sql .= " hy_orte.Ort as 'Ort',";
+        $sql .= " tl_hy_orte.Ort as 'Ort',";
         $sql .= " DATE_FORMAT(hy_spiele.Datum,'%d.%c') as 'Datum',";
         $sql .= " DATE_FORMAT(hy_spiele.Uhrzeit,'%H:%S') as 'Uhrzeit',";
         $sql .= " hy_spiele.T1 as 'T1',";
@@ -141,7 +141,7 @@ class FeSpieleController extends AbstractFussballController
         $sql .= " FROM hy_spiele";
         $sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft1 ON hy_spiele.M1 = mannschaft1.ID";
         $sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft2 ON hy_spiele.M2 = mannschaft2.ID";
-        $sql .= " LEFT JOIN hy_orte ON hy_spiele.Ort = hy_orte.ID";
+        $sql .= " LEFT JOIN tl_hy_orte ON hy_spiele.Ort = tl_hy_orte.ID";
         $sql .= " WHERE hy_spiele.Wettbewerb  ='".$this->aktWettbewerb['aktWettbewerb']."'";
         $sql .= " ORDER BY hy_spiele.Datum ASC , hy_spiele.Uhrzeit ASC ;";
        

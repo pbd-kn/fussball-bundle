@@ -119,7 +119,7 @@ class OrteController extends AbstractFussballController
         $c=$this->cgiUtil;
         $html="";
         // alle aktuellen Orte einlesen
-        $sql="SELECT * FROM hy_orte WHERE Wettbewerb='".$this->aktWettbewerb['aktWettbewerb']."' ORDER BY Ort ASC"; 
+        $sql="SELECT * FROM tl_hy_orte WHERE Wettbewerb='".$this->aktWettbewerb['aktWettbewerb']."' ORDER BY Ort ASC"; 
         $stmt = $this->connection->executeQuery($sql);
         $num_rows = $stmt->rowCount();    
         while (($row = $stmt->fetchAssociative()) !== false) {

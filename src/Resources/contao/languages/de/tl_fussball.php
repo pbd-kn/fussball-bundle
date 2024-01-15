@@ -71,6 +71,37 @@ $GLOBALS['TL_LANG']['tl_hy_mannschaft']['Nation'] = ['Nation', 'Index in die Nam
 $GLOBALS['TL_LANG']['tl_hy_mannschaft']['Flagge'] = ['Flagge', 'Imagename aus Nationentabelle'];
 $GLOBALS['TL_LANG']['tl_hy_mannschaft']['Gruppe'] = ['Gruppe', 'Gruppe in der die Manschaft ist'];
 /*
+ * Fields Gruppen  
+ */
+$GLOBALS['TL_LANG']['tl_hy_gruppen']['edit'] = ['Edit Gruppe', 'Edit Gruppe'];
+$GLOBALS['TL_LANG']['tl_hy_gruppen']['editheader'] = ['Edit Gruppe Header', 'Edit Gruppe Header'];
+$GLOBALS['TL_LANG']['tl_hy_gruppen']['copy'] = ['Copy Gruppe', 'Copy Gruppe'];
+$GLOBALS['TL_LANG']['tl_hy_gruppen']['delete'] = ['Delete Gruppe', 'Delete Gruppe'];
+$GLOBALS['TL_LANG']['tl_hy_gruppen']['show'] = ['Zeige Gruppe', 'Zeige Gruppe'];
+$GLOBALS['TL_LANG']['tl_hy_gruppen']['Wettbewerb'] = ['Wettbewerb', 'Wettbewerb'];
+$GLOBALS['TL_LANG']['tl_hy_gruppen']['Gruppe'] = ['Name der Gruppe', 'Name der Gruppe'];
+$GLOBALS['TL_LANG']['tl_hy_gruppen']['M1'] = ['Mannschaft in der Gruppe', 'Mannschaft in der Gruppe'];
+$GLOBALS['TL_LANG']['tl_hy_gruppen']['Platz'] = ['Platz in der Gruppe', 'Platz in der Gruppe'];
+$GLOBALS['TL_LANG']['tl_hy_gruppen']['Spiele'] = ['Anzahl Spiele', 'Anzahl Spiele'];
+$GLOBALS['TL_LANG']['tl_hy_gruppen']['Sieg'] = ['Anzahl Siege', 'Anzahl Siege'];
+$GLOBALS['TL_LANG']['tl_hy_gruppen']['Unentschieden'] = ['Anzahl Unentschieden', 'Anzahl Unentschieden'];
+$GLOBALS['TL_LANG']['tl_hy_gruppen']['Niederlage'] = ['Anzahl Niederlagen', 'Anzahl Niederlagen'];
+$GLOBALS['TL_LANG']['tl_hy_gruppen']['Tore'] = ['Anzahl Tore', 'Anzahl Tore'];
+$GLOBALS['TL_LANG']['tl_hy_gruppen']['Gegentore'] = ['Anzahl Gegentore', 'Anzahl Gegentore'];
+$GLOBALS['TL_LANG']['tl_hy_gruppen']['Differenz'] = ['Differenz Tore', 'Differenz Tore'];
+$GLOBALS['TL_LANG']['tl_hy_gruppen']['Punkte'] = ['Anzahl Punkte', 'Anzahl Punkte'];
+/*
+ * Fields Orte  
+ */
+$GLOBALS['TL_LANG']['tl_hy_orte']['edit'] = ['Edit Orte', 'Edit Orte'];
+$GLOBALS['TL_LANG']['tl_hy_orte']['editheader'] = ['Edit Orte Header', 'Edit Orte Header'];
+$GLOBALS['TL_LANG']['tl_hy_orte']['copy'] = ['Copy Orte', 'Copy Orte'];
+$GLOBALS['TL_LANG']['tl_hy_orte']['delete'] = ['Delete Orte', 'Delete Orte'];
+$GLOBALS['TL_LANG']['tl_hy_orte']['show'] = ['Zeige Orte', 'Zeige Orte'];
+$GLOBALS['TL_LANG']['tl_hy_orte']['Wettbewerb'] = ['Wettbewerb', 'Wettbewerb'];
+$GLOBALS['TL_LANG']['tl_hy_orte']['Ort'] = ['Name der Ort', 'Name der Ort'];
+$GLOBALS['TL_LANG']['tl_hy_orte']['Beschreibung'] = ['Beschreibung', 'Beschreibung'];
+/*
  * Legends
 
 $GLOBALS['TL_LANG']['tl_extcss']['title_legend'] = 'Titel';

@@ -127,7 +127,7 @@ class VWTeilnehmerController extends AbstractFussballController
         $sql .= " mannschaft1.Name as 'M1Name',";
         $sql .= " mannschaft1.ID as 'M1Ind',";
         $sql .= " mannschaft1.Flagge as 'Flagge1'";
-	    $sql .= " FROM hy_gruppen as gruppen";
+	    $sql .= " FROM tl_hy_gruppen as gruppen";
         $sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft1 ON gruppen.M1 = mannschaft1.ID";
         $sql .= " WHERE gruppen.Wettbewerb  ='$Wettbewerb'";
         if ($gruppe != -1) {
@@ -275,9 +275,9 @@ class VWTeilnehmerController extends AbstractFussballController
 	      if ($Art == 'g') {    // Gruppen erster / Zweiter / Dritter
 
             // gruppe einlesen nach Platz sortiert
-            $sql= "SELECT Platz,mannschaft1.Name as 'M1Name' ,mannschaft1.ID as 'M1Ind' FROM  `hy_gruppen`"; 
-            $sql.=" LEFT JOIN tl_hy_mannschaft AS mannschaft1 ON hy_gruppen.M1 = mannschaft1.ID"; 
-            $sql.=" WHERE hy_gruppen.wettbewerb='".$Wettbewerb."' AND hy_gruppen.Gruppe='".$w['Tipp1']."' ORDER BY Platz";
+            $sql= "SELECT Platz,mannschaft1.Name as 'M1Name' ,mannschaft1.ID as 'M1Ind' FROM  `tl_hy_gruppen`"; 
+            $sql.=" LEFT JOIN tl_hy_mannschaft AS mannschaft1 ON tl_hy_gruppen.M1 = mannschaft1.ID"; 
+            $sql.=" WHERE tl_hy_gruppen.wettbewerb='".$Wettbewerb."' AND tl_hy_gruppen.Gruppe='".$w['Tipp1']."' ORDER BY Platz";
             $stmt = $conn->executeQuery($sql); 
             $Pl=array();
             while (($row = $stmt->fetchAssociative()) !== false) {

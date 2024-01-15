@@ -29,9 +29,9 @@ declare(strict_types=1);
  */
 
 /*
- * Table tl_extcss
+ * Table tl_hy_orte
  */
-$GLOBALS['TL_DCA']['tl_hy_nation'] = [
+$GLOBALS['TL_DCA']['tl_hy_orte'] = [
 //        'ctable' => ['tl_extcss_file'],
     // Config
     'config' => [
@@ -65,28 +65,28 @@ $GLOBALS['TL_DCA']['tl_hy_nation'] = [
         ],
         'operations' => [
             'edit' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_hy_nation']['edit'],
+                'label' => &$GLOBALS['TL_LANG']['tl_hy_orte']['edit'],
 //                'href' => 'table=tl_extcss_file',
                 'icon' => 'edit.gif',
             ],
             'editheader' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_hy_nation']['editheader'],
+                'label' => &$GLOBALS['TL_LANG']['tl_hy_orte']['editheader'],
                 'href' => 'act=edit',
                 'icon' => 'header.gif',
             ],
             'copy' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_hy_nation']['copy'],
+                'label' => &$GLOBALS['TL_LANG']['tl_hy_orte']['copy'],
                 'href' => 'act=copy',
                 'icon' => 'copy.gif',
             ],
             'delete' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_hy_nation']['delete'],
+                'label' => &$GLOBALS['TL_LANG']['tl_hy_orte']['delete'],
                 'href' => 'act=delete',
                 'icon' => 'delete.gif',
                 'attributes' => 'onclick="if(!confirm(\''.'Loeschen??'.'\'))return false;Backend.getScrollOffset()"',
             ],
             'show' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_hy_nation']['show'],
+                'label' => &$GLOBALS['TL_LANG']['tl_hy_orte']['show'],
                 'href' => 'act=show',
                 'icon' => 'show.gif',
             ],
@@ -95,8 +95,8 @@ $GLOBALS['TL_DCA']['tl_hy_nation'] = [
 
 
     'palettes' => [
-        '__selector__' => array('Nation','Type','Alfa2','Alfa3','Domain','Image'),
-		'default' => '{title_legend},Nation;Type;Alfa2;Alfa3;Domain;Image;'
+        '__selector__' => array('Wettbewerb','Ort','Beschreibung' ),
+		'default' => '{title_legend},Wettbewerb;Ort;Beschreibung;'
     ],
     // Fields
     'fields' => [
@@ -106,43 +106,22 @@ $GLOBALS['TL_DCA']['tl_hy_nation'] = [
         'tstamp' => [
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
-        'Nation' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_hy_nation']['Nation'],
+        'Wettbewerb' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_hy_orte']['Wettbewerb'],
             'exclude' => true,
             'inputType' => 'text',
             'eval' => ['mandatory' => true, 'maxlength' => 64],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
-        'Type' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_hy_nation']['Type'],
+        'Ort' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_hy_orte']['Ort'],
             'exclude' => true,
             'inputType' => 'text',
             'eval' => ['mandatory' => true, 'maxlength' => 64],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
-        'Alfa2' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_hy_nation']['Alfa2'],
-            'exclude' => true,
-            'inputType' => 'text',
-            'eval' => ['mandatory' => true, 'maxlength' => 64],
-            'sql' => "varchar(255) NOT NULL default ''",
-        ],
-        'Alfa3' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_hy_nation']['Alfa3'],
-            'exclude' => true,
-            'inputType' => 'text',
-            'eval' => ['mandatory' => true, 'maxlength' => 64],
-            'sql' => "varchar(255) NOT NULL default ''",
-        ],
-        'Domain' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_hy_nation']['Domain'],
-            'exclude' => true,
-            'inputType' => 'text',
-            'eval' => ['mandatory' => true, 'maxlength' => 64],
-            'sql' => "varchar(255) NOT NULL default ''",
-        ],
-        'Image' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_hy_nation']['Image'],
+        'Beschreibung' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_hy_orte']['Beschreibung'],
             'exclude' => true,
             'inputType' => 'text',
             'eval' => ['mandatory' => true, 'maxlength' => 64],

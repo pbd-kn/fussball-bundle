@@ -347,9 +347,9 @@ class FePunkteController extends AbstractFussballController
           }
 	      if ($Art == 'g') {    // Gruppen erster / Zweiter / Dritter
             // gruppe einlesen nach Platz sortiert
-            $sql= "SELECT Platz,mannschaft1.Name as 'M1Name' ,mannschaft1.ID as 'M1Ind' FROM  `hy_gruppen`"; 
-            $sql.=" LEFT JOIN tl_hy_mannschaft AS mannschaft1 ON hy_gruppen.M1 = mannschaft1.ID"; 
-            $sql.=" WHERE hy_gruppen.wettbewerb='".$Wettbewerb."' AND hy_gruppen.Gruppe='".$Tipp1."' ORDER BY Platz";
+            $sql= "SELECT Platz,mannschaft1.Name as 'M1Name' ,mannschaft1.ID as 'M1Ind' FROM  `tl_hy_gruppen`"; 
+            $sql.=" LEFT JOIN tl_hy_mannschaft AS mannschaft1 ON tl_hy_gruppen.M1 = mannschaft1.ID"; 
+            $sql.=" WHERE tl_hy_gruppen.wettbewerb='".$Wettbewerb."' AND tl_hy_gruppen.Gruppe='".$Tipp1."' ORDER BY Platz";
             $stmt = $conn->executeQuery($sql); 
             $num_rows = $stmt->rowCount();    
             $Pl=array();
@@ -422,16 +422,16 @@ class FePunkteController extends AbstractFussballController
 		$str.=$cgi->td((string)$Punkte);
       }
 	  if ($Art == 'p') {    // Mannschafts index 
-	    if ($W1 == -1) $g1=-1; else $g1=$mannschaften[$W1]['Name'];      
-	    if ($Tipp1 == -1) $g2=-1; else $g1=$mannschaften[$Tipp1]['Name'];      
-	    $str.=$cgi->td($g2).$cgi->td($g1);
+	    //if ($W1 == -1) $g1=-1; else $g1=$mannschaften[$W1]['Name'];      
+	    if ($Tipp1 == -1) $g2=-1; else $g2=$mannschaften[$Tipp1]['Name'];      
+	    $str.=$cgi->td($g2).$cgi->td($g2);
 	  	$str.=$cgi->td((string)$Punkte);
       }
 	  if ($Art == 'g') {    // Gruppen erster / Zweiter / Dritter
         // gruppe einlesen nach Platz sortiert
-        $sql= "SELECT Platz,mannschaft1.Name as 'M1Name' ,mannschaft1.ID as 'M1Ind' FROM  `hy_gruppen`"; 
-        $sql.=" LEFT JOIN tl_hy_mannschaft AS mannschaft1 ON hy_gruppen.M1 = mannschaft1.ID"; 
-        $sql.=" WHERE hy_gruppen.wettbewerb='".$Wettbewerb."' AND hy_gruppen.Gruppe='".$Tipp1."' ORDER BY Platz";
+        $sql= "SELECT Platz,mannschaft1.Name as 'M1Name' ,mannschaft1.ID as 'M1Ind' FROM  `tl_hy_gruppen`"; 
+        $sql.=" LEFT JOIN tl_hy_mannschaft AS mannschaft1 ON tl_hy_gruppen.M1 = mannschaft1.ID"; 
+        $sql.=" WHERE tl_hy_gruppen.wettbewerb='".$Wettbewerb."' AND tl_hy_gruppen.Gruppe='".$Tipp1."' ORDER BY Platz";
         $stmt = $conn->executeQuery($sql); 
         $num_rows = $stmt->rowCount();    
         $Pl=array();
