@@ -29,9 +29,9 @@ declare(strict_types=1);
  */
 
 /*
- * Table tl_hy_orte
+ * Table tl_hy_spiele
  */
-$GLOBALS['TL_DCA']['tl_hy_orte'] = [
+$GLOBALS['TL_DCA']['tl_hy_spiele'] = [
 //        'ctable' => ['tl_extcss_file'],
     // Config
     'config' => [
@@ -65,28 +65,28 @@ $GLOBALS['TL_DCA']['tl_hy_orte'] = [
         ],
         'operations' => [
             'edit' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_hy_orte']['edit'],
+                'label' => &$GLOBALS['TL_LANG']['tl_hy_spiele']['edit'],
 //                'href' => 'table=tl_extcss_file',
                 'icon' => 'edit.gif',
             ],
             'editheader' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_hy_orte']['editheader'],
+                'label' => &$GLOBALS['TL_LANG']['tl_hy_spiele']['editheader'],
                 'href' => 'act=edit',
                 'icon' => 'header.gif',
             ],
             'copy' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_hy_orte']['copy'],
+                'label' => &$GLOBALS['TL_LANG']['tl_hy_spiele']['copy'],
                 'href' => 'act=copy',
                 'icon' => 'copy.gif',
             ],
             'delete' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_hy_orte']['delete'],
+                'label' => &$GLOBALS['TL_LANG']['tl_hy_spiele']['delete'],
                 'href' => 'act=delete',
                 'icon' => 'delete.gif',
                 'attributes' => 'onclick="if(!confirm(\''.'Loeschen??'.'\'))return false;Backend.getScrollOffset()"',
             ],
             'show' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_hy_orte']['show'],
+                'label' => &$GLOBALS['TL_LANG']['tl_hy_spiele']['show'],
                 'href' => 'act=show',
                 'icon' => 'show.gif',
             ],
@@ -95,8 +95,8 @@ $GLOBALS['TL_DCA']['tl_hy_orte'] = [
 
 
     'palettes' => [
-        '__selector__' => array('Wettbewerb','Ort','Beschreibung' ),
-		'default' => '{title_legend},Wettbewerb;Ort;Beschreibung;'
+        '__selector__' => array('Wettbewerb','Nr','Gruppe','M1','M2','Ort','Datum','Uhrzeit','T1','T2','Link' ),
+		'default' => '{title_legend},Wettbewerb;Nr;Gruppe;M1;M2;Ort;Datum;Uhrzeit;T1;T2;Link;'
     ],
     // Fields
     'fields' => [
@@ -107,24 +107,77 @@ $GLOBALS['TL_DCA']['tl_hy_orte'] = [
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
         'Wettbewerb' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_hy_orte']['Wettbewerb'],
+            'label' => &$GLOBALS['TL_LANG']['tl_hy_spiele']['Wettbewerb'],
             'exclude' => true,
             'inputType' => 'text',
             'eval' => ['mandatory' => true, 'maxlength' => 64],
             'sql' => "varchar(255) NOT NULL default ''",
+        ],
+        'Nr' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_hy_orte']['Nr'],
+            'exclude' => true,
+            'inputType' => 'text',
+            'eval' => ['mandatory' => true, 'maxlength' => 64],
+            'sql' => "int  NOT NULL default -1",
+        ],
+        'Gruppe' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_hy_orte']['Gruppe'],
+            'exclude' => true,
+            'inputType' => 'text',
+            'eval' => ['mandatory' => true, 'maxlength' => 64],
+            'sql' => "varchar(255) NOT NULL default ''",
+        ],
+        'M1' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_hy_orte']['M1'],
+            'exclude' => true,
+            'inputType' => 'text',
+            'eval' => ['mandatory' => true, 'maxlength' => 64],
+            'sql' => "int  NOT NULL default -1",
+        ],
+        'M2' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_hy_orte']['M2'],
+            'exclude' => true,
+            'inputType' => 'text',
+            'eval' => ['mandatory' => true, 'maxlength' => 64],
+            'sql' => "int(10)  NOT NULL default -1",
         ],
         'Ort' => [
             'label' => &$GLOBALS['TL_LANG']['tl_hy_orte']['Ort'],
             'exclude' => true,
             'inputType' => 'text',
             'eval' => ['mandatory' => true, 'maxlength' => 64],
-            'sql' => "varchar(255) NOT NULL default ''",
+            'sql' => "int  NOT NULL default -1",
         ],
-        'Beschreibung' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_hy_orte']['Beschreibung'],
+        'Datum' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_hy_orte']['Datum'],
             'exclude' => true,
             'inputType' => 'text',
-            'eval' => ['mandatory' => true, 'maxlength' => 64],
+            'sql' => "date",
+        ],
+        'Uhrzeit' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_hy_orte']['Uhrzeit'],
+            'exclude' => true,
+            'inputType' => 'text',
+            'sql' => "time",
+        ],
+        'T1' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_hy_orte']['T1'],
+            'exclude' => true,
+            'inputType' => 'text',
+            'eval' => ['mandatory' => true],
+            'sql' => "int  NOT NULL default -1",
+        ],
+        'T2' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_hy_orte']['T2'],
+            'exclude' => true,
+            'inputType' => 'text',
+            'eval' => ['mandatory' => true],
+            'sql' => "int NOT NULL default -1",
+        ],
+        'Link' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_hy_orte']['Link'],
+            'exclude' => true,
+            'inputType' => 'text',
             'sql' => "varchar(255) default ''",
         ],
     ],

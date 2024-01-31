@@ -121,29 +121,29 @@ class FeSpieleController extends AbstractFussballController
         $Wettbewerb=$this->aktWettbewerb['aktWettbewerb'];
         // alle aktuellen Spiele einlesen        
         $sql  = "SELECT";
-        $sql .= " hy_spiele.ID as 'ID',";
-        $sql .= " hy_spiele.Nr as 'Nr',";
-        $sql .= " hy_spiele.Gruppe as 'Gruppe',";
-        $sql .= " hy_spiele.M1 as 'M1Ind',";
+        $sql .= " tl_hy_spiele.ID as 'ID',";
+        $sql .= " tl_hy_spiele.Nr as 'Nr',";
+        $sql .= " tl_hy_spiele.Gruppe as 'Gruppe',";
+        $sql .= " tl_hy_spiele.M1 as 'M1Ind',";
         $sql .= " mannschaft1.Nation as 'M1',";
         $sql .= " mannschaft1.Name as 'M1Name',";
         $sql .= " mannschaft1.Flagge as 'Flagge1',";
-        $sql .= " hy_spiele.M2 as 'M2Ind',";
+        $sql .= " tl_hy_spiele.M2 as 'M2Ind',";
         $sql .= " mannschaft2.Nation as 'M2',";
         $sql .= " mannschaft2.Name as 'M2Name',";
         $sql .= " mannschaft2.Flagge as 'Flagge2',";
-        $sql .= " hy_spiele.Ort as 'OrtInd',";
+        $sql .= " tl_hy_spiele.Ort as 'OrtInd',";
         $sql .= " tl_hy_orte.Ort as 'Ort',";
-        $sql .= " DATE_FORMAT(hy_spiele.Datum,'%d.%c') as 'Datum',";
-        $sql .= " DATE_FORMAT(hy_spiele.Uhrzeit,'%H:%S') as 'Uhrzeit',";
-        $sql .= " hy_spiele.T1 as 'T1',";
-        $sql .= " hy_spiele.T2 as 'T2'";
-        $sql .= " FROM hy_spiele";
-        $sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft1 ON hy_spiele.M1 = mannschaft1.ID";
-        $sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft2 ON hy_spiele.M2 = mannschaft2.ID";
-        $sql .= " LEFT JOIN tl_hy_orte ON hy_spiele.Ort = tl_hy_orte.ID";
-        $sql .= " WHERE hy_spiele.Wettbewerb  ='".$this->aktWettbewerb['aktWettbewerb']."'";
-        $sql .= " ORDER BY hy_spiele.Datum ASC , hy_spiele.Uhrzeit ASC ;";
+        $sql .= " DATE_FORMAT(tl_hy_spiele.Datum,'%d.%c') as 'Datum',";
+        $sql .= " DATE_FORMAT(tl_hy_spiele.Uhrzeit,'%H:%S') as 'Uhrzeit',";
+        $sql .= " tl_hy_spiele.T1 as 'T1',";
+        $sql .= " tl_hy_spiele.T2 as 'T2'";
+        $sql .= " FROM tl_hy_spiele";
+        $sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft1 ON tl_hy_spiele.M1 = mannschaft1.ID";
+        $sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft2 ON tl_hy_spiele.M2 = mannschaft2.ID";
+        $sql .= " LEFT JOIN tl_hy_orte ON tl_hy_spiele.Ort = tl_hy_orte.ID";
+        $sql .= " WHERE tl_hy_spiele.Wettbewerb  ='".$this->aktWettbewerb['aktWettbewerb']."'";
+        $sql .= " ORDER BY tl_hy_spiele.Datum ASC , tl_hy_spiele.Uhrzeit ASC ;";
        
 
         $stmt = $this->connection->executeQuery($sql);

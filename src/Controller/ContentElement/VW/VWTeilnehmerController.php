@@ -171,22 +171,22 @@ class VWTeilnehmerController extends AbstractFussballController
         $debug.="erzeugeWetttabelle $tid wettbewerb $Wettbewerb<br>";
         $str='';
         $sql =  "SELECT ";
-	    $sql .= " hy_wetteaktuell.ID as ID,";
-	    $sql .= " hy_wetteaktuell.Wettbewerb as Wettbewerb,";
-    	$sql .= " hy_wetteaktuell.W1 as W1,";
-	    $sql .= " hy_wetteaktuell.W2 as W2,";
-	    $sql .= " hy_wetteaktuell.W3 as W3,";
-        $sql .= " hy_wetteaktuell.Wette as Hywettenindex,";
-	    $sql .= " hy_wetten.Art as Art,";
-	    $sql .= " hy_wetten.Tipp1 as Tipp1,";
-	    $sql .= " hy_wetten.Tipp2 as Tipp2,";
-	    $sql .= " hy_wetten.Tipp3 as Tipp3,";
-	    $sql .= " hy_wetten.Tipp4 as Tipp4,";
-	    $sql .= " hy_wetten.Kommentar as Kommentar";
-	    $sql .= " FROM hy_wetteaktuell";
-	    $sql .= " LEFT JOIN hy_wetten ON hy_wetteaktuell.Wette = hy_wetten.ID";
-	    $sql .= " WHERE hy_wetteaktuell.Wettbewerb = '$Wettbewerb' AND hy_wetteaktuell.Teilnehmer = $tid";
-	    $sql .= " ORDER BY hy_wetten.Kommentar";
+	    $sql .= " tl_hy_wetteaktuell.ID as ID,";
+	    $sql .= " tl_hy_wetteaktuell.Wettbewerb as Wettbewerb,";
+    	$sql .= " tl_hy_wetteaktuell.W1 as W1,";
+	    $sql .= " tl_hy_wetteaktuell.W2 as W2,";
+	    $sql .= " tl_hy_wetteaktuell.W3 as W3,";
+        $sql .= " tl_hy_wetteaktuell.Wette as Hywettenindex,";
+	    $sql .= " tl_hy_wetten.Art as Art,";
+	    $sql .= " tl_hy_wetten.Tipp1 as Tipp1,";
+	    $sql .= " tl_hy_wetten.Tipp2 as Tipp2,";
+	    $sql .= " tl_hy_wetten.Tipp3 as Tipp3,";
+	    $sql .= " tl_hy_wetten.Tipp4 as Tipp4,";
+	    $sql .= " tl_hy_wetten.Kommentar as Kommentar";
+	    $sql .= " FROM tl_hy_wetteaktuell";
+	    $sql .= " LEFT JOIN tl_hy_wetten ON tl_hy_wetteaktuell.Wette = tl_hy_wetten.ID";
+	    $sql .= " WHERE tl_hy_wetteaktuell.Wettbewerb = '$Wettbewerb' AND tl_hy_wetteaktuell.Teilnehmer = $tid";
+	    $sql .= " ORDER BY tl_hy_wetten.Kommentar";
         $debug.="erzeuge Wetttabelle<br>sql: $sql<br>";
         $stmt = $conn->executeQuery($sql);
         $anz = $stmt->rowCount();
@@ -205,8 +205,8 @@ class VWTeilnehmerController extends AbstractFussballController
 //$str.=$cgi->td('sql wetten: '.$sql);
         // alle Wetten eines Teilnehmers abarbeiten
         // $w ist das Ergebis des sql incl Join
-        // indices Tipp1, Tipp2, Tipp3, Tipp4     Werte aus der Tabelle hy_wetten
-        //         W1,W2,W3,W4                    Werte der getippten aus hy_wetteaktuell
+        // indices Tipp1, Tipp2, Tipp3, Tipp4     Werte aus der Tabelle tl_hy_wetten
+        //         W1,W2,W3,W4                    Werte der getippten aus tl_hy_wetteaktuell
 	    foreach ($wetten as $w) {
 	      $wettindex=$w['ID'];    // Id aus wetteaktuell
 	      $kommentar=$w['Kommentar'];
@@ -222,11 +222,11 @@ class VWTeilnehmerController extends AbstractFussballController
 	      $str.=$cgi->td((string)$Art);
           $cgi->td($w['Tipp1']).$cgi->td($w['Tipp2']).$cgi->td($w['Tipp3']).$cgi->td($w['Tipp4']);          
     // Bestimmung der gewetteten Werte Interpretation je nach Wett Typ
-          $Wetten1=$w['Tipp1'];            // Wert1 aus hy_wetten nur der ist relevant und wird abhaengig vom Wetttyp interpretiert
+          $Wetten1=$w['Tipp1'];            // Wert1 aus tl_hy_wetten nur der ist relevant und wird abhaengig vom Wetttyp interpretiert
           $Wetten2=$w['Tipp2'];       
           $Wetten3=$w['Tipp3'];
           $Wetten4=$w['Tipp4'];
-	      $W1=$w['W1'];            // aktuelle Werte aus hy_wetteaktuell des Teilnehmers werden abhaenig vom Wetttyp interpretiert
+	      $W1=$w['W1'];            // aktuelle Werte aus tl_hy_wetteaktuell des Teilnehmers werden abhaenig vom Wetttyp interpretiert
           $W2=$w['W2'];
           $W3=$w['W3'];
 	      $str.=$cgi->td((string)$w['Tipp1']);  // Wert aus Wetten
@@ -237,10 +237,10 @@ class VWTeilnehmerController extends AbstractFussballController
             $sql  = "SELECT";
             $sql .= " mannschaft1.Name as 'M1Name',";
             $sql .= " mannschaft2.Name as 'M2Name'";
-            $sql .= " FROM hy_spiele";
-            $sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft1 ON hy_spiele.M1 = mannschaft1.ID";
-            $sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft2 ON hy_spiele.M2 = mannschaft2.ID";            
-            $sql .= " WHERE hy_spiele.Wettbewerb  ='".$Wettbewerb."' AND hy_spiele.ID=".$w['Tipp1'].";";
+            $sql .= " FROM tl_hy_spiele";
+            $sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft1 ON tl_hy_spiele.M1 = mannschaft1.ID";
+            $sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft2 ON tl_hy_spiele.M2 = mannschaft2.ID";            
+            $sql .= " WHERE tl_hy_spiele.Wettbewerb  ='".$Wettbewerb."' AND tl_hy_spiele.ID=".$w['Tipp1'].";";
             $stmt = $conn->executeQuery($sql);
             $num_rows = $stmt->rowCount();    
             $row = $stmt->fetchAssociative();
@@ -306,7 +306,7 @@ class VWTeilnehmerController extends AbstractFussballController
         $sql .= " teilnehmer.Name as 'Name',";
         $sql .= " teilnehmer.Kurzname as 'Kurzname',";
         $sql .= " teilnehmer.Email as 'Email'";
-        $sql .= " FROM hy_teilnehmer as teilnehmer";
+        $sql .= " FROM 'tl_hy_teilnehmer as teilnehmer";
         $sql .= " WHERE Wettbewerb  ='".$this->aktWettbewerb['aktWettbewerb']."' ";
         $sql .= " ORDER BY teilnehmer.Kurzname  ;";
         $stmt = $this->connection->executeQuery($sql);

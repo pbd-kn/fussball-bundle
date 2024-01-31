@@ -264,9 +264,9 @@ class FePunkteController extends AbstractFussballController
     	$sql .= " wetteaktuell.W1 as W1,";
 	    $sql .= " wetteaktuell.W2 as W2,";
 	    $sql .= " wetteaktuell.W3 as W3";
-	    $sql .= " FROM hy_wetteaktuell as wetteaktuell";
+	    $sql .= " FROM tl_hy_wetteaktuell as wetteaktuell";
 	    $sql .= " WHERE wetteaktuell.Wettbewerb = '$Wettbewerb' AND wetteaktuell.Teilnehmer = $tid";
-	    //$sql .= " ORDER BY hy_wetten.Kommentar";
+	    //$sql .= " ORDER BY tl_hy_wetten.Kommentar";
         $stmt = $conn->executeQuery($sql);
         $anz = $stmt->rowCount();
 
@@ -285,8 +285,8 @@ class FePunkteController extends AbstractFussballController
         $str.=$cgi->tbody();
         // alle Wetten eines Teilnehmers abarbeiten
         // $w ist das Ergebis des sql incl Join
-        // indices Tipp1, Tipp2, Tipp3, Tipp4     Werte aus der Tabelle hy_wetten
-        //         W1,W2,W3,W4                    Werte der getippten aus hy_wetteaktuell
+        // indices Tipp1, Tipp2, Tipp3, Tipp4     Werte aus der Tabelle tl_hy_wetten
+        //         W1,W2,W3,W4                    Werte der getippten aus tl_hy_wetteaktuell
 	    foreach ($aktwetten as $Wind=>$Aktw) {    // wind ist gleichzeitig der Index für die Wettentabelle
 	      $Hywettenindex=$Wind;
 	      $wettindex=$Aktw['ID'];    // Id aus wetteaktuell
@@ -311,7 +311,7 @@ class FePunkteController extends AbstractFussballController
           $Pok=$wetten[$Wind]['Pok'];
           $Ptrend=$wetten[$Wind]['Ptrend'];
           $cgi->td($Tipp1).$cgi->td($Tipp2).$cgi->td($Tipp3).$cgi->td($Tipp4);          
-	      $W1=$Aktw['W1'];            // aktuelle Werte aus hy_wetteaktuell des Teilnehmers werden abhaenig vom Wetttyp interpretiert
+	      $W1=$Aktw['W1'];            // aktuelle Werte aus tl_hy_wetteaktuell des Teilnehmers werden abhaenig vom Wetttyp interpretiert
           $W2=$Aktw['W2'];
           $W3=$Aktw['W3'];
           $Punkte=berechnePunkte($Art,$W1,$W2,$W3,$Tipp1,$Tipp2,$Tipp3,$Pok,$Ptrend,$debug);         
@@ -320,10 +320,10 @@ class FePunkteController extends AbstractFussballController
             $sql  = "SELECT";
             $sql .= " mannschaft1.Name as 'M1Name',";
             $sql .= " mannschaft2.Name as 'M2Name'";
-            $sql .= " FROM hy_spiele";
-            $sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft1 ON hy_spiele.M1 = mannschaft1.ID";
-            $sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft2 ON hy_spiele.M2 = mannschaft2.ID";            
-            $sql .= " WHERE hy_spiele.Wettbewerb  ='".$Wettbewerb."' AND hy_spiele.ID=".$Tipp1.";";
+            $sql .= " FROM tl_hy_spiele";
+            $sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft1 ON tl_hy_spiele.M1 = mannschaft1.ID";
+            $sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft2 ON tl_hy_spiele.M2 = mannschaft2.ID";            
+            $sql .= " WHERE tl_hy_spiele.Wettbewerb  ='".$Wettbewerb."' AND hy_spiele.ID=".$Tipp1.";";
            //$debug.="Manschaft sql $sql";
             $stmt = $conn->executeQuery($sql);
 
@@ -398,7 +398,7 @@ class FePunkteController extends AbstractFussballController
       $Pok=$row['Pok'];
       $Ptrend=$row['Ptrend'];
       $cgi->td($Tipp1).$cgi->td($Tipp2).$cgi->td($Tipp3).$cgi->td($Tipp4);          
-	  $W1=$row['W1'];            // aktuelle Werte aus hy_wetteaktuell des Teilnehmers werden abhaenig vom Wetttyp interpretiert
+	  $W1=$row['W1'];            // aktuelle Werte aus tl_hy_wetteaktuell des Teilnehmers werden abhaenig vom Wetttyp interpretiert
       $W2=$row['W2'];
       $W3=$row['W3'];
       $Punkte=berechnePkt($row);
@@ -408,10 +408,10 @@ class FePunkteController extends AbstractFussballController
         $sql  = "SELECT";
         $sql .= " mannschaft1.Name as 'M1Name'";
         $sql .= ", mannschaft2.Name as 'M2Name'";
-        $sql .= " FROM hy_spiele";
-        $sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft1 ON hy_spiele.M1 = mannschaft1.ID";
-        $sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft2 ON hy_spiele.M2 = mannschaft2.ID";            
-        $sql .= " WHERE hy_spiele.Wettbewerb  ='".$Wettbewerb."' AND hy_spiele.ID=".$Tipp1.";";
+        $sql .= " FROM tl_hy_spiele";
+        $sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft1 ON tl_hy_spiele.M1 = mannschaft1.ID";
+        $sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft2 ON tl_hy_spiele.M2 = mannschaft2.ID";            
+        $sql .= " WHERE tl_hy_spiele.Wettbewerb  ='".$Wettbewerb."' AND tl_hy_spiele.ID=".$Tipp1.";";
         $stmt = $conn->executeQuery($sql);
         $row = $stmt->fetchAssociative();
 	    $str.=$cgi->td((string)$row['M1Name']."/".(string)$row['M2Name']."($Tipp2/$Tipp3)").$cgi->td("$W1/$W2");
@@ -455,29 +455,29 @@ class FePunkteController extends AbstractFussballController
         $Wettbewerb=$this->aktWettbewerb['aktWettbewerb'];
         // alle Teilnehmer deren wetten entsprechend sortiert
         $sql  = "SELECT teilnehmer.ID as 'ID',teilnehmer.Name as 'Name',teilnehmer.Kurzname as 'Kurzname',teilnehmer.Email as 'Email'";
-        $sql .= " FROM hy_teilnehmer as teilnehmer WHERE Wettbewerb  ='$Wettbewerb' ORDER BY teilnehmer.Kurzname  ;";
+        $sql .= " FROM 'tl_hy_teilnehmer as teilnehmer WHERE Wettbewerb  ='$Wettbewerb' ORDER BY teilnehmer.Kurzname  ;";
         
         $sql =  "SELECT ";
-        $sql .= " hy_wetten.Wettbewerb as Wettbewerb";
-        $sql .= " ,hy_teilnehmer.Name as Name";
-        $sql .= " ,hy_teilnehmer.ID as TlnID";
-        $sql .= " ,hy_wetten.Art as Art";
-        $sql .= " ,hy_wetten.Kommentar as Kommentar";
-        $sql .= " ,hy_wetten.Tipp1 as Tipp1";
-        $sql .= " ,hy_wetten.Tipp2 as Tipp2";
-        $sql .= " ,hy_wetten.Tipp3 as Tipp3";
-        $sql .= " ,hy_wetten.Tipp4 as Tipp4";
-        $sql .= " ,hy_wetten.Pok as Pok";
-        $sql .= " ,hy_wetten.Ptrend as Ptrend";
-        $sql .= " ,hy_wetteaktuell.W1 as W1";
-        $sql .= " ,hy_wetteaktuell.W2 as W2";
-        $sql .= " ,hy_wetteaktuell.W3 as W3";
-        $sql .= " ,hy_wetteaktuell.Wette as Wette";
-        $sql .= " FROM hy_wetteaktuell as hy_wetteaktuell"; 
-        $sql .= " LEFT JOIN hy_teilnehmer ON hy_wetteaktuell.Teilnehmer = hy_teilnehmer.ID"; 
-        $sql .= " LEFT JOIN hy_wetten ON hy_wetteaktuell.Wette = hy_wetten.ID"; 
-        $sql .= " WHERE hy_wetteaktuell.Wettbewerb='$Wettbewerb'"; 
-        $sql .= " ORDER by hy_teilnehmer.Name,"; 
+        $sql .= " tl_hy_wetten.Wettbewerb as Wettbewerb";
+        $sql .= " ,'tl_hy_teilnehmer.Name as Name";
+        $sql .= " ,'tl_hy_teilnehmer.ID as TlnID";
+        $sql .= " , tl_hy_wetten.Art as Art";
+        $sql .= " , tl_hy_wetten.Kommentar as Kommentar";
+        $sql .= " , tl_hy_wetten.Tipp1 as Tipp1";
+        $sql .= " , tl_hy_wetten.Tipp2 as Tipp2";
+        $sql .= " , tl_hy_wetten.Tipp3 as Tipp3";
+        $sql .= " , tl_hy_wetten.Tipp4 as Tipp4";
+        $sql .= " , tl_hy_wetten.Pok as Pok";
+        $sql .= " , tl_hy_wetten.Ptrend as Ptrend";
+        $sql .= " , tl_hy_wetteaktuell.W1 as W1";
+        $sql .= " , tl_hy_wetteaktuell.W2 as W2";
+        $sql .= " , tl_hy_wetteaktuell.W3 as W3";
+        $sql .= " , tl_hy_wetteaktuell.Wette as Wette";
+        $sql .= " FROM tl_hy_wetteaktuell as tl_hy_wetteaktuell"; 
+        $sql .= " LEFT JOIN 'tl_hy_teilnehmer ON tl_hy_wetteaktuell.Teilnehmer = 'tl_hy_teilnehmer.ID"; 
+        $sql .= " LEFT JOIN tl_hy_wetten ON tl_hy_wetteaktuell.Wette = tl_hy_wetten.ID"; 
+        $sql .= " WHERE tl_hy_wetteaktuell.Wettbewerb='$Wettbewerb'"; 
+        $sql .= " ORDER by 'tl_hy_teilnehmer.Name,"; 
         $sql .= " CASE WHEN art = 's' AND Kommentar like '%achtel%' THEN 4";    // Reihenfolge ist wichtig
         $sql .= " WHEN art = 's' AND Kommentar like '%Viertel%' THEN 5";          
         $sql .= " WHEN art = 's' AND Kommentar like '%Halb%' THEN 6"; 
@@ -495,10 +495,10 @@ class FePunkteController extends AbstractFussballController
         /* 
           das waere doch ein versuch wert alles zulesen und dann auszuwerten, bei "gruppenwechsel oder Kommentarwechsel" ueberschrift wechseln
           evtl oder by noch anpasse mit case ??
-        SELECT * FROM `hy_wetteaktuell` 
-        LEFT JOIN hy_teilnehmer ON hy_wetteaktuell.Teilnehmer = hy_teilnehmer.ID 
-        LEFT JOIN hy_wetten ON hy_wetteaktuell.Wette = hy_wetten.ID 
-        WHERE hy_wetteaktuell.Wettbewerb='wm2022' ORDER by hy_teilnehmer.Kurzname, hy_wetten.Art asc; 
+        SELECT * FROM ` tl_hy_wetteaktuell` 
+        LEFT JOIN 'tl_hy_teilnehmer ON tl_hy_wetteaktuell.Teilnehmer = 'tl_hy_teilnehmer.ID 
+        LEFT JOIN tl_hy_wetten ON tl_hy_wetteaktuell.Wette = tl_hy_wetten.ID 
+        WHERE tl_hy_wetteaktuell.Wettbewerb='wm2022' ORDER by 'tl_hy_teilnehmer.Kurzname, tl_hy_wetten.Art asc; 
         SELECT OrderID, Quantity,
 CASE WHEN Quantity > 30 THEN 'The quantity is greater than 30'
 WHEN Quantity = 30 THEN 'The quantity is 30'

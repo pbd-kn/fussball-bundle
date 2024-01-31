@@ -653,14 +653,20 @@ EOT;
     function createOrtOption ($conn,$cgi,$Wettbewerb,$name,$selcted) {
       // selected ist der Index des Ortes
 	  $sql = "select ID,Ort From tl_hy_orte where Wettbewerb='$Wettbewerb' ORDER By Ort ASC";
-//echo " SQL $sql <br>";	
+//echo " SQL $sql <br>";	 
       $stmt = $conn->executeQuery($sql);
       $optarray= array();
       while (($row = $stmt->fetchAssociative()) !== false) {
 //echo "Ort gefunden index " . $row['ID'] . " Ort " . $row['Ort'] . "<br>";
         $optarray[$row['Ort']] = $row['ID'];
       }
-      return $cgi->select($name, $optarray,$selcted);
+      $res= $cgi->select($name, $optarray,$selcted);
+      $res = iconv('UTF-8', 'ISO-8859-1', $res);
+//      $search  = array("\xC3\xA4", "\xC3\xB6", "\xC3\xBC", "\xC3\x84", "\xC3\x96","\xC3\x9f");
+//      $replace = array("ä", 'ö', 'ü', 'Ä', 'Ö','Ü','ß');
+//      $res= str_replace($search, $replace, $res);          
+      return $res;
+      
     }
     function createGruppenOption ($cgi,$name,$GruppenArray,$selected) {
       $res=$cgi->select($name,$GruppenArray,$selected);
@@ -726,7 +732,7 @@ EOT;
       $id=$ID;
       if ($id !=-1) {
         // Spiel einlesen
-        $sql="SELECT Nr,Gruppe,M1,M2,Ort,Datum,Uhrzeit,T1,T2 from hy_spiele where ID='$id' LIMIT 1;";
+        $sql="SELECT Nr,Gruppe,M1,M2,Ort,Datum,Uhrzeit,T1,T2 from tl_hy_spiele where ID='$id' LIMIT 1;";
         $debug .= "sql: $sql  ";	
         $stmt = $this->connection->executeQuery($sql);
         /*
@@ -750,7 +756,7 @@ EOT;
       } else {
         // Spielnummer neu setzen
         $html.="Spiel neu<br>\n";
-        $sql="SELECT Nr from hy_spiele where Wettbewerb='$Wettbewerb' ORDER BY NR DESC LIMIT 1;";
+        $sql="SELECT Nr from tl_hy_spiele where Wettbewerb='$Wettbewerb' ORDER BY NR DESC LIMIT 1;";
         $stmt = $this->connection->executeQuery($sql);
         $num_rows = $stmt->rowCount();    
         $debug .= "Anzahl: $num_rows  ";
@@ -818,7 +824,7 @@ EOT;
       $sql .= " mannschaft2.Nation as 'M2',";
       $sql .= " mannschaft2.Name as 'M2Name',";
       $sql .= " mannschaft2.Flagge as 'Flagge2'";
-      $sql .= " FROM hy_spiele as spiele";
+      $sql .= " FROM tl_hy_spiele as spiele";
       $sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft1 ON spiele.M1 = mannschaft1.ID";
       $sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft2 ON spiele.M2 = mannschaft2.ID";
       $sql .= " WHERE spiele.Wettbewerb  ='$Wettbewerb'";
@@ -913,7 +919,7 @@ EOT;
       $S1 = $row['Tipp1'];  // Spiel
 	  $T1 = $row['Tipp2'];  // T1
 	  $T2 = $row['Tipp3'];  // T2
-      $debug.=" S1 $S1 T1 $T1 T2 $T2 T3 $T3";
+      $debug.=" S1 $S1 T1 $T1 T2 $T2";
 	  $str.=$cgi->td(array("valign"=>"top"),"Spiel");
 	  $str.=$cgi->td(array("valign"=>"top"),createSpieleOption ($conn,$cgi,$Wettbewerb,"Tipp1",$S1)) . "\n";
       $str.=$cgi->td(array("valign"=>"top"),"T1");
@@ -1081,7 +1087,7 @@ EOT;
       } else if ($aktion == 'b') { // Wette bearbeiten	
   	    $id = $ID;
 	    // Besorge Wettdaten
-        $sql=" select ID,Kommentar,Pok,Ptrend,Art,Tipp1,Tipp2,Tipp3,Tipp4 from hy_wetten Where ID = '$id';";
+        $sql=" select ID,Kommentar,Pok,Ptrend,Art,Tipp1,Tipp2,Tipp3,Tipp4 from  tl_hy_wetten Where ID = '$id';";
         $debug.="Wettdaten sql: $sql";
         $stmt=$conn->executeQuery($sql);
 	    $Row=$stmt->fetchAssociative();
@@ -1198,7 +1204,7 @@ EOT;
       } 
       if ($aktion == 'u') { // bearbeiten	
 	    // Besorge Teilnehmerdaten
-        $sql = " select ID,Kurzname,Name,Email from hy_teilnehmer Where ID = '$id';";
+        $sql = " select ID,Kurzname,Name,Email from 'tl_hy_teilnehmer Where ID = '$id';";
         $debug .= "sql: $sql  ";	
         $stmt = $this->connection->executeQuery($sql);
         $Row = $stmt->fetchAssociative();
@@ -1456,7 +1462,7 @@ EOT;
         $row = $stmt->fetchAssociative();  // s. Doctrine\DBAL
         $wb=$row['value1']; 
         //echo "noch d (loeschen) nicht realisiert ID $id Wettbewerb $wb<br>";
-        $tbs = array("hy_wetteaktuell","hy_teilnehmer","hy_spiele","tl_hy_orte","tl_hy_mannschaft","tl_hy_gruppen");
+        $tbs = array("tl_hy_wetteaktuell","'tl_hy_teilnehmer","tl_hy_spiele","tl_hy_orte","tl_hy_mannschaft","tl_hy_gruppen");
         foreach ($tbs as $k=>$tab) {
           $sql="DELETE FROM $tab WHERE wettbewerb ='$wb';";
 //echo "sql: $sql<br>";	
@@ -1826,7 +1832,7 @@ EOT;
        foreach ($Mannschaften as $k=>$row) {
          $M1=$row['ID'];$Platz=-1;$Spiele=-1;$Sieg=-1;$Unentschieden=-1;$Niederlage=-1;$Tore=-1;$Gegentore=-1;$Differenz=-1;$Punkte=-1;
          $Gruppe=$row['Gruppe'];    
-         $sql  = "SELECT ID,Nr,M1,M2,T1,T2 FROM hy_spiele WHERE Wettbewerb  ='$Wettbewerb' AND M1 = $M1";  // Heim Spiele
+         $sql  = "SELECT ID,Nr,M1,M2,T1,T2 FROM tl_hy_spiele WHERE Wettbewerb  ='$Wettbewerb' AND M1 = $M1";  // Heim Spiele
          $stmt = $this->connection->executeQuery($sql); $num_rows = $stmt->rowCount();    
          //$debug.="|spiele sql: $sql anz: $num_rows | ";	
          while (($spielrow = $stmt->fetchAssociative()) !== false) {
@@ -1842,7 +1848,7 @@ EOT;
             }
            }
          }
-         $sql  = "SELECT ID,Nr,M1,M2,T1,T2 FROM hy_spiele WHERE Wettbewerb  ='$Wettbewerb' AND M2 = $M1";  // Auswaerts Spiele
+         $sql  = "SELECT ID,Nr,M1,M2,T1,T2 FROM tl_hy_spiele WHERE Wettbewerb  ='$Wettbewerb' AND M2 = $M1";  // Auswaerts Spiele
          $stmt = $this->connection->executeQuery($sql); $num_rows = $stmt->rowCount();    
          while (($spielrow = $stmt->fetchAssociative()) !== false) {
            //$debug.="| auswaerts T1 ".$spielrow['T1']."  auswaerts T2 ".$spielrow['T2']." | ";	
@@ -2045,7 +2051,7 @@ EOT;
       if ($aktion == "n" ) {   // neueintrag
         // check spielnummer
     // zuerst Prüfen ob schon vorhanden
-        $sql = "select Nr From hy_spiele where Wettbewerb='$Wettbewerb' AND Nr='$Nr'";
+        $sql = "select Nr From tl_hy_spiele where Wettbewerb='$Wettbewerb' AND Nr='$Nr'";
 //echo "<br>sql: $sql<br>";
         $stmt = $this->connection->executeQuery($sql);
         $anz = $stmt->rowCount();
@@ -2068,7 +2074,7 @@ EOT;
         $value .= "'" . $Uhrzeit ."' ," ; 
         $value .= "'" . $T1 ."' ," ; 
         $value .= "'" . $T2 ."' )" ;
-	    $sql="INSERT INTO hy_spiele(Wettbewerb,Nr,Gruppe,M1,M2,Ort,Datum,Uhrzeit,T1,T2) VALUES $value";
+	    $sql="INSERT INTO tl_hy_spiele(Wettbewerb,Nr,Gruppe,M1,M2,Ort,Datum,Uhrzeit,T1,T2) VALUES $value";
         $cnt = $this->connection->executeStatement($sql);
         $debug.="sql: $sql<br>";	
 	    $html.="Wettbewerb $Wettbewerb Spielnummer $Nr Gruppe $Gruppe M1 $M1 M2 $M2  Ort $Ort Datum $Datum Uhrzeit $Uhrzeit T1 $T1 T2 $T2 neu";
@@ -2087,7 +2093,7 @@ EOT;
         $value .= "Uhrzeit='$Uhrzeit' ," ; 
         $value .= "T1=$T1 ," ; 
         $value .= "T2=$T2 " ;
-	    $sql = "update hy_spiele $value where ID=$id";
+	    $sql = "update tl_hy_spiele $value where ID=$id";
 $debug.=" sql: $sql\n";	
     //return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
         $cnt = $this->connection->executeStatement($sql);
@@ -2098,9 +2104,9 @@ $debug.=" sql: $sql\n";
       }
     }
     if ($aktion == "d" ) {   // Spiel loeschen
-	  $sql = "Delete from hy_spiele WHERE ID='$id' LIMIT 1";
+	  $sql = "Delete from tl_hy_spiele WHERE ID='$id' LIMIT 1";
       $cnt = $this->connection->executeStatement($sql);
-      //$html.="in Tabelle hy_spiele betroffene Saetze $cnt<br>";
+      //$html.="in Tabelle tl_hy_spiele betroffene Saetze $cnt<br>";
 	  $html.="Spiel $id Nr $Nr gel&ouml;scht";
       $html = utf8_encode($html);
       return new JsonResponse(['data' => $html,'error'=>$errortxt,'debug'=>$debug]); 
@@ -2155,24 +2161,24 @@ $debug.=" sql: $sql\n";
     }
     if ($aktion == "n" ) {   // neueintrag
       $value = "( '$Wettbewerb','$Kommentar','$Art',$Pok,$Ptrend,'$Tipp1','$Tipp2','$Tipp3','$Tipp4')";
-	  $sql="INSERT INTO hy_wetten(Wettbewerb,Kommentar,Art,Pok,Ptrend,Tipp1,Tipp2,Tipp3,Tipp4) VALUES $value";
+	  $sql="INSERT INTO  tl_hy_wetten(Wettbewerb,Kommentar,Art,Pok,Ptrend,Tipp1,Tipp2,Tipp3,Tipp4) VALUES $value";
       $cnt = $this->connection->executeStatement($sql);
       $debug.="sql: $sql<br>";	
       $html.="Kommentar: $Kommentar Art: $Art Pok: $Pok Ptrend: $Ptrend Tipp1: $Tipp1 Tipp2: $Tipp2 Tipp3: $Tipp3 Tipp4: $Tipp4 neu";
       $html = utf8_encode($html); 
       // Wettid Lesen
-      $sql="SELECT * FROM hy_wetten WHERE ID = LAST_INSERT_ID();";
+      $sql="SELECT * FROM  tl_hy_wetten WHERE ID = LAST_INSERT_ID();";
       $stmt = $this->connection->executeQuery($sql);
       $row = $stmt->fetchAssociative();
       $lastWettid=$row['ID'];
-      // hy_wettenaktuell eintragen
+      //  tl_hy_wettenaktuell eintragen
       // alle Teilnehmer einlesen
       $sql  = "SELECT";
       $sql .= " teilnehmer.ID as 'ID',";
       $sql .= " teilnehmer.Name as 'Name',";
       $sql .= " teilnehmer.Kurzname as 'Kurzname',";
       $sql .= " teilnehmer.Email as 'Email'";
-      $sql .= " FROM hy_teilnehmer as teilnehmer";
+      $sql .= " FROM 'tl_hy_teilnehmer as teilnehmer";
       $sql .= " WHERE Wettbewerb  ='".$this->aktWettbewerb['aktWettbewerb']."' ";
       $sql .= " ORDER BY teilnehmer.Kurzname  ;";
       $stmt = $this->connection->executeQuery($sql);
@@ -2188,7 +2194,7 @@ $debug.=" sql: $sql\n";
           $tid = $tln['ID'];
           $wettid=$lastWettid;
 	      $value = "( '$Wettbewerb' , $tid , $wettid,-1 ,-1,-1 )" ; 
-	      $sql="INSERT INTO hy_wetteaktuell(Wettbewerb,Teilnehmer,Wette,W1,W2,W3) VALUES $value";
+	      $sql="INSERT INTO  tl_hy_wetteaktuell(Wettbewerb,Teilnehmer,Wette,W1,W2,W3) VALUES $value";
           $debug.="Teilnehmerwetten: $sql<br>";
           $cnt = $this->connection->executeStatement($sql);  
 //          $errortext.="wette fuer Tln $tid Name: ".$tln['Name'].' Wette '.$wettid.' geschrieben';       
@@ -2210,7 +2216,7 @@ $debug.=" sql: $sql\n";
       $value .= "Tipp2='$Tipp2'," ; 
       $value .= "Tipp3='$Tipp3' ," ; 
       $value .= "Tipp4='$Tipp4' " ; 
-	  $sql = "update hy_wetten $value where ID=$id";$debug.=" sql: $sql\n";	
+	  $sql = "update  tl_hy_wetten $value where ID=$id";$debug.=" sql: $sql\n";	
       $cnt = $this->connection->executeStatement($sql);
       $html.="Wettbewerb $Wettbewerb Kommentar: $Kommentar Art: $Art Pok: $Pok Ptrend: $Ptrend Tipp1: $Tipp1 Tipp2: $Tipp2 Tipp3: $Tipp3 Tipp4: $Tipp4 neu";
       //$html = utf8_encode($html);
@@ -2218,7 +2224,7 @@ $debug.=" sql: $sql\n";
     }
     if ($aktion == "u" ) {   // alle Wetten updaten, d.h. die Werte tipp1 Tipp2 Tipp3 abhängig vom aktuellen Stand neu eintragen
       // zuerst alle Wetten zum Wettbewerb einlesen
-      $sql="SELECT * FROM `hy_wetten` WHERE  Wettbewerb='$Wettbewerb' ORDER By 'Art'";
+      $sql="SELECT * FROM ` tl_hy_wetten` WHERE  Wettbewerb='$Wettbewerb' ORDER By 'Art'";
       $stmt = $this->connection->executeQuery($sql);
       $anz = $stmt->rowCount();
       $debug.="sql: $sql";
@@ -2227,16 +2233,16 @@ $debug.=" sql: $sql\n";
         $wetten[] = $row;
       }     
       foreach ($wetten as $w) {
-        $wettindex=$w['ID'];    // Id aus hy_wetten 
+        $wettindex=$w['ID'];    // Id aus  tl_hy_wetten 
         $kommentar=$w['Kommentar'];
         $Art=strtolower($w['Art']);
 	    if ($Art == 's') {    // Spielausgang Tipp 1 = Spiel
           // Spiel einlesen Tipp1 ist die Spielnummer
-          $sql  = "SELECT mannschaft1.ID as 'M1Ind',mannschaft2.ID as 'M2Ind',hy_spiele.T1 as 'T1',hy_spiele.T2 as 'T2'";
-          $sql .= " FROM hy_spiele";
-          $sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft1 ON hy_spiele.M1 = mannschaft1.ID";
-          $sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft2 ON hy_spiele.M2 = mannschaft2.ID";
-          $sql .= " WHERE hy_spiele.Wettbewerb  ='".$Wettbewerb."' AND hy_spiele.ID=".$w['Tipp1'].";";
+          $sql  = "SELECT mannschaft1.ID as 'M1Ind',mannschaft2.ID as 'M2Ind',tl_hy_spiele.T1 as 'T1',tl_hy_spiele.T2 as 'T2'";
+          $sql .= " FROM tl_hy_spiele";
+          $sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft1 ON tl_hy_spiele.M1 = mannschaft1.ID";
+          $sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft2 ON tl_hy_spiele.M2 = mannschaft2.ID";
+          $sql .= " WHERE tl_hy_spiele.Wettbewerb  ='".$Wettbewerb."' AND tl_hy_spiele.ID=".$w['Tipp1'].";";
           $stmt = $this->connection->executeQuery($sql);
           $num_rows = $stmt->rowCount();    
           $row = $stmt->fetchAssociative();
@@ -2244,7 +2250,7 @@ $debug.=" sql: $sql\n";
           $T2=$row['T2'];
           // Tipp2 = T1 Tipp3 = T2
           $value = "SET Tipp2='$T1',Tipp3='$T2'" ; 
-	      $sql = "update hy_wetten $value where ID=$wettindex";
+	      $sql = "update  tl_hy_wetten $value where ID=$wettindex";
           $debug.=" sql: $sql\n";	
           $cnt = $this->connection->executeStatement($sql);
           $html.="Wettbewerb $Wettbewerb Spielwette $wettindex Tipp2: $T1 Tipp3: $T2 neu<br>";           
@@ -2267,7 +2273,7 @@ $debug.=" sql: $sql\n";
           }     
           // Tipp2 = erster Tipp3 = zweiter Tipp4 dritter der Gruppe
             $value = "SET Tipp2='".$Pl[0]['M1Ind']."',Tipp3='".$Pl[1]['M1Ind']."',Tipp4='".$Pl[2]['M1Ind']."'" ; 
-	        $sql = "update hy_wetten $value where ID=$wettindex";
+	        $sql = "update  tl_hy_wetten $value where ID=$wettindex";
             $debug.=" sql: $sql\n";	
             $cnt = $this->connection->executeStatement($sql);
             $html.="Wettbewerb $Wettbewerb Spielwette $wettindex Tipp2: $T1 Tipp3: $T2 neu<br>";           
@@ -2276,11 +2282,11 @@ $debug.=" sql: $sql\n";
       return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
     }
     if ($aktion == "d" ) {   // Wette loeschen
-	  $sql = "Delete from hy_wetten WHERE ID='$id' LIMIT 1";
+	  $sql = "Delete from  tl_hy_wetten WHERE ID='$id' LIMIT 1";
       $cnt = $this->connection->executeStatement($sql);
-      //$html.="in Tabelle hy_wetten betroffene Saetze $cnt<br>";
+      //$html.="in Tabelle  tl_hy_wetten betroffene Saetze $cnt<br>";
 	  $html.="Wette $id Nr $Nr gel&ouml;scht";
-	  $sql = "Delete from hy_wetteaktuell WHERE Wette='$id'";
+	  $sql = "Delete from  tl_hy_wetteaktuell WHERE Wette='$id'";
       $cnt = $this->connection->executeStatement($sql);
 	  $html.="Wette $id in $cnt Teilnehmern gel&ouml;scht";
       $html = utf8_encode($html);
@@ -2325,11 +2331,11 @@ $debug.=" sql: $sql\n";
       }
       if ($aktion == "n" ) {   // neueintrag
         $value = "( '$Wettbewerb' ,'$Kurzname' , '$Name' , '$Email' )" ; 
-        $sql="INSERT INTO hy_teilnehmer(Wettbewerb,Kurzname,Name,Email) VALUES $value";
+        $sql="INSERT INTO 'tl_hy_teilnehmer(Wettbewerb,Kurzname,Name,Email) VALUES $value";
         $cnt = $this->connection->executeStatement($sql);
 	    $html.="Wettbewerb $Wettbewerb Teilnehmer $Kurzname Name $Name Email $Email neu gesetzt";
       // TeilnehmerId besorgen
-	    $sql = "Select ID from hy_teilnehmer where Wettbewerb = '$Wettbewerb'  and Kurzname='" . $Kurzname."';";
+	    $sql = "Select ID from 'tl_hy_teilnehmer where Wettbewerb = '$Wettbewerb'  and Kurzname='" . $Kurzname."';";
         $stmt = $this->connection->executeQuery($sql);
         $debug.="sql: $sql<br>";	
         $anz = $stmt->rowCount();
@@ -2337,7 +2343,7 @@ $debug.=" sql: $sql\n";
         $tid=$row['ID'];
         $html.="Teilnehmer &uuml;bernommen<br> Wetten einrichten <br>";
 	    // Wetten fuer Teilnehmer uebernehmen aus wetten Tabelle
-        $sql = "Select ID,Kommentar,Art From hy_wetten WHERE Wettbewerb='$Wettbewerb'";
+        $sql = "Select ID,Kommentar,Art From  tl_hy_wetten WHERE Wettbewerb='$Wettbewerb'";
         $debug.="Wetten sql: $sql<br>";
         $stmt = $this->connection->executeQuery($sql);
         $anz = $stmt->rowCount();
@@ -2348,13 +2354,13 @@ $debug.=" sql: $sql\n";
 	    foreach ($wetten as $data) {
           $wettid=$data['ID'];
 	      $value = "( '$Wettbewerb' , $tid , $wettid,-1 ,-1,-1 )" ; 
-	      $sql="INSERT INTO hy_wetteaktuell(Wettbewerb,Teilnehmer,Wette,W1,W2,W3) VALUES $value";
+	      $sql="INSERT INTO  tl_hy_wetteaktuell(Wettbewerb,Teilnehmer,Wette,W1,W2,W3) VALUES $value";
           $debug.="Teilnehmerwetten: $sql<br>";
           $cnt = $this->connection->executeStatement($sql);
 	    }      
       } elseif ($aktion == 'u') {
         // TeilnehmerId besorgen/pruefen
-	    $sql = "Select ID from hy_teilnehmer where Wettbewerb = '$Wettbewerb'  and ID='$id.';";
+	    $sql = "Select ID from 'tl_hy_teilnehmer where Wettbewerb = '$Wettbewerb'  and ID='$id.';";
         $debug.="sql: $sql<br>";	
         $stmt = $this->connection->executeQuery($sql);
         $anz = $stmt->rowCount();
@@ -2368,7 +2374,7 @@ $debug.=" sql: $sql\n";
           return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
         }
         $value = "SET Wettbewerb='$Wettbewerb' ,Kurzname='$Kurzname', Name='$Name', Email='$Email'" ; 
-	    $sql = "UPDATE hy_teilnehmer $value where ID='$id'";
+	    $sql = "UPDATE 'tl_hy_teilnehmer $value where ID='$id'";
         $debug.="UPDATE Teilnehmer sql: $sql<br>";	
         $cnt = $this->connection->executeStatement($sql);
 	    $html.="Teilnehmer " . $Kurzname . " ge&auml;ndert";
@@ -2378,15 +2384,15 @@ $debug.=" sql: $sql\n";
     }
     if ($aktion == "d" ) {   
       $tid=$id;
-	  $sql = "Delete from hy_teilnehmer WHERE ID=$tid LIMIT 1";
+	  $sql = "Delete from 'tl_hy_teilnehmer WHERE ID=$tid LIMIT 1";
       $cnt = $this->connection->executeStatement($sql);
-      //$html.="in Tabelle hy_teilnehmer betroffene Saetze $cnt<br>";
-	  $html.="Teilnehmer gel&ouml;scht";                     // eigentlich muessen auch noch die Teilnehmerwetten in hy_wetteaktuell
+      //$html.="in Tabelle 'tl_hy_teilnehmer betroffene Saetze $cnt<br>";
+	  $html.="Teilnehmer gel&ouml;scht";                     // eigentlich muessen auch noch die Teilnehmerwetten in  tl_hy_wetteaktuell
                                                              // geloescht werden
-	  $sql = "Delete from hy_wetteaktuell where Wettbewerb = '$Wettbewerb' AND Teilnehmer =$tid";
+	  $sql = "Delete from  tl_hy_wetteaktuell where Wettbewerb = '$Wettbewerb' AND Teilnehmer =$tid";
       $cnt = $this->connection->executeStatement($sql);
-      $debug.="Teilnehmer $id und in Tabelle hy_wetteaktuell betroffene Saetze $cnt<br>";
-      $html.="Teilnehmer $id und in Tabelle hy_wetteaktuell betroffene Saetze $cnt<br>";
+      $debug.="Teilnehmer $id und in Tabelle  tl_hy_wetteaktuell betroffene Saetze $cnt<br>";
+      $html.="Teilnehmer $id und in Tabelle  tl_hy_wetteaktuell betroffene Saetze $cnt<br>";
       $html = utf8_encode($html);
       return new JsonResponse(['data' => $html,'error'=>$errortxt,'debug'=>$debug]); 
     }
@@ -2403,7 +2409,8 @@ $debug.=" sql: $sql\n";
      * name="FussballRequestClass::class\storeteilnehmerwette", 
      * defaults={"_scope" = "frontend"})
      */
-  public function storeteilnehmerwette(string $aktion,int $Idwettaktuell=-1,string $W1="",string $W2='',string $W3='')
+     
+  public function storeteilnehmerwette(string $aktion,int $Idwettaktuell=-1,string $W1='-1',string $W2='-1',string $W3='-1')
   {
     if (!isset($aktion) || $aktion != 's' || $Idwettaktuell < 0 ) {
       $html.="fehlerhafte Aktion oder ID <br>";
@@ -2412,18 +2419,18 @@ $debug.=" sql: $sql\n";
       return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
     }
     $c=$this->cgiUtil;
-    $id = $ID;
+    $id = $Idwettaktuell;
     $html="";
     $aktion=strtolower($aktion);
     $debug="aktion: $aktion";
     $errortxt="";
     $Wettbewerb = $this->aktWettbewerb['aktWettbewerb'];
-    $debug.=" id: $id, Wettbewerb: $Wettbewerb, Ort: $ort, Beschreibung $beschreibung";
-    if ($aktion == "s" ) {   // neueintrag
+    $debug.=" id: $id, Wettbewerb: $Wettbewerb, W1: $W1, W2 $W2, W3 $W3";
+    if ($aktion == "s" ) {   // update so wie store
         $value = "SET W1='$W1' ,W2='$W2', W3='$W3' " ;
-	    $sql = "update hy_wetteaktuell $value where Wettbewerb='$Wettbewerb' AND ID=$Idwettaktuell;";
+	    $sql = "update  tl_hy_wetteaktuell $value where Wettbewerb='$Wettbewerb' AND ID=$Idwettaktuell;";
         $cnt = $this->connection->executeStatement($sql);
-	    $html.="Wetteaktuell $Wettbewerb hy_wetteaktuell $Idwettaktuellneu SET W1='$W1' ,W2='$W2', W3='$W3' gesetzt";
+	    $html.="Wetteaktuell $Wettbewerb  tl_hy_wetteaktuell $Idwettaktuell SET W1='$W1' ,W2='$W2', W3='$W3' gesetzt";
       $html = utf8_encode($html);
       return new JsonResponse(['data' => $html,'error'=>$errortxt,'debug'=>$debug]); 
     }

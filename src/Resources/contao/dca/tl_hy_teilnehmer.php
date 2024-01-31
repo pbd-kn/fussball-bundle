@@ -29,9 +29,9 @@ declare(strict_types=1);
  */
 
 /*
- * Table tl_hy_orte
+ * Table tl_extcss
  */
-$GLOBALS['TL_DCA']['tl_hy_orte'] = [
+$GLOBALS['TL_DCA']['tl_hy_teilnehmer'] = [
 //        'ctable' => ['tl_extcss_file'],
     // Config
     'config' => [
@@ -65,28 +65,28 @@ $GLOBALS['TL_DCA']['tl_hy_orte'] = [
         ],
         'operations' => [
             'edit' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_hy_orte']['edit'],
+                'label' => &$GLOBALS['TL_LANG']['tl_hy_teilnehmer']['edit'],
 //                'href' => 'table=tl_extcss_file',
                 'icon' => 'edit.gif',
             ],
             'editheader' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_hy_orte']['editheader'],
+                'label' => &$GLOBALS['TL_LANG']['tl_hy_teilnehmer']['editheader'],
                 'href' => 'act=edit',
                 'icon' => 'header.gif',
             ],
             'copy' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_hy_orte']['copy'],
+                'label' => &$GLOBALS['TL_LANG']['tl_hy_teilnehmer']['copy'],
                 'href' => 'act=copy',
                 'icon' => 'copy.gif',
             ],
             'delete' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_hy_orte']['delete'],
+                'label' => &$GLOBALS['TL_LANG']['tl_hy_teilnehmer']['delete'],
                 'href' => 'act=delete',
                 'icon' => 'delete.gif',
                 'attributes' => 'onclick="if(!confirm(\''.'Loeschen??'.'\'))return false;Backend.getScrollOffset()"',
             ],
             'show' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_hy_orte']['show'],
+                'label' => &$GLOBALS['TL_LANG']['tl_hy_teilnehmer']['show'],
                 'href' => 'act=show',
                 'icon' => 'show.gif',
             ],
@@ -95,8 +95,8 @@ $GLOBALS['TL_DCA']['tl_hy_orte'] = [
 
 
     'palettes' => [
-        '__selector__' => array('Wettbewerb','Ort','Beschreibung' ),
-		'default' => '{title_legend},Wettbewerb;Ort;Beschreibung;'
+        '__selector__' => array('Wettbewerb','Name','Kurzname','Email','Punkte'),
+		'default' => '{title_legend},Wettbewerb;Name;Kurzname;Email;Punkte;'
     ],
     // Fields
     'fields' => [
@@ -107,25 +107,39 @@ $GLOBALS['TL_DCA']['tl_hy_orte'] = [
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
         'Wettbewerb' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_hy_orte']['Wettbewerb'],
+            'label' => &$GLOBALS['TL_LANG']['tl_hy_teilnehmer']['Wettbewerb'],
             'exclude' => true,
             'inputType' => 'text',
             'eval' => ['mandatory' => true, 'maxlength' => 64],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
-        'Ort' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_hy_orte']['Ort'],
+        'Name' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_hy_teilnehmer']['Name'],
             'exclude' => true,
             'inputType' => 'text',
             'eval' => ['mandatory' => true, 'maxlength' => 64],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
-        'Beschreibung' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_hy_orte']['Beschreibung'],
+        'Kurzname' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_hy_teilnehmer']['Kurzname'],
             'exclude' => true,
             'inputType' => 'text',
             'eval' => ['mandatory' => true, 'maxlength' => 64],
-            'sql' => "varchar(255) default ''",
+            'sql' => "varchar(255) NOT NULL default ''",
+        ],
+        'Email' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_hy_teilnehmer']['Email'],
+            'exclude' => true,
+            'inputType' => 'text',
+            'eval' => ['mandatory' => true, 'maxlength' => 64],
+            'sql' => "varchar(255) NOT NULL default ''",
+        ],
+        'Punkte' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_hy_teilnehmer']['Punkte'],
+            'exclude' => true,
+            'inputType' => 'text',
+            'eval' => ['mandatory' => true, 'maxlength' => 64],
+            'sql' => "int  default '0'",
         ],
     ],
 ];

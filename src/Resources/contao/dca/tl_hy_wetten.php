@@ -29,9 +29,9 @@ declare(strict_types=1);
  */
 
 /*
- * Table tl_hy_orte
+ * Table tl_extcss
  */
-$GLOBALS['TL_DCA']['tl_hy_orte'] = [
+$GLOBALS['TL_DCA']['tl_hy_wetten'] = [
 //        'ctable' => ['tl_extcss_file'],
     // Config
     'config' => [
@@ -65,28 +65,28 @@ $GLOBALS['TL_DCA']['tl_hy_orte'] = [
         ],
         'operations' => [
             'edit' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_hy_orte']['edit'],
+                'label' => &$GLOBALS['TL_LANG']['tl_hy_wetten']['edit'],
 //                'href' => 'table=tl_extcss_file',
                 'icon' => 'edit.gif',
             ],
             'editheader' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_hy_orte']['editheader'],
+                'label' => &$GLOBALS['TL_LANG']['tl_hy_wetten']['editheader'],
                 'href' => 'act=edit',
                 'icon' => 'header.gif',
             ],
             'copy' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_hy_orte']['copy'],
+                'label' => &$GLOBALS['TL_LANG']['tl_hy_wetten']['copy'],
                 'href' => 'act=copy',
                 'icon' => 'copy.gif',
             ],
             'delete' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_hy_orte']['delete'],
+                'label' => &$GLOBALS['TL_LANG']['tl_hy_wetten']['delete'],
                 'href' => 'act=delete',
                 'icon' => 'delete.gif',
                 'attributes' => 'onclick="if(!confirm(\''.'Loeschen??'.'\'))return false;Backend.getScrollOffset()"',
             ],
             'show' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_hy_orte']['show'],
+                'label' => &$GLOBALS['TL_LANG']['tl_hy_wetten']['show'],
                 'href' => 'act=show',
                 'icon' => 'show.gif',
             ],
@@ -95,8 +95,8 @@ $GLOBALS['TL_DCA']['tl_hy_orte'] = [
 
 
     'palettes' => [
-        '__selector__' => array('Wettbewerb','Ort','Beschreibung' ),
-		'default' => '{title_legend},Wettbewerb;Ort;Beschreibung;'
+        '__selector__' => array('Wettbewerb','Kommentar','Art','Tipp1','Tipp2','Tipp3','Tipp4','Pok','Ptrend'),
+		'default' => '{title_legend},Wettbewerb;Kommentar;Art;Tipp1;Tipp2;Tipp3;Tipp4;Pok;Ptrend;'
     ],
     // Fields
     'fields' => [
@@ -106,26 +106,68 @@ $GLOBALS['TL_DCA']['tl_hy_orte'] = [
         'tstamp' => [
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
-        'Wettbewerb' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_hy_orte']['Wettbewerb'],
+        'Wettbewrb' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_hy_wetten']['Wettbewerb'],
             'exclude' => true,
             'inputType' => 'text',
             'eval' => ['mandatory' => true, 'maxlength' => 64],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
-        'Ort' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_hy_orte']['Ort'],
+        'Kommentar' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_hy_wetten']['Kommentar'],
             'exclude' => true,
             'inputType' => 'text',
             'eval' => ['mandatory' => true, 'maxlength' => 64],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
-        'Beschreibung' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_hy_orte']['Beschreibung'],
+        'Art' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_hy_wetten']['Art'],
             'exclude' => true,
             'inputType' => 'text',
             'eval' => ['mandatory' => true, 'maxlength' => 64],
-            'sql' => "varchar(255) default ''",
+            'sql' => "varchar(255) NOT NULL default ''",
+        ],
+        'Tipp1' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_hy_wetten']['Tipp1'],
+            'exclude' => true,
+            'inputType' => 'text',
+            'eval' => [ 'maxlength' => 64],
+            'sql' => "varchar(255) default '-1'",
+        ],
+        'Tipp2' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_hy_wetten']['Tipp2'],
+            'exclude' => true,
+            'inputType' => 'text',
+            'eval' => ['maxlength' => 64],
+            'sql' => "varchar(255) default '-1'",
+        ],
+        'Tipp3' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_hy_wetten']['Tipp3'],
+            'exclude' => true,
+            'inputType' => 'text',
+            'eval' => ['maxlength' => 64],
+            'sql' => "varchar(255) default '-1'",
+        ],
+        'Tipp4' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_hy_wetten']['Tipp4'],
+            'exclude' => true,
+            'inputType' => 'text',
+            'eval' => ['maxlength' => 64],
+            'sql' => "varchar(255) default '-1'",
+        ],
+        'Pok' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_hy_wetten']['Pok'],
+            'exclude' => true,
+            'inputType' => 'text',
+            'eval' => [ 'maxlength' => 64],
+            'sql' => "int  NOT NULL default '-1'",
+        ],
+        'Ptrend' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_hy_wetten']['Ptrend'],
+            'exclude' => true,
+            'inputType' => 'text',
+            'eval' => [ 'maxlength' => 64],
+            'sql' => "int  NOT NULL default '-1'",
         ],
     ],
 ];

@@ -29,9 +29,9 @@ declare(strict_types=1);
  */
 
 /*
- * Table tl_hy_orte
+ * Table tl_extcss
  */
-$GLOBALS['TL_DCA']['tl_hy_orte'] = [
+$GLOBALS['TL_DCA']['tl_hy_wetteaktuell'] = [
 //        'ctable' => ['tl_extcss_file'],
     // Config
     'config' => [
@@ -65,28 +65,28 @@ $GLOBALS['TL_DCA']['tl_hy_orte'] = [
         ],
         'operations' => [
             'edit' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_hy_orte']['edit'],
+                'label' => &$GLOBALS['TL_LANG']['tl_hy_wetteaktuell']['edit'],
 //                'href' => 'table=tl_extcss_file',
                 'icon' => 'edit.gif',
             ],
             'editheader' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_hy_orte']['editheader'],
+                'label' => &$GLOBALS['TL_LANG']['tl_hy_wetteaktuell']['editheader'],
                 'href' => 'act=edit',
                 'icon' => 'header.gif',
             ],
             'copy' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_hy_orte']['copy'],
+                'label' => &$GLOBALS['TL_LANG']['tl_hy_wetteaktuell']['copy'],
                 'href' => 'act=copy',
                 'icon' => 'copy.gif',
             ],
             'delete' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_hy_orte']['delete'],
+                'label' => &$GLOBALS['TL_LANG']['tl_hy_wetteaktuell']['delete'],
                 'href' => 'act=delete',
                 'icon' => 'delete.gif',
                 'attributes' => 'onclick="if(!confirm(\''.'Loeschen??'.'\'))return false;Backend.getScrollOffset()"',
             ],
             'show' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_hy_orte']['show'],
+                'label' => &$GLOBALS['TL_LANG']['tl_hy_wetteaktuell']['show'],
                 'href' => 'act=show',
                 'icon' => 'show.gif',
             ],
@@ -95,8 +95,8 @@ $GLOBALS['TL_DCA']['tl_hy_orte'] = [
 
 
     'palettes' => [
-        '__selector__' => array('Wettbewerb','Ort','Beschreibung' ),
-		'default' => '{title_legend},Wettbewerb;Ort;Beschreibung;'
+        '__selector__' => array('Wettbewerb','Teilnehmer','Wette','W1','W2','W3'),
+		'default' => '{title_legend},Wettbewerb;Teilnehmer;Wette;W1;W2;W3;'
     ],
     // Fields
     'fields' => [
@@ -107,25 +107,46 @@ $GLOBALS['TL_DCA']['tl_hy_orte'] = [
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
         'Wettbewerb' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_hy_orte']['Wettbewerb'],
+            'label' => &$GLOBALS['TL_LANG']['tl_hy_wetteaktuell']['Wettbewerb'],
             'exclude' => true,
             'inputType' => 'text',
             'eval' => ['mandatory' => true, 'maxlength' => 64],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
-        'Ort' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_hy_orte']['Ort'],
+        'Teilnehmer' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_hy_wetteaktuell']['Teilnehmer'],
             'exclude' => true,
             'inputType' => 'text',
-            'eval' => ['mandatory' => true, 'maxlength' => 64],
-            'sql' => "varchar(255) NOT NULL default ''",
+            'eval' => ['maxlength' => 64],
+            'sql' => "int  NOT NULL default '-1'",
         ],
-        'Beschreibung' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_hy_orte']['Beschreibung'],
+        'Wette' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_hy_wetteaktuell']['Wette'],
             'exclude' => true,
             'inputType' => 'text',
-            'eval' => ['mandatory' => true, 'maxlength' => 64],
-            'sql' => "varchar(255) default ''",
+            'eval' => ['maxlength' => 64],
+            'sql' => "int  NOT NULL default '-1'",
+        ],
+        'W1' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_hy_wetteaktuell']['W1'],
+            'exclude' => true,
+            'inputType' => 'text',
+            'eval' => ['maxlength' => 64],
+            'sql' => "int  NOT NULL default '-1'",
+        ],
+        'W2' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_hy_wetteaktuell']['W2'],
+            'exclude' => true,
+            'inputType' => 'text',
+            'eval' => ['maxlength' => 64],
+            'sql' => "int  NOT NULL default '-1'",
+        ],
+        'W3' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_hy_wetteaktuell']['W3'],
+            'exclude' => true,
+            'inputType' => 'text',
+            'eval' => ['maxlength' => 64],
+            'sql' => "int  NOT NULL default '-1'",
         ],
     ],
 ];
