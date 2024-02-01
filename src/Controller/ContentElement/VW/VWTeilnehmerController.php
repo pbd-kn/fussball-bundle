@@ -306,7 +306,7 @@ class VWTeilnehmerController extends AbstractFussballController
         $sql .= " teilnehmer.Name as 'Name',";
         $sql .= " teilnehmer.Kurzname as 'Kurzname',";
         $sql .= " teilnehmer.Email as 'Email'";
-        $sql .= " FROM 'tl_hy_teilnehmer as teilnehmer";
+        $sql .= " FROM tl_hy_teilnehmer as teilnehmer";
         $sql .= " WHERE Wettbewerb  ='".$this->aktWettbewerb['aktWettbewerb']."' ";
         $sql .= " ORDER BY teilnehmer.Kurzname  ;";
         $stmt = $this->connection->executeQuery($sql);

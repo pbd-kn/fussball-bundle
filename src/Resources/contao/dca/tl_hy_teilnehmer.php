@@ -31,7 +31,7 @@ declare(strict_types=1);
 /*
  * Table tl_extcss
  */
-$GLOBALS['TL_DCA']['tl_hy_teilnehmer'] = [
+$GLOBALS['TL_DCA'][tl_hy_teilnehmer'] = [
 //        'ctable' => ['tl_extcss_file'],
     // Config
     'config' => [
@@ -65,28 +65,28 @@ $GLOBALS['TL_DCA']['tl_hy_teilnehmer'] = [
         ],
         'operations' => [
             'edit' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_hy_teilnehmer']['edit'],
+                'label' => &$GLOBALS['TL_LANG'][tl_hy_teilnehmer']['edit'],
 //                'href' => 'table=tl_extcss_file',
                 'icon' => 'edit.gif',
             ],
             'editheader' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_hy_teilnehmer']['editheader'],
+                'label' => &$GLOBALS['TL_LANG'][tl_hy_teilnehmer']['editheader'],
                 'href' => 'act=edit',
                 'icon' => 'header.gif',
             ],
             'copy' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_hy_teilnehmer']['copy'],
+                'label' => &$GLOBALS['TL_LANG'][tl_hy_teilnehmer']['copy'],
                 'href' => 'act=copy',
                 'icon' => 'copy.gif',
             ],
             'delete' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_hy_teilnehmer']['delete'],
+                'label' => &$GLOBALS['TL_LANG'][tl_hy_teilnehmer']['delete'],
                 'href' => 'act=delete',
                 'icon' => 'delete.gif',
                 'attributes' => 'onclick="if(!confirm(\''.'Loeschen??'.'\'))return false;Backend.getScrollOffset()"',
             ],
             'show' => [
-                'label' => &$GLOBALS['TL_LANG']['tl_hy_teilnehmer']['show'],
+                'label' => &$GLOBALS['TL_LANG'][tl_hy_teilnehmer']['show'],
                 'href' => 'act=show',
                 'icon' => 'show.gif',
             ],
@@ -107,35 +107,35 @@ $GLOBALS['TL_DCA']['tl_hy_teilnehmer'] = [
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
         'Wettbewerb' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_hy_teilnehmer']['Wettbewerb'],
+            'label' => &$GLOBALS['TL_LANG'][tl_hy_teilnehmer']['Wettbewerb'],
             'exclude' => true,
             'inputType' => 'text',
             'eval' => ['mandatory' => true, 'maxlength' => 64],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'Name' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_hy_teilnehmer']['Name'],
+            'label' => &$GLOBALS['TL_LANG'][tl_hy_teilnehmer']['Name'],
             'exclude' => true,
             'inputType' => 'text',
             'eval' => ['mandatory' => true, 'maxlength' => 64],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'Kurzname' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_hy_teilnehmer']['Kurzname'],
+            'label' => &$GLOBALS['TL_LANG'][tl_hy_teilnehmer']['Kurzname'],
             'exclude' => true,
             'inputType' => 'text',
             'eval' => ['mandatory' => true, 'maxlength' => 64],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'Email' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_hy_teilnehmer']['Email'],
+            'label' => &$GLOBALS['TL_LANG'][tl_hy_teilnehmer']['Email'],
             'exclude' => true,
             'inputType' => 'text',
             'eval' => ['mandatory' => true, 'maxlength' => 64],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'Punkte' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_hy_teilnehmer']['Punkte'],
+            'label' => &$GLOBALS['TL_LANG'][tl_hy_teilnehmer']['Punkte'],
             'exclude' => true,
             'inputType' => 'text',
             'eval' => ['mandatory' => true, 'maxlength' => 64],

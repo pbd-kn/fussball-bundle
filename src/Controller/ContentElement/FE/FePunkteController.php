@@ -455,12 +455,12 @@ class FePunkteController extends AbstractFussballController
         $Wettbewerb=$this->aktWettbewerb['aktWettbewerb'];
         // alle Teilnehmer deren wetten entsprechend sortiert
         $sql  = "SELECT teilnehmer.ID as 'ID',teilnehmer.Name as 'Name',teilnehmer.Kurzname as 'Kurzname',teilnehmer.Email as 'Email'";
-        $sql .= " FROM 'tl_hy_teilnehmer as teilnehmer WHERE Wettbewerb  ='$Wettbewerb' ORDER BY teilnehmer.Kurzname  ;";
+        $sql .= " FROM tl_hy_teilnehmer as teilnehmer WHERE Wettbewerb  ='$Wettbewerb' ORDER BY teilnehmer.Kurzname  ;";
         
         $sql =  "SELECT ";
         $sql .= " tl_hy_wetten.Wettbewerb as Wettbewerb";
-        $sql .= " ,'tl_hy_teilnehmer.Name as Name";
-        $sql .= " ,'tl_hy_teilnehmer.ID as TlnID";
+        $sql .= " ,tl_hy_teilnehmer.Name as Name";
+        $sql .= " ,tl_hy_teilnehmer.ID as TlnID";
         $sql .= " , tl_hy_wetten.Art as Art";
         $sql .= " , tl_hy_wetten.Kommentar as Kommentar";
         $sql .= " , tl_hy_wetten.Tipp1 as Tipp1";
@@ -474,10 +474,10 @@ class FePunkteController extends AbstractFussballController
         $sql .= " , tl_hy_wetteaktuell.W3 as W3";
         $sql .= " , tl_hy_wetteaktuell.Wette as Wette";
         $sql .= " FROM tl_hy_wetteaktuell as tl_hy_wetteaktuell"; 
-        $sql .= " LEFT JOIN 'tl_hy_teilnehmer ON tl_hy_wetteaktuell.Teilnehmer = 'tl_hy_teilnehmer.ID"; 
+        $sql .= " LEFT JOIN tl_hy_teilnehmer ON tl_hy_wetteaktuell.Teilnehmer = tl_hy_teilnehmer.ID"; 
         $sql .= " LEFT JOIN tl_hy_wetten ON tl_hy_wetteaktuell.Wette = tl_hy_wetten.ID"; 
         $sql .= " WHERE tl_hy_wetteaktuell.Wettbewerb='$Wettbewerb'"; 
-        $sql .= " ORDER by 'tl_hy_teilnehmer.Name,"; 
+        $sql .= " ORDER by tl_hy_teilnehmer.Name,"; 
         $sql .= " CASE WHEN art = 's' AND Kommentar like '%achtel%' THEN 4";    // Reihenfolge ist wichtig
         $sql .= " WHEN art = 's' AND Kommentar like '%Viertel%' THEN 5";          
         $sql .= " WHEN art = 's' AND Kommentar like '%Halb%' THEN 6"; 
@@ -496,9 +496,9 @@ class FePunkteController extends AbstractFussballController
           das waere doch ein versuch wert alles zulesen und dann auszuwerten, bei "gruppenwechsel oder Kommentarwechsel" ueberschrift wechseln
           evtl oder by noch anpasse mit case ??
         SELECT * FROM ` tl_hy_wetteaktuell` 
-        LEFT JOIN 'tl_hy_teilnehmer ON tl_hy_wetteaktuell.Teilnehmer = 'tl_hy_teilnehmer.ID 
+        LEFT JOIN tl_hy_teilnehmer ON tl_hy_wetteaktuell.Teilnehmer = tl_hy_teilnehmer.ID 
         LEFT JOIN tl_hy_wetten ON tl_hy_wetteaktuell.Wette = tl_hy_wetten.ID 
-        WHERE tl_hy_wetteaktuell.Wettbewerb='wm2022' ORDER by 'tl_hy_teilnehmer.Kurzname, tl_hy_wetten.Art asc; 
+        WHERE tl_hy_wetteaktuell.Wettbewerb='wm2022' ORDER by tl_hy_teilnehmer.Kurzname, tl_hy_wetten.Art asc; 
         SELECT OrderID, Quantity,
 CASE WHEN Quantity > 30 THEN 'The quantity is greater than 30'
 WHEN Quantity = 30 THEN 'The quantity is 30'

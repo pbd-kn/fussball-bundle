@@ -1204,7 +1204,7 @@ EOT;
       } 
       if ($aktion == 'u') { // bearbeiten	
 	    // Besorge Teilnehmerdaten
-        $sql = " select ID,Kurzname,Name,Email from 'tl_hy_teilnehmer Where ID = '$id';";
+        $sql = " select ID,Kurzname,Name,Email from tl_hy_teilnehmer Where ID = '$id';";
         $debug .= "sql: $sql  ";	
         $stmt = $this->connection->executeQuery($sql);
         $Row = $stmt->fetchAssociative();
@@ -1462,7 +1462,7 @@ EOT;
         $row = $stmt->fetchAssociative();  // s. Doctrine\DBAL
         $wb=$row['value1']; 
         //echo "noch d (loeschen) nicht realisiert ID $id Wettbewerb $wb<br>";
-        $tbs = array("tl_hy_wetteaktuell","'tl_hy_teilnehmer","tl_hy_spiele","tl_hy_orte","tl_hy_mannschaft","tl_hy_gruppen");
+        $tbs = array("tl_hy_wetteaktuell","tl_hy_teilnehmer","tl_hy_spiele","tl_hy_orte","tl_hy_mannschaft","tl_hy_gruppen");
         foreach ($tbs as $k=>$tab) {
           $sql="DELETE FROM $tab WHERE wettbewerb ='$wb';";
 //echo "sql: $sql<br>";	
@@ -2178,7 +2178,7 @@ $debug.=" sql: $sql\n";
       $sql .= " teilnehmer.Name as 'Name',";
       $sql .= " teilnehmer.Kurzname as 'Kurzname',";
       $sql .= " teilnehmer.Email as 'Email'";
-      $sql .= " FROM 'tl_hy_teilnehmer as teilnehmer";
+      $sql .= " FROM tl_hy_teilnehmer as teilnehmer";
       $sql .= " WHERE Wettbewerb  ='".$this->aktWettbewerb['aktWettbewerb']."' ";
       $sql .= " ORDER BY teilnehmer.Kurzname  ;";
       $stmt = $this->connection->executeQuery($sql);
@@ -2331,11 +2331,11 @@ $debug.=" sql: $sql\n";
       }
       if ($aktion == "n" ) {   // neueintrag
         $value = "( '$Wettbewerb' ,'$Kurzname' , '$Name' , '$Email' )" ; 
-        $sql="INSERT INTO 'tl_hy_teilnehmer(Wettbewerb,Kurzname,Name,Email) VALUES $value";
+        $sql="INSERT INTO tl_hy_teilnehmer(Wettbewerb,Kurzname,Name,Email) VALUES $value";
         $cnt = $this->connection->executeStatement($sql);
 	    $html.="Wettbewerb $Wettbewerb Teilnehmer $Kurzname Name $Name Email $Email neu gesetzt";
       // TeilnehmerId besorgen
-	    $sql = "Select ID from 'tl_hy_teilnehmer where Wettbewerb = '$Wettbewerb'  and Kurzname='" . $Kurzname."';";
+	    $sql = "Select ID from tl_hy_teilnehmer where Wettbewerb = '$Wettbewerb'  and Kurzname='" . $Kurzname."';";
         $stmt = $this->connection->executeQuery($sql);
         $debug.="sql: $sql<br>";	
         $anz = $stmt->rowCount();
@@ -2360,7 +2360,7 @@ $debug.=" sql: $sql\n";
 	    }      
       } elseif ($aktion == 'u') {
         // TeilnehmerId besorgen/pruefen
-	    $sql = "Select ID from 'tl_hy_teilnehmer where Wettbewerb = '$Wettbewerb'  and ID='$id.';";
+	    $sql = "Select ID from tl_hy_teilnehmer where Wettbewerb = '$Wettbewerb'  and ID='$id.';";
         $debug.="sql: $sql<br>";	
         $stmt = $this->connection->executeQuery($sql);
         $anz = $stmt->rowCount();
@@ -2374,7 +2374,7 @@ $debug.=" sql: $sql\n";
           return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
         }
         $value = "SET Wettbewerb='$Wettbewerb' ,Kurzname='$Kurzname', Name='$Name', Email='$Email'" ; 
-	    $sql = "UPDATE 'tl_hy_teilnehmer $value where ID='$id'";
+	    $sql = "UPDATE tl_hy_teilnehmer $value where ID='$id'";
         $debug.="UPDATE Teilnehmer sql: $sql<br>";	
         $cnt = $this->connection->executeStatement($sql);
 	    $html.="Teilnehmer " . $Kurzname . " ge&auml;ndert";
@@ -2384,9 +2384,9 @@ $debug.=" sql: $sql\n";
     }
     if ($aktion == "d" ) {   
       $tid=$id;
-	  $sql = "Delete from 'tl_hy_teilnehmer WHERE ID=$tid LIMIT 1";
+	  $sql = "Delete from tl_hy_teilnehmer WHERE ID=$tid LIMIT 1";
       $cnt = $this->connection->executeStatement($sql);
-      //$html.="in Tabelle 'tl_hy_teilnehmer betroffene Saetze $cnt<br>";
+      //$html.="in Tabelle tl_hy_teilnehmer betroffene Saetze $cnt<br>";
 	  $html.="Teilnehmer gel&ouml;scht";                     // eigentlich muessen auch noch die Teilnehmerwetten in  tl_hy_wetteaktuell
                                                              // geloescht werden
 	  $sql = "Delete from  tl_hy_wetteaktuell where Wettbewerb = '$Wettbewerb' AND Teilnehmer =$tid";
