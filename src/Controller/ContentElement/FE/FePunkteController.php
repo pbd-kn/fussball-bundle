@@ -562,7 +562,7 @@ EOT;
               // Zeile ausgeben  tid hat noch den alten Teilnehmer
               //$html.="zeile fuer $tid ausgeben aktTlnName $aktTlnName<br>";
               $html.=$c->td();
-                $html.=$c->Button(array("onClick"=>"punkteDetail(this);","title"=>"Wetten anzeigen"),"A",$tid) . "\n";
+              $html.=$c->Button(array("onClick"=>"punkteDetail(this);","title"=>"Wetten anzeigen"),"A",$tid) . "\n";
               $html.=$c->end_td();
               $html.=$c->td($aktTlnName).$c->td((string) $Gesamtpunkte);
 	          $html.=$c->end_tr() . "\n"; 
