@@ -276,14 +276,17 @@ class FeEndstandController extends AbstractFussballController
       * $c = cgiUtil
       * $f = fussballUtil
       * $conn = datenbankconnection
-      * $Wettbewerb = Wettbewrb as String
-      * $deutschlandgruppe = Deutschlandgruppe as String
+      * $Wettbewerb = Wettbewerb as String
+      * $wherelike = like Parameter fuer Where as String, Auswahl der gruppe (deutschlandgruppe)
+      * $teilnehmer = Teilnehmerarray art s mit wettenaktuell und wetten
+      * $tabtitle  Tittel in der Ueberschrift
+      * $nation = Auswahl der Nation innerhalb der ausgewaehlten Gruppe($wherelike). z.B Spiele nur mit Deutschland
       * 
-      * res gerenderte deutschlandwetten
+      * res gerenderte spielwetten
       */
      
-     function createDeutschlandgruppe($c,$f,$conn,$Wettbewerb,$deutschlandgruppe,$teilnehmer ) {
-       //echo "createDeutschlandgruppe<br>";
+     function createSpielegruppe($c,$f,$conn,$Wettbewerb,$wherelike,$teilnehmer,$tabtitle,$nation="") {
+       //echo "like Gruppe $wherelike<br>";
        $debug = false;
 	   // lese die gewetteten Spiele
        $res="";               // result html
@@ -308,83 +311,69 @@ class FeEndstandController extends AbstractFussballController
        $sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft1 ON tl_hy_spiele.M1 = mannschaft1.ID";
        $sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft2 ON tl_hy_spiele.M2 = mannschaft2.ID";
        $sql .= " LEFT JOIN tl_hy_orte ON tl_hy_spiele.Ort = tl_hy_orte.ID";
-       $sql .= " WHERE tl_hy_spiele.Wettbewerb  = '$Wettbewerb'  AND LOWER(tl_hy_spiele.Gruppe) like '$deutschlandgruppe' ";
+       $sql .= " WHERE tl_hy_spiele.Wettbewerb  ='$Wettbewerb'  AND LOWER(tl_hy_spiele.Gruppe) like '$wherelike' ";
        $sql .= " ORDER BY tl_hy_spiele.Datum ASC , tl_hy_spiele.Uhrzeit ASC ;";
        if ($debug) echo "SQL<br>$sql<br>";	
 	   $tippspiele=array();
        $stmt = $conn->executeQuery ($sql);
        $num_rows = $stmt->rowCount();    
        while (($row = $stmt->fetchAssociative()) !== false) {
-	     if ((strtolower($row['M1']) == 'deutschland') || (strtolower($row['M2']) == 'deutschland')) $tippspiele[] = $row;
+         if ($nation != "") {
+	       if ((strtolower($row['M1']) == strtolower($nation)) || (strtolower($row['M2']) == strtolower($nation))) $tippspiele[] = $row;
+         } else $tippspiele[] = $row;
 	   }
        if ($debug)  {	
-         echo "<br>--------tippspiele alle Deutschland Spiele-------------------------<br>";
+         echo "<br>--------tippspiele alle  Spiele-------------------------<br>";
          foreach ($tippspiele as $k=>$tln) {
            echo "<br>";
            foreach ($tln as $k1=>$v1) echo "  $k1: $v1  ";
          } 
        }
 	
-	   // lese nur eine Wette die das deutschlandspiel beinhalten.
+	   // lese Pok und Ptrend aus dem ersten teilnehmersatz.
+       $tln=$teilnehmer[array_key_first($teilnehmer)];
+       $Pok=$tln['Pok'];
+       $Ptrend=$tln['Ptrend'];
        // also die Angaben zu Ptrend ....
-	   // in row wird der Wettstand ausgelesen 
-	   $sql =  "Select";
-	   $sql .= " Pok, Ptrend from tl_hy_wetten where LOWER(Kommentar) like '%deutschlandspiel%'  AND wettbewerb='$Wettbewerb' LIMIT 1;";
-       if ($debug)  echo " SQL wettstand $sql<br>";	
-       $rowstmt = $conn->executeQuery ($sql);
-       $anz = $rowstmt->rowCount();    
-       if ($anz == 0) {      // keine Spiele vorhanden
-         //$str.=file_get_contents ("html_Templates/pageHeader.html");
-         $res.="Keine Deutschlandspiele in den Wetten";
-         //$str.=file_get_contents ("html_Templates/pageFooter.html");
-         //echo "Keine Deutschlandspiele in den Wetten<br>\n";
-         return $res;
-       }
-       $Pok=0;
-       $Ptrend=0;
-       if ($row = $rowstmt->fetchAssociative()){
-         $Pok=$row['Pok'];
-         $Ptrend=$row['Ptrend'];
-       }
   
          //$res.=.=file_get_contents ("html_Templates/pageHeader.html");
        $res.=$c->table(array("class"=>"tablecss","rules"=>"all","border"=>"1","cellspacing"=>"1","cellpadding"=>"5"));
-       $str.=$c->thead();
+       $res.=$c->thead();                      // start ueberschrift
        $res.=$c->tr(array("height"=>"30"));
-       $res.=$c->th(array("colspan"=>"4","align"=>"center","height"=>"30"),"<b>Deutschland Gruppenspiele</b>");
+       $res.=$c->th(array("colspan"=>count($tippspiele)+2,"align"=>"center","height"=>"30"),"<b>$tabtitle</b>");
        //$str.=$c->th(array("width"=>"122"),"<input class='druck' type='button' onclick='print()' value='Drucken'></h2>");
        $res.=$c->end_tr();
-       $str.=$c->end_thead();
-       $str.=$c->tbody();
        $res.=$c->tr();
        $res.=$c->td(array("align"=>"left","valign"=>"top"),"Name");	   
-	   foreach ($tippspiele as $sp) {   // alle Deutschlandspiele mit akt Ergebnis und Ptren/Pok ausgeben
+	   foreach ($tippspiele as $sp) {   // alle Tipppiele mit akt Ergebnis und Ptren/Pok ausgeben
 	     $fl1 = "<img src='".$f->getImagePath($sp['Flagge1']). "' >&nbsp;";
 	     $fl2 = "<img src='".$f->getImagePath($sp['Flagge2']). "' >&nbsp;";
 	     $str="";
-	     if ($debug) $str .= "<b>Deutschland Spiel Nr: " . $sp['ID'] . " "; 
+	     if ($debug) $str .= "<b>Spiel Nr: " . $sp['ID'] . " "; 
 	     $str .=$sp['Datum'] . "<br>";
 	     $str .= $fl1 . $sp['M1'] . " : " . $sp['T1'] . "<br>";
 	     $str .= $fl2 . $sp['M2'] . " : " . $sp['T2'] . "<br>";
          $str .= "Punkte:" . $Ptrend ."/". $Pok;
          
-         if ($debug) echo "str: $str<br>\n";		  
+         //if ($debug) echo "str: $str<br>\n";		  
          $res.=$c->td(array("align"=>"left","valign"=>"top"),$str);	   
        }
        $res.=$c->td(array("align"=>"left","valign"=>"top"),"Gesamtpunkte");	   
-       $res.=$c->end_tr();         // Deutschlandspiel mit ptrend und pok eine Zeile 
+       $res.=$c->end_tr();         // Spiel mit ptrend und pok eine Zeile 
+       $res.=$c->end_thead();      // ende ueberschrift
        $akttlnmr="";
 	   $gesamtsumme=0;
 	   $gesamttext="";
-	   foreach ($teilnehmer as $tln) {   // alle Spiele aus der Deutschlandgruppe nach teilnehmer bewerten
-           $sp="";
-           foreach ($tippspiele as $spiel) {
-             //$res.=$c->td("spiel sp Art ".$tln['Art'].' Tipp1 '.$tln['Tipp1'].' ID '.$sp['ID']);
-	         if (strtolower ($tln['Art']) == 's' && $tln['Tipp1'] == $spiel['ID']) { // Spiel gefunden
-               $sp=$spiel;
-             }
+       $str.=$c->tbody();
+	   foreach ($teilnehmer as $tln) {   // alle Spiele aus der teilnehmer bewerten
+         $sp="";
+         foreach ($tippspiele as $spiel) {
+           //$res.=$c->td("spiel sp Art ".$tln['Art'].' Tipp1 '.$tln['Tipp1'].' ID '.$sp['ID']);
+	       if ($tln['Tipp1'] == $spiel['ID']) { // Spiel gefunden
+             $sp=$spiel;
            }
-           if ($sp == "") continue;
+         }
+         if ($sp == "") continue;
          $rowcnt++;
          if ($tln['Kurzname'] != $akttlnmr) { // neue Zeile
            if ( $akttlnmr != "") {
@@ -400,40 +389,40 @@ class FeEndstandController extends AbstractFussballController
 		   $akttlnmr = $tln['Kurzname'];
            if ($debug) echo "neuer Teilnehmer $akttlnmr<br>";
          }
-           //$res.=$c->td("spiel tln Art ".$tln['Art']);
-             //$res.=$c->td("spiel sp Art ".$tln['Art'].' Tipp1 '.$tln['Tipp1'].' ID '.$sp['ID']);
-               if ($debug) echo "Spiel gefunden M1: ".$sp['M1']." M2: ".$sp['M2']."<br";
-		       $str=" gewettet: " . $tln['W1'] . ":" . $tln['W2'] . "<br>";
-		       $points=berechnePunkte($tln['Art'],$tln['W1'],$tln['W2'],$tln['Tipp1'],$sp['T1'],$sp['T2'],$tln['Pok'],$tln['Ptrend']);
-		       if ( $points >0 ) { addierePunkte($conn,$points,$tln['ID']);	 }
+         //$res.=$c->td("spiel tln Art ".$tln['Art']);
+         //$res.=$c->td("spiel sp Art ".$tln['Art'].' Tipp1 '.$tln['Tipp1'].' ID '.$sp['ID']);
+         if ($debug) echo "Spiel gefunden M1: ".$sp['M1']." M2: ".$sp['M2']."<br";
+		 $str=" gewettet: " . $tln['W1'] . ":" . $tln['W2'] . "<br>";
+		 $points=berechnePunkte($tln['Art'],$tln['W1'],$tln['W2'],$tln['Tipp1'],$sp['T1'],$sp['T2'],$tln['Pok'],$tln['Ptrend']);
+		 if ( $points >0 ) { addierePunkte($conn,$points,$tln['ID']);	 }
 		  
-		       $str .= "Punkte $points";
-		       $gesamtsumme = $gesamtsumme + $points;
-		       if ($gesamttext == "") $gesamttext = "$points";
-		       else $gesamttext .= " + $points";
-               if ($debug) echo "str: $str<br>\n";		  
-               $res.=$c->td($str);
+		 $str .= "Punkte $points";
+		 $gesamtsumme = $gesamtsumme + $points;
+		 if ($gesamttext == "") $gesamttext = "$points";
+		 else $gesamttext .= " + $points";
+         if ($debug) echo "str: $str<br>\n";		  
+         $res.=$c->td($str);
            
-      }          // schleife teilnehmer
-         if ( $akttlnmr != "")  {
+       }          // schleife teilnehmer
+       if ( $akttlnmr != "")  {
            // Vorher noch Gesamtsumme ausgeben
 	       $res.=$c->td("$gesamttext = $gesamtsumme");
 	       $gesamttext="";
 	       $gesamtsumme=0;
 	       $res.=$c->end_tr();
-	     }
+	    }
 
        $res.=$c->end_tbody().$c->end_table();
        //$res.=file_get_contents ("html_Templates/pageFooter.html");
        return $res;
-     }                   // ende Deutschlandgruppe
+     }                   // ende Spielgruppe
 
      /*
       * $c = cgiUtil
       * $f = fussballUtil
       * $conn = datenbankconnection
       * $Wettbewerb = Wettbewrb as String
-      * $teilnehmer = Teilnehmerarray mit wettenaktuell und wetten
+      * $teilnehmer = Teilnehmerarray art g mit wettenaktuell und wetten
       * 
       * res gerenderte Gruppenwetten
       */
@@ -608,8 +597,148 @@ class FeEndstandController extends AbstractFussballController
       //$res.=$c->file_get_contents ("html_Templates/pageFooter.html");
       return $res;
     }    // ende create Gruppen
-
      
+     /*
+      * $c = cgiUtil
+      * $f = fussballUtil
+      * $conn = datenbankconnection
+      * $Wettbewerb = Wettbewrb as String
+      * $wetten = verfuegbare wetten zum Wetbewerb value wettenrow index (id)
+      * wetten[]
+      *    tl_hy_wetten.ID as 'ID'";       
+      *    tl_hy_wetten.Art as 'Art'";  
+      *    tl_hy_wetten.Tipp1 as 'Tipp1'";         Bei platzwetten index der Mannschaft
+      *                                            bei gruppenwetten Gruppenname A,B,C....
+      *    tl_hy_wetten.Tipp2 as 'Tipp2'";  
+      *    tl_hy_wetten.Tipp3 as 'Tipp3'";  
+      *    tl_hy_wetten.Tipp4 as 'Tipp4'";  
+      *    tl_hy_wetten.Pok as 'Pok'";   // 
+      *    tl_hy_wetten.Ptrend as 'Ptrend'";   
+      *    tl_hy_wetten.Kommentar as 'Kommentar'";   
+      *    mannschaftP.Nation as 'MPNation'";      Gilt für Platzwette Mannschafts id aus Tipp1
+      *    mannschaftP.Flagge as 'MPFlagge'";      Gilt für Platzwette Mannschafts id aus Tipp1
+      *    mannschaftP.ID as 'MPInd'";             Gilt für Platzwette Mannschafts id aus Tipp1    
+      * 
+      * $teilnehmeraktWetten = Akutelle Wetten aller Teilnehmer index strtolower(Name)
+      *    tl_hy_teilnehmer.ID as 'ID'";
+      *    tl_hy_teilnehmer.Kurzname as 'Kurzname'";
+      *    tl_hy_teilnehmer.Name as 'Name'";
+      *    tl_hy_wetteaktuell.W1 as 'W1'";    // Wettwert 1 des Teilnehmers
+      *    tl_hy_wetteaktuell.W2 as 'W2'";    // Wettwert 2 des Teilnehmers
+      *    tl_hy_wetteaktuell.W3 as 'W3'";    // Wettwert 2 des Teilnehmers
+      *    tl_hy_wetteaktuell.Wette as 'Windex'";  // index der aktuellen zeigt auf tl_hy_wetten
+      *    tl_hy_wetten.Art as 'Art'";       // S
+      *    tl_hy_wetten.Tipp1 as 'Tipp1'";   // wette g Gruppe Wette S Spieleindex P Platz wird eigentlich nicht mehr benoetiget  da in Wetten
+      *    tl_hy_wetten.ID as 'WettenId'";   // wette g Gruppe Wette S Spieleindex P Platz wird eigentlich nicht mehr benoetiget  da in Wetten
+      *    tl_hy_wetten.Pok as 'Pok'";   // 
+      *    tl_hy_wetten.Ptrend as 'Ptrend'";            
+      *    tl_hy_wetten.Kommentar as 'Kommentar'";   
+      *    mannschaft1.Nation as 'M1'";
+      *    mannschaft2.Nation as 'M2'";
+      *    mannschaft3.Nation as 'M3'";
+      *    mannschaftP.Nation as 'MPNation'";           wird eigentlich nicht mehr benoetiget da in Wetten
+      *    mannschaft1.ID as 'M1Ind'";
+      *    mannschaft2.ID as 'M2Ind'";
+      *    mannschaft3.ID as 'M3Ind'";
+      *    mannschaftP.ID as 'MPInd'";                   wird eigentlich nicht mehr benoetiget da in Wetten
+      *    FROM tl_hy_teilnehmer";
+      * 
+      * $selectArray = Array das die zu verwendeten Wettarten angibt z.b array("p","v")  Platz und vergleichsweten
+      * $tabtitle  Titel in der Ueberschrift
+      * 
+      * res P-Wette ($teilnehmeraktWetteMeister) V-Wette (Deutchland wird) Kommentare werden uebernommen
+      */
+    
+     function createPuV($c,$f,$conn,$Wettbewerb,$wetten,$teilnehmeraktWetten,$selectArray,$tabtitle) {
+       //echo "like Gruppe $wherelike<br>";
+       $debug = false;
+       $res="";
+       $tippwetten=array();    // selektiere relevante Wetten
+       foreach ($wetten as $Windex=>$row) {
+         //if ($debug) echo "wette Id $Windex Art: ".$row['Art']."<br>";
+         if (in_array(strtolower($row['Art']), $selectArray) || in_array($row['Art'], $selectArray)) { // ergibt auch die Reihenfolge der Spalten und der Ueberschrift
+           $tippwetten[$Windex]=$row;
+           if ($debug) echo "wette Id $Windex gespeichert<br>";
+         }
+       } 
+         
+         //$res.=.=file_get_contents ("html_Templates/pageHeader.html");
+       $res.=$c->table(array("class"=>"tablecss","rules"=>"all","border"=>"1","cellspacing"=>"1","cellpadding"=>"5"));
+       $res.=$c->thead();                      // start ueberschrift
+         $res.=$c->tr(array("height"=>"30"));
+         $res.=$c->th(array("colspan"=>count($tippwetten)+2,"align"=>"center","height"=>"30"),"<b>$tabtitle</b>");
+         //$str.=$c->th(array("width"=>"122"),"<input class='druck' type='button' onclick='print()' value='Drucken'></h2>");
+         $res.=$c->end_tr();
+         $res.=$c->tr();
+         $res.=$c->td(array("align"=>"left","valign"=>"top"),"Name");	   
+	     foreach ($tippwetten as $Windex=>$wette) {   // alle Wetten ausgeben in die Ueberschrift uebernehmen
+	       if ($debug)$str="$Windex:<br>";
+           else $str="";
+	       if ($debug)$str .= 'Kommentar: '.$wette['Kommentar']."<br>";
+           else $str .= $wette['Kommentar']."<br>";
+	       if ($debug) $str .= 'Wert: ';
+           if ($wette['Art'] == 'P') $str.=$wette['MPNation'];
+           else $str.=$wette['Tipp1'];
+           $res.=$c->td(array("align"=>"left","valign"=>"top"),$str);	   
+         }
+         $res.=$c->td(array("align"=>"left","valign"=>"top"),"Gesamtpunkte");	   
+         $res.=$c->end_tr();         // Spiel mit ptrend und pok eine Zeile 
+       $res.=$c->end_thead();      // ende ueberschrift
+       $akttlnmr="";
+	   $gesamtsumme=0;
+	   $gesamttext="";
+	   $gesamtpunkte=0;
+       $str.=$c->tbody();
+	   foreach ($teilnehmeraktWetten as $akttlnmr=>$tlwetten) {  
+         if ($debug) echo "aktuelle Wetten des Teilnehmers $akttlnmr<br>";
+         // selektiere aktuelle Wetten des Teilnehmers
+         $akttippwetten=array();    // selektiere relevante Wetten
+         foreach ($tlwetten as $k=>$rowaktwett) {
+           $Windex=$rowaktwett['Windex'];
+           //if ($debug) echo "wette Id $wettId Art: ".$row['Art']."<br>";
+           if (isset($tippwetten[$Windex])) {        // ist diese aktuelle Wette in den Wetten vorhanden (sollte sein)
+             $akttippwetten[$Windex]=$rowaktwett;    // sortiert nach dem Index von Wetten
+             if ($debug) echo "akttippwetten index $k Id $Windex gespeichert<br>";
+           }
+         } 
+         if ($debug) echo "anz akttippwetten: ".count($akttippwetten)."<br>";
+         if (count($akttippwetten) == 0) continue;
+
+         //$rowcnt++;
+		 $res.=$c->tr();                     // eine zeile pro Teilnehmer
+		 $res.=$c->td($akttlnmr);
+         $points=0;
+         $gesamttext == "";
+		 //$akttlnmr = $tln['Kurzname'];
+         if ($debug) echo "aktueller Teilnehmer $akttlnmr<br>";
+         // Suche aktuelleWette anhand es Wettindex
+	     foreach ($tippwetten as $Windex=>$wette) {    // in der Reihenfolge der Spalten
+           $tln=$akttippwetten[$Windex];         // Teilnehmer aktuelle Wette
+           if ($debug) echo "Windex $Windex Art: ".$tln['Art']."<br>";
+         
+		   $str=" gewettet: " . $tln['W1'] .":". $tln['M1'] ."<br>";
+           if ($debug) echo "$str<br>";
+		   $points=berechnePunkte($tln['Art'],$tln['W1'],$tln['W2'],$wette['Tipp1'],$wette['Tipp2'],$wette['Tipp3'],$wette['Pok'],$wette['Ptrend']);
+           $str.="Punkte: $points";
+	       $res.=$c->td($str);
+           if ($debug) echo "Points: $points<br>";
+		   if ( $points >0 ) { 
+             addierePunkte($conn,$points,$tln['ID']);	
+             if ($gesamttext == "") $gesamttext=$points;
+             else $gesamttext .= " + $points";
+             $gesamtpunkte += $points;
+           }
+           if ($debug) echo "gesamttext: $gesamttext<br>\n";		  
+         }      // Schleife ueber spalten    
+         if ($debug) echo "gesamttext: $gesamttext<br>\n";		  
+	     $res.=$c->td("$gesamttext = $gesamtpunkte");
+	     $res.=$c->end_tr();         
+       }// schleife teilnehmer
+       $res.=$c->end_tbody();
+       $res.=$c->end_table();
+       //$res.=file_get_contents ("html_Templates/pageFooter.html");
+       return $res;
+     }                   // ende createPuV
     
     $c=$this->cgiUtil;
     $conn=$this->connection;
@@ -627,33 +756,106 @@ class FeEndstandController extends AbstractFussballController
     $sql .= " ,tl_hy_wetteaktuell.W3 as 'W3'";    // Wettwert 2 des Teilnehmers
     $sql .= " ,tl_hy_wetteaktuell.Wette as 'Windex'";  // index der aktuellen zeigt auf tl_hy_wetten
     $sql .= " ,tl_hy_wetten.Art as 'Art'";       // S
-    $sql .= " ,tl_hy_wetten.Tipp1 as 'Tipp1'";   // wette g Gruppe Wette S Spieleindex
-//    $sql .= " ,tl_hy_wetten.Tipp2 as 'Tipp2'";  
-//    $sql .= " ,tl_hy_wetten.Tipp3 as 'Tipp3'";  
-//    $sql .= " ,tl_hy_wetten.Tipp4 as 'Tipp4'";  
+    $sql .= " ,tl_hy_wetten.Tipp1 as 'Tipp1'";   // wette g Gruppe Wette S Spieleindex P Platz
+    $sql .= " ,tl_hy_wetten.ID as 'WettenId'";   // wette g Gruppe Wette S Spieleindex P Platz
     $sql .= " ,tl_hy_wetten.Pok as 'Pok'";   // 
-    $sql .= " ,tl_hy_wetten.Ptrend as 'Ptrend'";   // 
+    $sql .= " ,tl_hy_wetten.Ptrend as 'Ptrend'";   
+    $sql .= " ,tl_hy_wetten.Kommentar as 'Kommentar'";   
   	$sql .= " ,mannschaft1.Nation as 'M1'";
 	$sql .= " ,mannschaft2.Nation as 'M2'";
 	$sql .= " ,mannschaft3.Nation as 'M3'";
+	$sql .= " ,mannschaftP.Nation as 'MPNation'";
 	$sql .= " ,mannschaft1.ID as 'M1Ind'";
 	$sql .= " ,mannschaft2.ID as 'M2Ind'";
 	$sql .= " ,mannschaft3.ID as 'M3Ind'";
+	$sql .= " ,mannschaftP.ID as 'MPInd'";
     $sql .= " FROM tl_hy_teilnehmer";
     $sql .= " LEFT JOIN tl_hy_wetteaktuell  ON tl_hy_wetteaktuell.Teilnehmer = tl_hy_teilnehmer.ID";
     $sql .= " LEFT JOIN tl_hy_wetten  ON tl_hy_wetteaktuell.Wette = tl_hy_wetten.ID";
 	$sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft1 ON tl_hy_wetteaktuell.W1 = mannschaft1.ID";
 	$sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft2 ON tl_hy_wetteaktuell.W2 = mannschaft2.ID";
 	$sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft3 ON tl_hy_wetteaktuell.W3 = mannschaft3.ID";
-    $sql .= " WHERE tl_hy_teilnehmer.Wettbewerb  ='$Wettbewerb' ORDER BY tl_hy_teilnehmer.Kurzname ASC, tl_hy_wetten.Tipp1 ASC";
+	$sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaftP ON tl_hy_wetten.Tipp1 = mannschaftP.ID";
+    $sql .= " WHERE tl_hy_teilnehmer.Wettbewerb  ='$Wettbewerb' ORDER BY tl_hy_teilnehmer.Kurzname ASC, tl_hy_wetten.Art, tl_hy_wetten.Tipp1 ASC";
     $sql .= ";";
+    
 
-    if ($debug) echo "SQL<br>$sql<br>";	
+    if ($debug) echo "SQL<br>$sql<br>";
+    $teilnehmer=array();
+    $teilnehmeraktWetten=array();
     $stmt = $conn->executeQuery ($sql);
     $num_rows = $stmt->rowCount();    
     while ($row = $stmt->fetchAssociative()) {   // teilnehmer merken sortiert nach Wettart incl. zugehörigen Wettaktuall und wette
       $teilnehmer[strtolower((string)$row['Art'])][]=$row;
+      $teilnehmeraktWetten[strtolower((string)$row['Name'])][]=$row;
 	}
+
+    // Wetten einlesen 
+    $sql  = "SELECT";
+    $sql .= " tl_hy_wetten.ID as 'ID'";       
+    $sql .= " ,tl_hy_wetten.Art as 'Art'";  
+    $sql .= " ,tl_hy_wetten.Tipp1 as 'Tipp1'";  
+    $sql .= " ,tl_hy_wetten.Tipp2 as 'Tipp2'";  
+    $sql .= " ,tl_hy_wetten.Tipp3 as 'Tipp3'";  
+    $sql .= " ,tl_hy_wetten.Tipp4 as 'Tipp4'";  
+    $sql .= " ,tl_hy_wetten.Pok as 'Pok'";   // 
+    $sql .= " ,tl_hy_wetten.Ptrend as 'Ptrend'";   
+    $sql .= " ,tl_hy_wetten.Kommentar as 'Kommentar'";   
+	$sql .= " ,mannschaftP.Nation as 'MPNation'";
+	$sql .= " ,mannschaftP.Flagge as 'MPFlagge'";
+	$sql .= " ,mannschaftP.ID as 'MPInd'";
+    $sql .= " FROM tl_hy_wetten";
+	$sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaftP ON tl_hy_wetten.Tipp1 = mannschaftP.ID";
+    $sql .= " WHERE tl_hy_wetten.Wettbewerb  ='$Wettbewerb' ORDER BY tl_hy_wetten.Art";
+    $sql .= ";";
+    
+
+    if ($debug) echo "SQL<br>$sql<br>";
+
+    $wetten=array();
+    $stmt = $conn->executeQuery ($sql);
+    $num_rows = $stmt->rowCount();    
+    while ($row = $stmt->fetchAssociative()) {   // wette nach index sortieren
+      $wetten[$row['ID']]=$row;
+	}
+
+    /*
+     * ORDER BY tl_hy_teilnehmer.Kurzname ASC, tl_hy_wetten.Art, tl_hy_wetten.Tipp1 ASC";
+     * Array teilnehmer [art]
+     * Werte eines eintrags
+     *     tl_hy_teilnehmer.ID as 'ID'";
+     *     tl_hy_teilnehmer.Kurzname as 'Kurzname'";
+     *     tl_hy_teilnehmer.Name as 'Name'";
+     *     tl_hy_wetteaktuell.W1 as 'W1'";    // Wettwert 1 des Teilnehmers
+     *     tl_hy_wetteaktuell.W2 as 'W2'";    // Wettwert 2 des Teilnehmers
+     *     tl_hy_wetteaktuell.W3 as 'W3'";    // Wettwert 2 des Teilnehmers
+     *     tl_hy_wetteaktuell.Wette as 'Windex'";  // index der aktuellen zeigt auf tl_hy_wetten
+     *     tl_hy_wetten.Art as 'Art'";       // S
+     *     tl_hy_wetten.Tipp1 as 'Tipp1'";   // Wettart s = Speilenummer
+     *                                       // Wettart g = Gruppe als Text
+     *                                       // Wettart p = Index Manschaft
+     *                                       // Wettart v = Vergleichswert zu W1
+     *     tl_hy_wetten.ID as 'WettenId'";   // index der Wette
+     *     tl_hy_wetten.Pok as 'Pok'";       // Punkte OK
+     *     tl_hy_wetten.Ptrend as 'Ptrend'"; // Punkte Trend  
+     *     tl_hy_wetten.Kommentar as 'Kommentar'"; // Kommentar aus Wetten z.b
+     *                                             // Deutschland wird
+     *                                             // Deutschlandspiel
+     *                                             // Gruppe A, Gruppe B,..
+     *                                             // Achtel
+     *                                             // Viertel
+     *                                             // Halb
+     *                                             // Finale
+     *                                             // Meister (EM oder WM)
+     *     mannschaft1.Nation as 'M1'";            // mannschaft1 mannschaft ausgewählt aus M1 (bei Spielewette);
+     *     mannschaft1.ID as 'M1Ind'";
+     *     mannschaft2.Nation as 'M2'";            // mannschaft2 mannschaft ausgewählt aus M2 (bei Spielewette);
+     *     mannschaft2.ID as 'M2Ind'";
+     *     mannschaft3.Nation as 'M3'";            // mannschaft3 mannschaft ausgewählt aus M3 (bei Spielewette);
+     *     mannschaft3.ID as 'M3Ind'";
+     *     mannschaftP.Nation as 'MPNation'";      // mannschaftP mannschaft ausgewählt aus tl_hy_wetten.Tipp1 as 'Tipp1' (P-Wette);
+     *     mannschaftP.ID as 'MPInd'";
+     */
 
     
      $deutschlandgruppe=$this->aktWettbewerb['aktDGruppe'];
@@ -661,8 +863,13 @@ class FeEndstandController extends AbstractFussballController
      loescheTlnPunkte($this->connection,$Wettbewerb);
      //echo "<br>Alle Teilnehmerpunkte gel&ouml;scht<br>";
      //echo "<br>erzeuge Deutschlandgruppe<br>";
-     $html.=createDeutschlandgruppe($this->cgiUtil,$this->fussballUtil,$conn,$Wettbewerb,$deutschlandgruppe,$teilnehmer['s']);
+     $html.=createSpielegruppe($this->cgiUtil,$this->fussballUtil,$conn,$Wettbewerb,$deutschlandgruppe,$teilnehmer['s'],'Deutschland Gruppenspiele','Deutschland');
      $html.=createGruppen($this->cgiUtil,$this->fussballUtil,$conn,$Wettbewerb,$teilnehmer['g']);
+     $html.=createSpielegruppe($this->cgiUtil,$this->fussballUtil,$conn,$Wettbewerb,'achtel%',$teilnehmer['s'],'Achtelfinale');
+     $html.=createSpielegruppe($this->cgiUtil,$this->fussballUtil,$conn,$Wettbewerb,'viertel%',$teilnehmer['s'],'Viertelfinale');
+     $html.=createSpielegruppe($this->cgiUtil,$this->fussballUtil,$conn,$Wettbewerb,'halb%',$teilnehmer['s'],'Halbfinale');
+     $html.=createSpielegruppe($this->cgiUtil,$this->fussballUtil,$conn,$Wettbewerb,'finale',$teilnehmer['s'],'Finale');
+     $html.=createPuV($this->cgiUtil,$this->fussballUtil,$conn,$Wettbewerb,$wetten,$teilnehmeraktWetten,["p","v"],'Platz und Vergleich');
 
 
      $response = new Response($html,Response::HTTP_OK,['content-type' => 'text/html']);

@@ -234,7 +234,7 @@ EOT;
         $html.=$c->thead();
         foreach ($this->WettenArten as $Art) {
           $html.=$c->tr();
-          $html.=$c->th("&nbsp;").$c->th("ID").$c->th("Pok").$c->th("Ptrend").$c->th("Art").$c->th("Kommentar");
+          $html.=$c->th("&nbsp;").$c->th("ID").$c->th("Pok").$c->th("Ptrend").$c->th($Art).$c->th("Kommentar");
           switch(strtolower($Art))
           {
             case 's': {   // Spielwette Tipp1 Spiel Tipp2 Tore M1 Tipp 2 Tore M2

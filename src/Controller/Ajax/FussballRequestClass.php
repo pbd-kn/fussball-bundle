@@ -179,14 +179,14 @@ EOT;
       $html.= $c->end_tr() . $c->tr() . "\n";
       $html.= $c->td(array("valign"=>"top"),"Deutschlandgruppe");
       $html.= $c->td(array("valign"=>"top"),$c->textfield(array("name"=>"deutschlandGruppe","value"=>"$DGruppe"))) . "\n";
-      $html.= $c->end_tr() . "\n";;
+      $html.= $c->end_tr() . "\n";
       $html.= $c->td(array("valign"=>"top"),"Beginn JJJJ-MM-TT");
       $html.= $c->td(array("valign"=>"top"),$c->textfield(array("name"=>"startDatum","value"=>"$StartDatum"))) . "\n";
-      $html.= $c->end_tr() . "\n";;
+      $html.= $c->end_tr() . "\n";
       $html.= $c->td(array("valign"=>"top"),"Ende JJJJ-MM-TT");
       $html.= $c->td(array("valign"=>"top"),$c->textfield(array("name"=>"endeDatum","value"=>"$EndeDatum"))) . "\n";
       $html.= $c->end_tr() . "\n";
-      $html.= $c->end_table() . "\n";;
+      $html.= $c->end_table() . "\n";
       $html.= $c->end_form();
   
       $html = utf8_encode($html);
@@ -348,7 +348,7 @@ EOT;
         //$html.=$c->td(array("valign"=>"top"),"Flagge") . "\n";
         //$html.=$c->td(array("valign"=>"top")) . "\n";
       $html.= $c->end_tr()."\n";
-      $html.= $c->end_table() . "\n";;
+      $html.= $c->end_table() . "\n";
       $html.= $c->end_form();
   
       $html = utf8_encode($html);
@@ -460,7 +460,7 @@ EOT;
         $html.=$c->td(array("valign"=>"top"),$c->textfield(array("name"=>"ort","id"=>"ort","value"=>"$ort")))."\n";
         $html.=$c->td(array("valign"=>"top"),$c->textfield(array("name"=>"beschreibung","id"=>"beschreibung","value"=>"$beschreibung")))."\n";
       $html.= $c->end_tr()."\n";
-      $html.= $c->end_table() . "\n";;
+      $html.= $c->end_table() . "\n";
       $html.= $c->end_form();
   
       $html = utf8_encode($html);
@@ -793,7 +793,7 @@ EOT;
         $html.=$c->td(array("valign"=>"top"),"T1").$c->td(array("valign"=>"top"),$c->textfield(array("name"=>"T1","id"=>"T1","value"=>"$T1"))) . "\n";
         $html.=$c->td(array("valign"=>"top"),"T2").$c->td(array("valign"=>"top"),$c->textfield(array("name"=>"T2","id"=>"T2","value"=>"$T2"))) . "\n";
       $html.= $c->end_tr()."\n";
-      $html.= $c->end_table() . "\n";;
+      $html.= $c->end_table() . "\n";
       $html.= $c->end_form();
   
       $html = utf8_encode($html);
@@ -908,8 +908,8 @@ EOT;
     }
 
     function createWettbottom($row,$cgi) {
-      $str =$cgi->end_tr()."\n";;
-      $str .=$cgi->end_table()."\n";;
+      $str =$cgi->end_tr()."\n";
+      $str .=$cgi->end_table()."\n";
       $str .=$cgi->end_form();
 	  return $str;
     }
@@ -1147,8 +1147,8 @@ EOT;
       $str.=$cgi->td(array("valign"=>"top"),$cgi->textfield(array("name"=>"Name","id"=>"Name","value"=>"$Name"))) . "\n";
       $str.=$cgi->td(array("valign"=>"top"),"Email");
       $str.=$cgi->td(array("valign"=>"top"),$cgi->textfield(array("name"=>"Email","id"=>"Email","value"=>"$Email"))) . "\n";
-      $str.=$cgi->end_tr() . "\n";;
-      $str.=$cgi->end_table() . "\n";;
+      $str.=$cgi->end_tr() . "\n";
+      $str.=$cgi->end_table() . "\n";
       $str.=$cgi->end_form();
       return $str;
     }
@@ -1249,7 +1249,7 @@ EOT;
       $str.=$cgi->tr();
       $str.=$cgi->td(array("valign"=>"top"),"ID");
       $str.=$cgi->td(array("valign"=>"top"),$cgi->textfield(array("disabled"=>"true","name"=>"ID","id"=>"ID","value"=>"$ID","size"=>"4"))) . "\n";
-      $str.=$cgi->end_tr() . $cgi->tr()."\n";;
+      $str.=$cgi->end_tr() . $cgi->tr()."\n";
       $str.=$cgi->td(array("valign"=>"top"),"Nation");
       $str.=$cgi->td(array("valign"=>"top"),$cgi->textfield(array("placeholder"=>"Nation Name eindeutig","name"=>"Nation","id"=>"Nation","value"=>"$Nation"))) . "\n";
       $str.=$cgi->td(array("valign"=>"top"),"Type");
@@ -1262,18 +1262,18 @@ EOT;
       $titleType.="%:MA:%  Mittelamerika\n"; 
       $titleType.="%:NA:%  Nordamerika\n"; 
       $str.=$cgi->td(array("valign"=>"top"),$cgi->textfield(array("title"=>$titleType,"name"=>"Type","id"=>"Type","value"=>"$Type"))) . "\n";
-      $str.=$cgi->end_tr() . $cgi->tr()."\n";;
+      $str.=$cgi->end_tr() . $cgi->tr()."\n";
       $str.=$cgi->td(array("valign"=>"top"),"Alfa2");
       $str.=$cgi->td(array("valign"=>"top"),$cgi->textfield(array("name"=>"Alfa2","id"=>"Alfa2","value"=>"$Alfa2"))) . "\n";
       $str.=$cgi->td(array("valign"=>"top"),"Alfa3");
       $str.=$cgi->td(array("valign"=>"top"),$cgi->textfield(array("name"=>"Alfa3","id"=>"Alfa3","value"=>"$Alfa3"))) . "\n";
-      $str.=$cgi->end_tr() . $cgi->tr(). "\n";;
+      $str.=$cgi->end_tr() . $cgi->tr(). "\n";
       $str.=$cgi->td(array("valign"=>"top"),"Domain");
       $str.=$cgi->td(array("valign"=>"top"),$cgi->textfield(array("name"=>"Domain","id"=>"Domain","value"=>"$Domain"))) . "\n";
       $str.=$cgi->td(array("valign"=>"top"),"Image");
       $str.=$cgi->td(array("valign"=>"top"),$cgi->textfield(array("placeholder"=>"Imagename aus /assets/flaggen evtl. hochladen","name"=>"Image","id"=>"Image","value"=>"$Image"))) . "\n";
-      $str.=$cgi->end_tr() . "\n";;
-      $str.=$cgi->end_table() . "\n";;
+      $str.=$cgi->end_tr() . "\n";
+      $str.=$cgi->end_table() . "\n";
       $str.=$cgi->end_form();
       return $str;
     }
