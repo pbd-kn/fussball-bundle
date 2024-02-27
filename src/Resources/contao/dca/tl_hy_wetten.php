@@ -106,7 +106,7 @@ $GLOBALS['TL_DCA']['tl_hy_wetten'] = [
         'tstamp' => [
             'sql' => "int(10) unsigned NOT NULL default '0'",
         ],
-        'Wettbewrb' => [
+        'Wettbewerb' => [
             'label' => &$GLOBALS['TL_LANG']['tl_hy_wetten']['Wettbewerb'],
             'exclude' => true,
             'inputType' => 'text',
