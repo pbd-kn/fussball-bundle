@@ -302,10 +302,18 @@ class VWTeilnehmerController extends AbstractFussballController
         $html="";
         // alle Teilnehmer einlesen
         $sql  = "SELECT";
-        $sql .= " teilnehmer.ID as 'ID',";
+/*        $sql .= " teilnehmer.ID as 'ID',";
         $sql .= " teilnehmer.Name as 'Name',";
         $sql .= " teilnehmer.Kurzname as 'Kurzname',";
-        $sql .= " teilnehmer.Email as 'Email'";
+        $sql .= " teilnehmer.Email as 'Email',";
+        $sql .= " teilnehmer.Bezahlt as 'Bezahlt',";
+        $sql .= " teilnehmer.Erst as 'Erst',";
+        $sql .= " teilnehmer.Achtel as 'Achtel',";
+        $sql .= " teilnehmer.Viertel as 'Viertel',";
+        $sql .= " teilnehmer.Halb as 'Halb',";
+        $sql .= " teilnehmer.Finale as 'Finale'";
+*/
+        $sql .= " * ";
         $sql .= " FROM tl_hy_teilnehmer as teilnehmer";
         $sql .= " WHERE Wettbewerb  ='".$this->aktWettbewerb['aktWettbewerb']."' ";
         $sql .= " ORDER BY teilnehmer.Kurzname  ;";
@@ -397,7 +405,7 @@ EOT;
         $html.=$c->table(array("class"=>"verwtablecss","border"=>1));
         $html.=$c->thead();
           $html.=$c->tr();
-            $html.=$c->th("&nbsp;").$c->th("ID").$c->th("Name").$c->th("Kurzname").$c->th("Email");
+            $html.=$c->th("Bez, Er, AF, VF, HF, FI").$c->th("ID").$c->th("Name").$c->th("Kurzname").$c->th("Email");
           $html.=$c->end_tr();
         $html.=$c->end_thead();
         $html.=$c->tbody();
@@ -409,6 +417,9 @@ EOT;
             $html.=$c->Button(array("onClick"=>"teilnehmerBearbeiten(this);","title"=>"Teilnehmer bearbeiten"),"B",$tid) . "\n";
             $html.=$c->Button(array("onClick"=>"teilnehmerLoeschen(this);","title"=>"Teilnehmer l&ouml;schen"),"L",$tid) . "\n";
             $html.=$c->Button(array("onClick"=>"wettenZeigen(this);","title"=>"Wetten anzeigen"),"W",$tid) . "\n";
+            $s=$tln['Bezahlt'].",".$tln['Erst'].",".$tln['Achtel'].",".$tln['Viertel'].",".$tln['Halb'].",".$tln['Finale'];
+            //$s="bez: ".$tln['Bezahlt'];
+            $html.=$c->textfield(array("value"=>"$s","disabled"=>"true")) . "\n";
           $html.=$c->end_td();
           $html.=$c->td((string) $tln['ID']).$c->td($tln['Name']).$c->td($tln['Kurzname']).$c->td($tln['Email']);
 	      $html.=$c->end_tr() . "\n";
@@ -417,7 +428,7 @@ EOT;
 	        $html.=erzeugeWetttabelle($this->connection,$c,$this->aktWettbewerb['aktWettbewerb'],$tid,$html);
 	        $html.="</div>";	
 	      $html.=$c->end_td();	
-	      $html.=$c->end_tr()."\n";
+	      $html.=$c->end_tr();
       }
       $html.=$c->end_tbody().$c->end_table().$c->end_form();
       $response = new Response($html,Response::HTTP_OK,['content-type' => 'text/html']);

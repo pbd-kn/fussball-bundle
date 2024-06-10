@@ -128,6 +128,56 @@ $GLOBALS['TL_DCA']['tl_hy_teilnehmer'] = [
             'eval' => ['mandatory' => true, 'maxlength' => 64],
             'sql' => "int  default '0'",
         ],
+        'Bezahlt' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_hy_teilnehmer']['bezahlt'],
+            'exclude' => true,
+            'inputType' => 'checkbox',
+            'default' => true,
+            'sql' => "char(1) NOT NULL default '0'",
+        ],
+        'Bezahlt' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_hy_teilnehmer']['bezahlt'],
+            'exclude' => true,
+            'inputType' => 'checkbox',
+            'default' => true,
+            'sql' => "char(1) NOT NULL default '0'",
+        ],
+        'Erst' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_hy_teilnehmer']['Erst'],
+            'exclude' => true,
+            'inputType' => 'checkbox',
+            'default' => true,
+            'sql' => "char(1) NOT NULL default '0'",
+        ],
+        'Achtel' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_hy_teilnehmer']['Achtel'],
+            'exclude' => true,
+            'inputType' => 'checkbox',
+            'default' => true,
+            'sql' => "char(1) NOT NULL default '0'",
+        ],
+        'Viertel' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_hy_teilnehmer']['Viertel'],
+            'exclude' => true,
+            'inputType' => 'checkbox',
+            'default' => true,
+            'sql' => "char(1) NOT NULL default '0'",
+        ],
+        'Halb' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_hy_teilnehmer']['Halb'],
+            'exclude' => true,
+            'inputType' => 'checkbox',
+            'default' => true,
+            'sql' => "char(1) NOT NULL default '0'",
+        ],
+        'Finale' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_hy_teilnehmer']['Finale'],
+            'exclude' => true,
+            'inputType' => 'checkbox',
+            'default' => true,
+            'sql' => "char(1) NOT NULL default '0'",
+        ],
+        
     ],
 ];
 

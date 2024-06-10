@@ -215,29 +215,49 @@ class CgiUtil
 
   public function textfield($atts){
     $str = "<input type='text' ";
-    foreach ($atts as  $key=>$val){ $str .= " $key='$val'"; }
+    if (is_array($atts)) {
+      foreach ($atts as  $key=>$val){ $str .= " $key='$val'"; }
+    }
     $str .= "></input>";
     return($str);
+  }
+
+  public function radioButton($atts, $value) {
+    $str = "<input type='radio' ";  
+    $clickName=""; 
+    if (is_array($atts)) {
+        foreach ($atts as $key => $val) {
+            if (strtolower($key) == "checked") { // Sonderbehandlung für checked
+                if ($val != "" && $val != "0") {
+                    $str .= "checked ";
+                }
+            } elseif (strtolower($key) == "id") {   // bei Angabe eines Namens wird ein eventhandler zum click eingefuegt
+              $clickName="$val";
+              $str .= "$key='$val' ";
+            } else {
+                $str .= "$key='$val' ";
+            }
+        }
+    } elseif (is_string($atts)) {
+        $str .= "$atts ";
+    }
+
+    $str .= "value='$value' />";
+    if ($clickName != "") {
+    $str.="<script>";
+    $str.="debugger;";
+        $str.="document.getElementById('$clickName').addEventListener('click', function() {";
+            $str.="\nevent.preventDefault(); // Verhindert den Standard-Submit";
+            $str.="debugger;\nthis.checked = !this.checked;\n";
+            $str.="if (this.checked==true) { \nthis.value = 'on';} else {\nthis.value = 'off';}";
+            $str.="console.log('Checkbox value:', this.value);";
+        $str.="});";
+    $str.="</script>";
+    }
+
+    return $str;
 }
 
-  public function radioButton($atts,$value){
-    $str = "<input type='radio' ";
-    foreach ($atts as  $key=>$val) {
-      if (strtolower($key) == "checked") {            // Sonderbehandlung für checked
-        if ($val != "") {
-          $str .= "checked";
-        }
-      } else {
-        $str .= " $key='$val'";
-      }
-    }
-    $str .= ">";
-    if($value != null) {
-      $str .= $value;
-    }
-    $str .= "</input>";
-    return($str);
-  }
 
   public function textarea($atts=null, $value=null){
      $str = "<textarea ";
