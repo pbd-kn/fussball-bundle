@@ -2349,8 +2349,7 @@ $debug.=" sql: $sql\n";
     if (!isset($Halb)) $Halb = 0;
     if (!isset($Finale)) $Finale = 0;
     // checkboxwerte prüfen
-    if ( ($Bezahlt != "0" && $Bezahlt != 1) ||
-         ($Erst != "0" && $Erst != 1) ||
+    if ( ($Erst != "0" && $Erst != 1) ||
          ($Achtel != "0" && $Achtel != 1) ||
          ($Viertel != "0" && $Viertel != 1) ||
          ($Halb != "0" && $Halb != 1) ||
@@ -2378,7 +2377,7 @@ $debug.=" sql: $sql\n";
       }
       if ($aktion == "n" ) {   // neueintrag
         $value = "( '$Wettbewerb' ,'$Kurzname' , '$Name' , '$Email', '$Bezahlt', '$Erst', '$Achtel', '$Viertel', '$Halb', '$Finale' )" ; 
-        $sql="INSERT INTO tl_hy_teilnehmer(Wettbewerb,Kurzname,Name,Email) VALUES $value";
+        $sql="INSERT INTO tl_hy_teilnehmer(Wettbewerb,Kurzname,Name,Email,Bezahlt,Erst,Achtel,Viertel,Halb,Finale) VALUES $value";
         $cnt = $this->connection->executeStatement($sql);
 	    $html.="Wettbewerb $Wettbewerb Teilnehmer $Kurzname Name $Name Email $Email neu gesetzt";
       // TeilnehmerId besorgen
