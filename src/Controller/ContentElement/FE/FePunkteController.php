@@ -375,7 +375,7 @@ class FePunkteController extends AbstractFussballController
     // gibt eine Zeile incl tr() aus
     function getWetteR($conn,$cgi,$Wettbewerb,$row,$mannschaften,&$Punkte,&$debug="") {
       if ($debug != "") $deb=true;
-      else $deb=false;
+    else $deb=false;
       $str="";
       if ($deb)$debug.="erzeugeZeile $tid wettbewerb $Wettbewerb wetten ".$row['Wette']."<br>"; 
       //$Hywettenindex=$Wind;
