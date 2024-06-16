@@ -256,7 +256,15 @@ class VWTeilnehmerController extends AbstractFussballController
 	      if ($Art == 'v') {    // Zahl Platz
             $str.=$cgi->hidden("W2$wettindex", -1);                    // zur weitergabe bei übernehmen
             $str.=$cgi->hidden("W3$wettindex", -1);                    // zur weitergabe bei übernehmen
-	        $str.=$cgi->td($w['Tipp1']);                               // Wert wird aus der Wettentabelle genommen
+            // werte 1 2 4 8 16
+            $infotext="1: Europameister
+2: Ausscheiden in Finale
+4: Ausscheiden in Halbfinale
+8: Ausscheiden in Viertelfinale
+16: Ausscheiden in Achtelfinale
+32: Ausscheiden in Gruppenspielen
+";
+	        $str.=$cgi->td(array("title"=>$infotext),$w['Tipp1']);                               // Wert wird aus der Wettentabelle genommen
             $str.=$cgi->td(array("valign"=>"top"),"T1: ".$cgi->textfield(array("name"=>"W1$id","id"=>"W1$id","value"=>"$W1","size"=>"4"))) . "\n";
 	        $str.=$cgi->td("&nbsp;");
           }

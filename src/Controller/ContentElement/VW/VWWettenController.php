@@ -314,7 +314,17 @@ EOT;
                break;
               }
               case 'v': {   // Vergleichwette Tipp1 Vergleichswert Tipp2 Tipp 3 Tipp4 irrelevant ??
-                $html.=$c->td((string)$row['Tipp1']).$c->td((string)$row['Tipp2']).$c->td((string)$row['Tipp3']).$c->td((string)$row['Tipp4']);
+              $infotext="Vergleichswette";
+                if (str_contains(strtolower($row['Kommentar']), 'deutschland')) { 
+             $infotext="1: Europameister
+2: Ausscheiden in Finale
+4: Ausscheiden in Halbfinale
+8: Ausscheiden in Viertelfinale
+16: Ausscheiden in Achtelfinale
+32: Ausscheiden in Gruppenspielen
+";
+                }
+                $html.=$c->td(array("title"=>$infotext),(string)$row['Tipp1']).$c->td((string)$row['Tipp2']).$c->td((string)$row['Tipp3']).$c->td((string)$row['Tipp4']);
                break;
               }
             }
