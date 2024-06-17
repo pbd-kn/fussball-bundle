@@ -369,10 +369,15 @@ class FePunkteController extends AbstractFussballController
       $str.=$cgi->end_tbody().$cgi->end_table() . "\n";
 	  return $str;
     }
-    // $tid = Teilnehmerindex
-    // $wetten = Wettenarray nach wettindex sortiert
-    //  $row,$this->Mannschaften,&$html
-    // gibt eine Zeile incl tr() aus
+    /*
+     * $conn,
+     * $cgi,
+     * $Wettbewerb,
+     * $row, = teilnehmersatz
+     * $mannschaften,
+     * &$Punkte,
+     * &$debug=""
+     */ 
     function getWetteR($conn,$cgi,$Wettbewerb,$row,$mannschaften,&$Punkte,&$debug="") {
       if ($debug != "") $deb=true;
     else $deb=false;
@@ -401,6 +406,23 @@ class FePunkteController extends AbstractFussballController
 	  $W1=$row['W1'];            // aktuelle Werte aus tl_hy_wetteaktuell des Teilnehmers werden abhaenig vom Wetttyp interpretiert
       $W2=$row['W2'];
       $W3=$row['W3'];
+	  if ($Art == 's') {    // Spielausgang Tipp 1 = Spiel
+        // Spiel einlesen
+        
+        $sql  = "SELECT";
+//        $sql .= " mannschaft1.Name as 'M1Name'";
+//        $sql .= ", mannschaft2.Name as 'M2Name'";
+        $sql .= " tl_hy_spiele.T1 as 'T1'";
+        $sql .= ", tl_hy_spiele.T2 as 'T2'";
+        $sql .= " FROM tl_hy_spiele";
+//        $sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft1 ON tl_hy_spiele.M1 = mannschaft1.ID";
+//        $sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft2 ON tl_hy_spiele.M2 = mannschaft2.ID";            
+        $sql .= " WHERE tl_hy_spiele.Wettbewerb  ='".$Wettbewerb."' AND tl_hy_spiele.ID=".$Tipp1.";";
+        $stmt = $conn->executeQuery($sql);
+        $sp = $stmt->fetchAssociative();
+        $row['W1']=$sp['T1'];
+        $row['W2']=$sp['T2'];
+      }
       $Punkte=berechnePkt($row);
 	  if ($Art == 's') {    // Spielausgang Tipp 1 = Spiel
         // Spiel einlesen
@@ -408,13 +430,15 @@ class FePunkteController extends AbstractFussballController
         $sql  = "SELECT";
         $sql .= " mannschaft1.Name as 'M1Name'";
         $sql .= ", mannschaft2.Name as 'M2Name'";
+        $sql .= ", tl_hy_spiele.T1 as 'T1'";
+        $sql .= ", tl_hy_spiele.T2 as 'T2'";
         $sql .= " FROM tl_hy_spiele";
         $sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft1 ON tl_hy_spiele.M1 = mannschaft1.ID";
         $sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft2 ON tl_hy_spiele.M2 = mannschaft2.ID";            
         $sql .= " WHERE tl_hy_spiele.Wettbewerb  ='".$Wettbewerb."' AND tl_hy_spiele.ID=".$Tipp1.";";
         $stmt = $conn->executeQuery($sql);
         $row = $stmt->fetchAssociative();
-	    $str.=$cgi->td((string)$row['M1Name']."/".(string)$row['M2Name']."($Tipp2/$Tipp3)").$cgi->td("$W1/$W2");
+	    $str.=$cgi->td((string)$row['M1Name']."/".(string)$row['M2Name']."(".(string)$row['T1']."/".(string)$row['T2'].")").$cgi->td("$W1/$W2");
 	  	  $str.=$cgi->td((string)$Punkte);
 	  }
 	  if ($Art == 'v') {    // Zahl Platz

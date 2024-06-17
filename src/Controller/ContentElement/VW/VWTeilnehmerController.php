@@ -275,7 +275,8 @@ class VWTeilnehmerController extends AbstractFussballController
   	        $sql =  "SELECT tl_hy_mannschaft.Name as 'M1Name',tl_hy_mannschaft.ID as 'M1Ind' FROM tl_hy_mannschaft WHERE Wettbewerb ='".$Wettbewerb."' AND ID=".$w['Tipp1'].";";
             $stmt = $conn->executeQuery($sql); 
             $row = $stmt->fetchAssociative();
-	        $str.=$cgi->td($row['M1Name']);
+            if (isset($row['M1Name'])) $str.=$cgi->td($row['M1Name']);
+            else  $str.=$cgi->td('-1');
 	        $s1=createAllMannschaftOption ($conn,$cgi,$Wettbewerb,"W1$wettindex",$W1);
 	        $str.=$cgi->td($W1 . $s1);
 	        $str.=$cgi->td("&nbsp;");

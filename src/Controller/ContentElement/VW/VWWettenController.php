@@ -310,7 +310,11 @@ EOT;
                break;
               }
               case 'p': {   // Platzwette Tipp1 M1 Tipp2 Tipp 3 Tipp4 irrelevant ??
-                $html.=$c->td($this->Mannschaften[$row['Tipp1']]['Name']).$c->td((string)$row['Tipp2']).$c->td((string)$row['Tipp3']).$c->td((string)$row['Tipp4']);
+                if (isset ($this->Mannschaften[$row['Tipp1']]['Name'])) $html.=$c->td($this->Mannschaften[$row['Tipp1']]['Name']);
+                else $html.=$c->td('-1');
+                if ($row['Tipp2'] =! -1) $html.=$c->td((string)$row['Tipp2']);
+                if ($row['Tipp3'] =! -1) $html.=$c->td((string)$row['Tipp3']);
+                if ($row['Tipp4'] =! -1) $html.=$c->td((string)$row['Tipp4']);
                break;
               }
               case 'v': {   // Vergleichwette Tipp1 Vergleichswert Tipp2 Tipp 3 Tipp4 irrelevant ??
