@@ -282,6 +282,7 @@ EOT;
             switch(strtolower($row['Art']))
             {
               case 's': {   // Spielwette Tipp1 Spiel Tipp2 Tore M1 Tipp 2 Tore M2
+/*
                 $sql  = "SELECT";
                 $sql .= " tl_hy_spiele.ID as 'ID',";
                 $sql .= " tl_hy_spiele.Nr as 'Nr',";
@@ -291,6 +292,8 @@ EOT;
                 $sql .= " mannschaft1.Name as 'M1Name',";
                 $sql .= " mannschaft1.Flagge as 'Flagge1',";
                 $sql .= " tl_hy_spiele.M2 as 'M2Ind',";
+                $sql .= " tl_hy_spiele.T1 as 'T1',";
+                $sql .= " tl_hy_spiele.T2 as 'T2',";
                 $sql .= " mannschaft2.Nation as 'M2',";
                 $sql .= " mannschaft2.Name as 'M2Name',";
                 $sql .= " mannschaft2.Flagge as 'Flagge2'";
@@ -298,11 +301,24 @@ EOT;
                 $sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft1 ON tl_hy_spiele.M1 = mannschaft1.ID";
                 $sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft2 ON tl_hy_spiele.M2 = mannschaft2.ID";
                 $sql .= " WHERE tl_hy_spiele.ID='".$row['Tipp1']."'";
+*/
+                $sql  = "SELECT";    // Spiel lesen
+                $sql .= " tl_hy_spiele.T1 as 'T1',";
+                $sql .= " tl_hy_spiele.T2 as 'T2',";                
+                $sql .= " mannschaft1.Name as 'M1Name',";
+                $sql .= " mannschaft1.Flagge as 'Flagge1',";
+                $sql .= " mannschaft2.Name as 'M2Name',";
+                $sql .= " mannschaft2.Flagge as 'Flagge2'";
+                $sql .= " FROM tl_hy_spiele";
+                $sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft1 ON tl_hy_spiele.M1 = mannschaft1.ID";
+                $sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft2 ON tl_hy_spiele.M2 = mannschaft2.ID";
+                $sql .= " WHERE tl_hy_spiele.ID='".$row['Tipp1']."'";
+
                 $stmt = $this->connection->executeQuery($sql);
                 $rowsp = $stmt->fetchAssociative();
 
                 $html.=$c->td('SpID: '.(string)$row['Tipp1']."<br>".$rowsp['M1Name']."<br>".$rowsp['M2Name']);
-                $html.=$c->td((string)$row['Tipp2']).$c->td((string)$row['Tipp3']).$c->td((string)$row['Tipp4']);
+                $html.=$c->td((string)$rowsp['T1']).$c->td((string)$rowsp['T2']).$c->td((string)$row['Tipp4']);
                break;
               }
               case 'g': {   // Gruppenwette Tipp1 Gruppe Tipp2 M1 Tipp 3 M2 Tipp3 M3

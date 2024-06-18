@@ -150,15 +150,17 @@ class FePunkteController extends AbstractFussballController
        */
        //function berechnePunkte($Art,$W1,$W2,$W3,$Tipp1,$Tipp2,$Tipp3,$Pok,$Ptrend,&$deb="") {
        function berechnePkt($row,&$deb="") {
-         $Art=strtolower((string)$row['Art']);$W1=$row['W1'];$W2=$row['W2'];$W3=$row['W3'];
-         $Tipp1=$row['Tipp1'];$Tipp2=$row['Tipp2'];$Tipp3=$row['Tipp3'];
+         $Art=strtolower((string)$row['Art']);$W1=$row['W1'];$W2=$row['W2'];$W3=$row['W3'];  // werte die aus der wette stammen, also endergebnis
+         $Tipp1=$row['Tipp1'];$Tipp2=$row['Tipp2'];$Tipp3=$row['Tipp3'];                     // werte die der Teilnehmer getippt hat
          $Pok=$row['Pok'];$Ptrend=$row['Ptrend'];
          if ($deb != "") $debug = true;
          else $debug = false;
+         //$debug=true;
          if ($debug) $deb.="berechnePunkte($Art,$W1,$W2,$Tipp1,$Tipp2,$Tipp3,$Pok,$Ptrend)<br>";
          //berechnePunkte(S,3,1,159,0,3,3,1)
          if ($Art == 's') {
     	   // Spielwette
+         if ($debug) $deb.="spielwette w1 $W1 W2 $W2)<br>";
 	       if ($W1 == -1 || $W2 == -1) {
              if ($debug) $deb.="W1 oder W2 -1 Punkte 0<br>";	  
 	         return 0;
@@ -167,6 +169,7 @@ class FePunkteController extends AbstractFussballController
              if ($debug) $deb.="Tipp2 oder Tipp3 -1 Punkte 0<br>";	  
 	         return 0;
 	       }
+         if ($debug) $deb.="spielwette Tipp2 $Tipp2 Tipp3 $Tipp3)<br>";
 	       if ($W1 == $Tipp2 && $W2 == $Tipp3) {	  
              if ($debug) $deb.="Treffer Punkte $Pok<br>";	  
 	         return $Pok;  
@@ -410,18 +413,18 @@ class FePunkteController extends AbstractFussballController
         // Spiel einlesen
         
         $sql  = "SELECT";
-//        $sql .= " mannschaft1.Name as 'M1Name'";
-//        $sql .= ", mannschaft2.Name as 'M2Name'";
-        $sql .= " tl_hy_spiele.T1 as 'T1'";
-        $sql .= ", tl_hy_spiele.T2 as 'T2'";
+        $sql .= " T1,T2";
         $sql .= " FROM tl_hy_spiele";
-//        $sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft1 ON tl_hy_spiele.M1 = mannschaft1.ID";
-//        $sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft2 ON tl_hy_spiele.M2 = mannschaft2.ID";            
         $sql .= " WHERE tl_hy_spiele.Wettbewerb  ='".$Wettbewerb."' AND tl_hy_spiele.ID=".$Tipp1.";";
         $stmt = $conn->executeQuery($sql);
         $sp = $stmt->fetchAssociative();
-        $row['W1']=$sp['T1'];
-        $row['W2']=$sp['T2'];
+        $row['Tipp2']=$sp['T1'];
+        $row['Tipp3']=$sp['T2'];
+        //$str.="spl $sql <br>";
+        //$str.= "spiel T1 ".$row['W1'].':'.$row['W2']."<br>";
+       //$debstr="";
+        //$Punktet=berechnePkt($row,$debstr);
+        //$str.="debstr $debstr<br>";
       }
       $Punkte=berechnePkt($row);
 	  if ($Art == 's') {    // Spielausgang Tipp 1 = Spiel
