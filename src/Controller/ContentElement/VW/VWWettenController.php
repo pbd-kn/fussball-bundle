@@ -318,7 +318,7 @@ EOT;
                 $rowsp = $stmt->fetchAssociative();
 
                 $html.=$c->td('SpID: '.(string)$row['Tipp1']."<br>".$rowsp['M1Name']."<br>".$rowsp['M2Name']);
-                $html.=$c->td((string)$rowsp['T1']).$c->td((string)$rowsp['T2']).$c->td((string)$row['Tipp4']);
+                $html.=$c->td((string)$rowsp['T1']."<br>siehe ").$c->td((string)$rowsp['T2']."<br>Spiel").$c->td((string)$row['Tipp4']);
                break;
               }
               case 'g': {   // Gruppenwette Tipp1 Gruppe Tipp2 M1 Tipp 3 M2 Tipp3 M3
