@@ -573,11 +573,11 @@ EOT;
         $html.=$c->div();
         $html.='aktueller Wettbewerb('.$this->aktWettbewerb['id'].'): '.$this->aktWettbewerb['aktWettbewerb'].'<br>';
         $html.=$c->start_form("", null,null,array("id"=>"inputForm"));
-        $html.=$c->table(array("class"=>"tablecss sortierbar","rules"=>"all","border"=>"1"));
+        $html.=$c->table(array("class"=>"tablecss","rules"=>"all","border"=>"1"));
         $html.=$c->thead();
             $html.=$c->th("&nbsp;");
-            $html.=$c->th(array("class"=>"sortierbar"),"Name");
-            $html.=$c->th(array("class"=>"sortierbar"),"Punkte");
+            $html.=$c->th("Name");
+            $html.=$c->th("Punkte");
         $html.=$c->end_thead();
         $html.=$c->tbody();
         $htmlPunktetabelle="";            // enthält die punktetabellen im divs mit id wett.
@@ -596,7 +596,7 @@ EOT;
               $html.=$c->end_td();
               $html.=$c->td($aktTlnName).$c->td((string) $Gesamtpunkte);
 	            $html.=$c->end_tr() . "\n"; 
-              $html.=$c->tr().$c->td(array("colspan"=>"5"));
+              $html.=$c->tr().$c->td(array("colspan"=>"3"));
               $html.=$htmlPunktetabelle;          // punktetabellen anhängen
               $html.=$c->end_td();             
 	            $html.=$c->end_tr() . "\n"; 
@@ -625,7 +625,7 @@ EOT;
         $html.=$c->end_td();
         $html.=$c->td($aktTlnName).$c->td((string) $Gesamtpunkte);
         $html.=$c->end_tr() . "\n";              
-        $html.=$c->tr().$c->td(array("colspan"=>"5"));
+        $html.=$c->tr().$c->td(array("colspan"=>"3"));
         $htmlPunktetabelle.=$c->end_tbody().$c->end_table()."</div>\n";
         $html.=$htmlPunktetabelle;          // punktetabellen anhängen
         $html.=$c->end_td();             
