@@ -199,36 +199,45 @@ class FePunkteController extends AbstractFussballController
         if ($debug) $deb.="Falsche Punkte 0<br>";	  	  
 	    return 0;
       } else if ($Art == 'g') {
-	    $Punkte = 0;
-	    if ($W1 == -1 || $W2 == -1 || $W3 == -1) return $Punkte;
-	    if ($W1 == $Tipp1) {
+         if ($debug) $deb.="gruppenwette w1 $W1 W2 $W2 Tipp1 $Tipp1 Tipp2 $Tipp2<br>";
+	       $Punkte = 0;
+	       //if ($W1 == -1 || $W2 == -1 || $W3 == -1) return $Punkte;
+	       if ($W1 == -1 || $W2 == -1) return $Punkte;
+         if ($debug) $deb.="gruppenwette auswerten<br>";
+	       if ($W1 == $Tipp1) {
           $Punkte = $Punkte + $Pok;
           $deb.="w1=Tipp1 ok<br>";
         }
-	    if ($W2 == $Tipp2) {
+	      if ($W2 == $Tipp2) {
           $Punkte = $Punkte + $Pok;
           $deb.="w2=Tipp2 ok<br>";
         }
-	    if ($W3 == $Tipp3) {
+/*
+	      if ($W3 == $Tipp3) {
           $Punkte = $Punkte + $Pok;
           $deb.="w3=Tipp3 ok<br>";
         }
+*/
         if ($W1 == $Tipp2) {
           $Punkte = $Punkte + $Ptrend;
           $deb.="w1=Tipp2 trend<br>";
         }
+/*
         if ($W1 == $Tipp3) {
           $Punkte = $Punkte + $Ptrend;
           $deb.="w1=Tipp3 trend<br>";
         }
+*/
         if ($W2 == $Tipp1) {
           $Punkte = $Punkte + $Ptrend;
           $deb.="w2=Tipp1 trend<br>";
         }
+/*
         if ($W2 == $Tipp3) {
           $Punkte = $Punkte + $Ptrend;
           $deb.="w1=Tipp3 trend<br>";
         }
+
         if ($W3 == $Tipp1) {
           $Punkte = $Punkte + $Ptrend;
           $deb.="w3=Tipp1 trend<br>";
@@ -237,6 +246,7 @@ class FePunkteController extends AbstractFussballController
           $Punkte = $Punkte + $Ptrend;
           $deb.="w3=Tipp2 trend<br>";
         }
+*/
 	    return $Punkte;
       } else if ($Art == 'v') {
 	    if ($W1 == -1) return 0;
@@ -409,6 +419,7 @@ class FePunkteController extends AbstractFussballController
 	  $W1=$row['W1'];            // aktuelle Werte aus tl_hy_wetteaktuell des Teilnehmers werden abhaenig vom Wetttyp interpretiert
       $W2=$row['W2'];
       $W3=$row['W3'];
+      $debstr="";
 	  if ($Art == 's') {    // Spielausgang Tipp 1 = Spiel
         // Spiel einlesen
         
@@ -426,7 +437,24 @@ class FePunkteController extends AbstractFussballController
         //$Punktet=berechnePkt($row,$debstr);
         //$str.="debstr $debstr<br>";
       }
-      $Punkte=berechnePkt($row);
+	  if ($Art == 'g') {    // Gruppen Ausgang
+        // gruppe einlesen nach Platz sortiert
+        $sql= "SELECT Platz,mannschaft1.Name as 'M1Name' ,mannschaft1.ID as 'M1Ind' FROM  `tl_hy_gruppen`"; 
+        $sql.=" LEFT JOIN tl_hy_mannschaft AS mannschaft1 ON tl_hy_gruppen.M1 = mannschaft1.ID"; 
+        $sql.=" WHERE tl_hy_gruppen.wettbewerb='".$Wettbewerb."' AND tl_hy_gruppen.Gruppe='".$Tipp1."' ORDER BY Platz";
+        $stmt = $conn->executeQuery($sql); 
+        $num_rows = $stmt->rowCount();  
+        //$debstr .= "sql $sql<br>"; 
+        $Pl=array();
+        while (($rowgerp = $stmt->fetchAssociative()) !== false) {
+          $Pl[] = $rowgerp;
+        } 
+        $row['Tipp1']=$Pl[0]['M1Ind'];
+        $row['Tipp2']=$Pl[1]['M1Ind'];
+      }    
+      
+      $Punkte=berechnePkt($row,$debstr);
+      //$str.="debstr $debstr<br>";
 	  if ($Art == 's') {    // Spielausgang Tipp 1 = Spiel
         // Spiel einlesen
         
@@ -487,6 +515,7 @@ class FePunkteController extends AbstractFussballController
         $sql =  "SELECT ";
         $sql .= " tl_hy_wetten.Wettbewerb as Wettbewerb";
         $sql .= " ,tl_hy_teilnehmer.Name as Name";
+        $sql .= " ,tl_hy_teilnehmer.Kurzname as Kurzname";
         $sql .= " ,tl_hy_teilnehmer.ID as TlnID";
         $sql .= " , tl_hy_wetten.Art as Art";
         $sql .= " , tl_hy_wetten.Kommentar as Kommentar";
@@ -519,32 +548,6 @@ class FePunkteController extends AbstractFussballController
         while (($row = $stmt->fetchAssociative()) !== false) {
           $this->TeilnehmerWetten[]=$row;
         }
-        /* 
-          das waere doch ein versuch wert alles zulesen und dann auszuwerten, bei "gruppenwechsel oder Kommentarwechsel" ueberschrift wechseln
-          evtl oder by noch anpasse mit case ??
-        SELECT * FROM ` tl_hy_wetteaktuell` 
-        LEFT JOIN tl_hy_teilnehmer ON tl_hy_wetteaktuell.Teilnehmer = tl_hy_teilnehmer.ID 
-        LEFT JOIN tl_hy_wetten ON tl_hy_wetteaktuell.Wette = tl_hy_wetten.ID 
-        WHERE tl_hy_wetteaktuell.Wettbewerb='wm2022' ORDER by tl_hy_teilnehmer.Kurzname, tl_hy_wetten.Art asc; 
-        SELECT OrderID, Quantity,
-CASE WHEN Quantity > 30 THEN 'The quantity is greater than 30'
-WHEN Quantity = 30 THEN 'The quantity is 30'
-when Quantity like '%1%' Then 'mit like'
-ELSE 'The quantity is under 30'
-END AS 'neue spalte'
-s. https://www.w3schools.com/sql/trymysql.asp?filename=trysql_case
-
-case kann auch innerhalb von Order verwendet werden 
-ORDER BY
-  CASE
-    WHEN word LIKE 'searchstring' THEN 1          // Sortierindex
-    WHEN word LIKE 'searchstring%' THEN 2
-    WHEN word LIKE '%searchstring' THEN 4
-    When word = 'anton' Then Berta else Paul      // nach einer anderen Spalte sortieren
-    ELSE 3
-  END
-
-        */
         // alle Mannschaften einlesen
         $sql="SELECT * FROM `tl_hy_mannschaft` WHERE `Wettbewerb`='".$this->aktWettbewerb['aktWettbewerb']."'"; 
         $stmt = $this->connection->executeQuery($sql);
@@ -567,14 +570,14 @@ ORDER BY
         </script>
 EOT;
         $html.=$my_script_txt;        
-        $html.=$c->div(array("class"=>"contentverwaltung"));
+        $html.=$c->div();
         $html.='aktueller Wettbewerb('.$this->aktWettbewerb['id'].'): '.$this->aktWettbewerb['aktWettbewerb'].'<br>';
         $html.=$c->start_form("", null,null,array("id"=>"inputForm"));
-        $html.=$c->table(array("class"=>"verwtablecss","border"=>1));
+        $html.=$c->table(array("class"=>"tablecss sortierbar","rules"=>"all","border"=>"1"));
         $html.=$c->thead();
-          $html.=$c->tr();
-            $html.=$c->th("&nbsp;").$c->th("Name").$c->th("Punkte");
-          $html.=$c->end_tr();
+            $html.=$c->th("&nbsp;");
+            $html.=$c->th(array("class"=>"sortierbar"),"Name");
+            $html.=$c->th(array("class"=>"sortierbar"),"Punkte");
         $html.=$c->end_thead();
         $html.=$c->tbody();
         $htmlPunktetabelle="";            // enthält die punktetabellen im divs mit id wett.
@@ -583,7 +586,7 @@ EOT;
         $aktTlnName='';
         foreach ($this->TeilnehmerWetten as $k=>$tln) {
           if ($tln['TlnID'] !=$tid)  {            // neuer Teilnehmer
-//          $html.="neuer Teilnehmer ".$tln['TlnID'].' alter Tln '.$tid.'<br>';
+          //$html.="neuer Teilnehmer ".$tln['TlnID'].' alter Tln '.$tid.'<br>';
             if ($tid != -1) { // es existiert schon ein Teilnehmer vorherigen Tln ausgeben
               $htmlPunktetabelle.=$c->end_tbody().$c->end_table()."</div>\n";
               // Zeile ausgeben  tid hat noch den alten Teilnehmer
@@ -592,14 +595,14 @@ EOT;
               $html.=$c->Button(array("onClick"=>"punkteDetail(this);","title"=>"Wetten anzeigen"),"A",$tid) . "\n";
               $html.=$c->end_td();
               $html.=$c->td($aktTlnName).$c->td((string) $Gesamtpunkte);
-	          $html.=$c->end_tr() . "\n"; 
+	            $html.=$c->end_tr() . "\n"; 
               $html.=$c->tr().$c->td(array("colspan"=>"5"));
               $html.=$htmlPunktetabelle;          // punktetabellen anhängen
               $html.=$c->end_td();             
-	          $html.=$c->end_tr() . "\n"; 
+	            $html.=$c->end_tr() . "\n"; 
             }
-            $tid = $tln['TlnID'];
             $Gesamtpunkte=0;
+            $tid = $tln['TlnID'];
             $aktTlnName=$tln['Name'];
             $htmlPunktetabelle='<div id=wett'.$tid.' style="display:none;">';
             $htmlPunktetabelle.=$c->table(array("border"=>"1")) . "\n";
@@ -610,7 +613,7 @@ EOT;
             $htmlPunktetabelle.=$c->end_thead();
             $htmlPunktetabelle.=$c->tbody();            
           }
-	      $htmlPunktetabelle.=getWetteR($this->connection,$c,$Wettbewerb,$tln,$this->Mannschaften,$Pkte); // alle aufsammeln
+	        $htmlPunktetabelle.=getWetteR($this->connection,$c,$Wettbewerb,$tln,$this->Mannschaften,$Pkte); // alle aufsammeln
           $Gesamtpunkte+=$Pkte;
       }
       if ($tid != -1) { // letzten Teilnehmer ausgeben
