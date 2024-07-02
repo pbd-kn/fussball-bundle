@@ -337,6 +337,7 @@ class FeEndstandController extends AbstractFussballController
        // also die Angaben zu Ptrend ....
   
          //$res.=.=file_get_contents ("html_Templates/pageHeader.html");
+       // thead start
        $res.=$c->table(array("class"=>"tablecss","rules"=>"all","border"=>"1","cellspacing"=>"1","cellpadding"=>"5"));
        $res.=$c->thead();                      // start ueberschrift
        $res.=$c->tr(array("height"=>"30"));
@@ -344,12 +345,16 @@ class FeEndstandController extends AbstractFussballController
        //$str.=$c->th(array("width"=>"122"),"<input class='druck' type='button' onclick='print()' value='Drucken'></h2>");
        $res.=$c->end_tr();
        $res.=$c->tr();
-       $res.=$c->td(array("align"=>"left","valign"=>"top"),"Name");	   
-	   foreach ($tippspiele as $sp) {   // alle Tipppiele mit akt Ergebnis und Ptren/Pok ausgeben
+       $res.=$c->td(array("align"=>"left","valign"=>"top"),"Name");	 
+       $headerSpielList=array();      // in headerSpielList sind die Ergebnisse der Spiele gespeichert
+	   foreach ($tippspiele as $sp) {   // alle Tippspiele mit akt Ergebnis und Ptren/Pok ausgeben
+           // spiel ergebnis lesen und in headerSpielList merken
+         $headerSpielList[]=$sp;
 	     $fl1 = "<img src='".$f->getImagePath($sp['Flagge1']). "' >&nbsp;";
 	     $fl2 = "<img src='".$f->getImagePath($sp['Flagge2']). "' >&nbsp;";
 	     $str="";
 	     if ($debug) $str .= "<b>Spiel Nr: " . $sp['ID'] . " "; 
+	     $str .= "<b>Spiel Nr: " . $sp['ID'] . "<br>"; 
 	     $str .=$sp['Datum'] . "<br>";
 	     $str .= $fl1 . $sp['M1'] . " : " . $sp['T1'] . "<br>";
 	     $str .= $fl2 . $sp['M2'] . " : " . $sp['T2'] . "<br>";
@@ -360,49 +365,55 @@ class FeEndstandController extends AbstractFussballController
        }
        $res.=$c->td(array("align"=>"left","valign"=>"top"),"Gesamtpunkte");	   
        $res.=$c->end_tr();         // Spiel mit ptrend und pok eine Zeile 
-       $res.=$c->end_thead();      // ende ueberschrift
+       $res.=$c->end_thead();      
+       // ende ueberschrift
        $akttlnmr="";
 	   $gesamtsumme=0;
 	   $gesamttext="";
        $str.=$c->tbody();
 	   foreach ($teilnehmer as $tln) {   // alle Spiele aus der teilnehmer bewerten
-         $sp="";
-         foreach ($tippspiele as $spiel) {
-           //$res.=$c->td("spiel sp Art ".$tln['Art'].' Tipp1 '.$tln['Tipp1'].' ID '.$sp['ID']);
-	       if ($tln['Tipp1'] == $spiel['ID']) { // Spiel gefunden
-             $sp=$spiel;
-           }
-         }
-         if ($sp == "") continue;
-         $rowcnt++;
-         if ($tln['Kurzname'] != $akttlnmr) { // neue Zeile
-           if ( $akttlnmr != "") {
+         if ($tln['Kurzname'] != $akttlnmr) { // neue Zeile wenn neuer Teilnehmer
+//echo 'neuer Teilnehmer id '.$tln['ID'].' Kurzname '.$tln['Kurzname'] ." akttlnmr: $akttlnmr<br>";
+         if ( $akttlnmr != "") {
 		       // Vorher noch Gesamtsumme ausgeben
-		     $res.=$c->td("$gesamttext = $gesamtsumme");
-		     $gesamttext="";
-		     $gesamtsumme=0;
-		     $res.=$c->end_tr();
-		   }
+		   $res.=$c->td("$gesamttext = $gesamtsumme");
+		   $gesamttext="";
+		   $gesamtsumme=0;
+           $teilnehmerId=$tln['ID'];
+		   $res.=$c->end_tr();
+		 }
          
-		   $res.=$c->tr();
-		   $res.=$c->td($tln['Name']);
-		   $akttlnmr = $tln['Kurzname'];
-           if ($debug) echo "neuer Teilnehmer $akttlnmr<br>";
-         }
-         //$res.=$c->td("spiel tln Art ".$tln['Art']);
-         //$res.=$c->td("spiel sp Art ".$tln['Art'].' Tipp1 '.$tln['Tipp1'].' ID '.$sp['ID']);
-         if ($debug) echo "Spiel gefunden M1: ".$sp['M1']." M2: ".$sp['M2']."<br";
-		 $str=" gewettet: " . $tln['W1'] . ":" . $tln['W2'] . "<br>";
-		 $points=berechnePunkte($tln['Art'],$tln['W1'],$tln['W2'],$tln['Tipp1'],$sp['T1'],$sp['T2'],$tln['Pok'],$tln['Ptrend']);
-		 if ( $points >0 ) { addierePunkte($conn,$points,$tln['ID']);	 }
-		  
-		 $str .= "Punkte $points";
-		 $gesamtsumme = $gesamtsumme + $points;
-		 if ($gesamttext == "") $gesamttext = "$points";
-		 else $gesamttext .= " + $points";
-         if ($debug) echo "str: $str<br>\n";		  
-         $res.=$c->td($str);
+		 $res.=$c->tr();
+		 $res.=$c->td($tln['Name']);
+		 $akttlnmr = $tln['Kurzname'];
+         if ($debug) echo "neuer Teilnehmer $akttlnmr<br>";
+         //}
+         foreach ($headerSpielList as $sp) {   // fuer jedes Spiel eine Spalte. identisch mit der Ueberschrift $headSpindex = auszuwertende Spielenummer
+           $spielIndex=$sp['ID'];
            
+           // aktuelle wette einlesen
+           $sql = 'select * from tl_hy_wetteaktuell ';
+           $sql .= ' LEFT JOIN tl_hy_wetten ON tl_hy_wetten.ID = tl_hy_wetteaktuell.Wette ';
+           $sql .= 'WHERE tl_hy_wetten.Tipp1 = '.$spielIndex.' AND tl_hy_wetteaktuell.Teilnehmer="'.$tln['ID'].'"';
+           $sql .= ' AND tl_hy_wetteaktuell.Wettbewerb="'.$Wettbewerb.'"';
+           $stmt = $conn->executeQuery ($sql);
+           $num_rows = $stmt->rowCount();    
+           $aktWetteTlnrow = $stmt->fetchAssociative();
+//echo "aktWett sql $sql<br>";
+           if ($debug) echo "Spiel gefunden M1: ".$sp['M1']." M2: ".$sp['M2']."<br";
+		   //$str="Spiel: ".$sp['ID']."<br>gewettet: " . $tln['W1'] . ":" . $tln['W2'] . "<br>";
+		   $str="Spiel: ".$sp['ID']."<br>gewettet: " . $aktWetteTlnrow['W1'] . ":" . $aktWetteTlnrow['W2'] . "<br>";
+		   $points=berechnePunkte($aktWetteTlnrow['Art'],$aktWetteTlnrow['W1'],$aktWetteTlnrow['W2'],$aktWetteTlnrow['Tipp1'],$sp['T1'],$sp['T2'],$tln['Pok'],$tln['Ptrend']);
+		   if ( $points >0 ) { addierePunkte($conn,$points,$tln['ID']);	 }
+		  
+		   $str .= "Punkte $points";
+		   $gesamtsumme = $gesamtsumme + $points;
+		   if ($gesamttext == "") $gesamttext = "$points";
+		   else $gesamttext .= " + $points";
+           if ($debug) echo "str: $str<br>\n";		  
+           $res.=$c->td($str);
+         }  
+         }
        }          // schleife teilnehmer
        if ( $akttlnmr != "")  {
            // Vorher noch Gesamtsumme ausgeben
