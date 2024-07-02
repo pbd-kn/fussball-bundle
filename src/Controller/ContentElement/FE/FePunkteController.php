@@ -291,8 +291,7 @@ class FePunkteController extends AbstractFussballController
         $str .= $cgi->table(array("border"=>"1")) . "\n";
         $str.=$cgi->thead();
         $str.=$cgi->tr();
-          //$str.=$cgi->th("&nbsp;").$cgi->th("ID").$cgi->th("WettenIndex").$cgi->th("Kommentar").$cgi->th("Art").$cgi->th("Tipp1").$cgi->th("Tipp2").$cgi->th("Tipp3").$cgi->th("Tipp4");
-          $str.=$cgi->th("ID").$cgi->th("WettenIndex").$cgi->th("Kommentar").$cgi->th("Art").$cgi->th("Ergebnis").$cgi->th("Wette").$cgi->th("Punkte");
+        $str.=$cgi->th("ID").$cgi->th("WettenIndex").$cgi->th("Kommentar").$cgi->th("Art").$cgi->th("Ergebnis").$cgi->th("Wette").$cgi->th("Punkte");
         $str.=$cgi->end_tr();
         $str.=$cgi->end_thead();
         $str.=$cgi->tbody();
@@ -473,7 +472,18 @@ class FePunkteController extends AbstractFussballController
 	  	  $str.=$cgi->td((string)$Punkte);
 	  }
 	  if ($Art == 'v') {    // Zahl Platz
-	    $str.=$cgi->td("$Tipp1").$cgi->td("$W1");                               // Wert wird aus der Wettentabelle genommen
+              $infotext="Vergleichswette";
+                if (str_contains(strtolower($kommentar), 'deutschland')) { 
+             $infotext="1: Europameister
+2: Ausscheiden in Finale
+4: Ausscheiden in Halbfinale
+8: Ausscheiden in Viertelfinale
+16: Ausscheiden in Achtelfinale
+32: Ausscheiden in Gruppenspielen
+";
+                }
+
+	    $str.=$cgi->td(array("title"=>$infotext),"$Tipp1").$cgi->td("$W1");         // Wert wird aus der Wettentabelle genommen
 		$str.=$cgi->td((string)$Punkte);
       }
 	  if ($Art == 'p') {    // Mannschafts index 
