@@ -354,7 +354,7 @@ class FeEndstandController extends AbstractFussballController
 	     $fl2 = "<img src='".$f->getImagePath($sp['Flagge2']). "' >&nbsp;";
 	     $str="";
 	     if ($debug) $str .= "<b>Spiel Nr: " . $sp['ID'] . " "; 
-	     $str .= "<b>Spiel Nr: " . $sp['ID'] . "<br>"; 
+	     //$str .= "<b>Spiel Nr: " . $sp['ID'] . "<br>"; 
 	     $str .=$sp['Datum'] . "<br>";
 	     $str .= $fl1 . $sp['M1'] . " : " . $sp['T1'] . "<br>";
 	     $str .= $fl2 . $sp['M2'] . " : " . $sp['T2'] . "<br>";
@@ -402,7 +402,7 @@ class FeEndstandController extends AbstractFussballController
 //echo "aktWett sql $sql<br>";
            if ($debug) echo "Spiel gefunden M1: ".$sp['M1']." M2: ".$sp['M2']."<br";
 		   //$str="Spiel: ".$sp['ID']."<br>gewettet: " . $tln['W1'] . ":" . $tln['W2'] . "<br>";
-		   $str="Spiel: ".$sp['ID']."<br>gewettet: " . $aktWetteTlnrow['W1'] . ":" . $aktWetteTlnrow['W2'] . "<br>";
+		   $str="gewettet: " . $aktWetteTlnrow['W1'] . ":" . $aktWetteTlnrow['W2'] . "<br>";
 		   $points=berechnePunkte($aktWetteTlnrow['Art'],$aktWetteTlnrow['W1'],$aktWetteTlnrow['W2'],$aktWetteTlnrow['Tipp1'],$sp['T1'],$sp['T2'],$tln['Pok'],$tln['Ptrend']);
 		   if ( $points >0 ) { addierePunkte($conn,$points,$tln['ID']);	 }
 		  
