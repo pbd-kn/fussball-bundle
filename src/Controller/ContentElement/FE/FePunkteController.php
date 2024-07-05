@@ -414,7 +414,7 @@ class FePunkteController extends AbstractFussballController
       $Tipp4=$row['Tipp4'];
       $Pok=$row['Pok'];
       $Ptrend=$row['Ptrend'];
-      $cgi->td($Tipp1).$cgi->td($Tipp2).$cgi->td($Tipp3).$cgi->td($Tipp4);          
+      //$cgi->td($Tipp1).$cgi->td($Tipp2).$cgi->td($Tipp3).$cgi->td($Tipp4);          
 	  $W1=$row['W1'];            // aktuelle Werte aus tl_hy_wetteaktuell des Teilnehmers werden abhaenig vom Wetttyp interpretiert
       $W2=$row['W2'];
       $W3=$row['W3'];
@@ -487,9 +487,12 @@ class FePunkteController extends AbstractFussballController
 		$str.=$cgi->td((string)$Punkte);
       }
 	  if ($Art == 'p') {    // Mannschafts index 
+
 	    //if ($W1 == -1) $g1=-1; else $g1=$mannschaften[$W1]['Name'];      
-	    if ($Tipp1 == -1) $g2=-1; else $g2=$mannschaften[$Tipp1]['Name'];      
-	    $str.=$cgi->td($g2).$cgi->td($g2);
+//echo "Meister Tipp1 $Tipp1 W1 $W1 W2 $W2<br>";
+	    if ($Tipp1 == -1) $meister=-1; else $meister=$mannschaften[$Tipp1]['Name'];      
+	    if ($W1 == -1) $g2=-1; else $g2=$mannschaften[$W1]['Name'];      
+	    $str.=$cgi->td($meister).$cgi->td($g2);   
 	  	$str.=$cgi->td((string)$Punkte);
       }
 	  if ($Art == 'g') {    // Gruppen erster / Zweiter / Dritter
