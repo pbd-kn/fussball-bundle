@@ -546,7 +546,7 @@ class FeEndstandController extends AbstractFussballController
 	   $gesamttext="";       // Text der Punkte für diesen Teilnehmer (akttlnmr)
        if($debug) echo "tkn lng ".count($teilnehmer)."<br>";
        foreach ($teilnehmer as $tln) {
-	     if (strtolower ($tln['Art']) == 'g' ) {     // nur Gruppenwetten A-Xauswerten
+	     if (strtolower ($tln['Art']) == 'g' ) {     // nur Gruppenwetten Auswerten
            if ($tln['Kurzname'] != $akttlnmr) { // neue Zeile
              if ( $akttlnmr != "") {
 		      // Vorher noch Gesamtsumme ausgeben in der aktuellen Zeile für akttlnmr ausgeben
@@ -712,6 +712,9 @@ class FeEndstandController extends AbstractFussballController
 	   $gesamtpunkte=0;
        $str.=$c->tbody();
 	   foreach ($teilnehmeraktWetten as $akttlnmr=>$tlwetten) {  
+	   $gesamtsumme=0;
+	   $gesamttext="";
+	   $gesamtpunkte=0;
          if ($debug) echo "aktuelle Wetten des Teilnehmers $akttlnmr<br>";
          // selektiere aktuelle Wetten des Teilnehmers
          $akttippwetten=array();    // selektiere relevante Wetten
