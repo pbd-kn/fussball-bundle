@@ -88,7 +88,7 @@ $katTitel = [
 <style>
 
 .kategorie-row {
-    margin-bottom: 50px;
+    margin-bottom: 25px;
 }
 
 .kategorie-titel {
@@ -102,7 +102,7 @@ $katTitel = [
 
 .kategorie-scroll {
     display: flex;
-    gap: 22px;
+    gap: 12px;
     overflow-x: auto;
     padding-bottom: 12px;
 }
@@ -127,7 +127,7 @@ $katTitel = [
     background: #9B0034;
     color: white;
     text-align: center;
-    padding: 8px;
+    padding: 5px;
     font-size: 18px;
     font-weight: bold;
     border-radius: 10px 10px 0 0;
@@ -147,7 +147,7 @@ $katTitel = [
 .gruppen-tabelle th,
 .gruppen-tabelle td {
     border: 1px solid #ccc;
-    padding: 4px 6px;
+    padding: 2px 4px;
     text-align: center;
 }
 
@@ -165,8 +165,8 @@ $katTitel = [
 .spiel-box {
     background: #fafafa;
     border: 1px solid #d0d0d0;
-    padding: 8px;
-    margin-bottom: 10px;
+    padding: 5px;
+    margin-bottom: 6px;
     border-radius: 10px;
     font-size: 13px;
 }
@@ -261,8 +261,8 @@ $katTitel = [
                             <div class="sp-nr">Spiel <?= $sp['Nr'] ?></div>
 
                             <div class="sp-kopf">
-                                <?= $sp['Ort'] ?><br>
-                                <?= $sp['Datum'] ?> · <?= $sp['Uhrzeit'] ?> Uhr
+                                <?= $sp['Ort'] ?>&nbsp;
+                                <?= $sp['Datum'] ?>&nbsp<?= $sp['Uhrzeit'] ?>
                             </div>
 
                             <div class="team">

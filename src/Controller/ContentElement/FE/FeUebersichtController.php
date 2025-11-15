@@ -108,8 +108,8 @@ protected function getResponse(Template $template, ContentModel $model, Request 
             m2.Flagge AS Flagge2,
             s.Ort AS OrtInd,
             o.Ort AS Ort,
-            DATE_FORMAT(s.Datum,'%d.%c') AS Datum,
-            DATE_FORMAT(s.Uhrzeit,'%H:%S') AS Uhrzeit,
+            DATE_FORMAT(s.Datum, '%d.%m') AS Datum,
+            DATE_FORMAT(s.Uhrzeit, '%H:%i') AS Uhrzeit,
             s.T1,
             s.T2
         FROM tl_hy_spiele AS s
