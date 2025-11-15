@@ -148,7 +148,8 @@ class FeGruppeController extends AbstractFussballController
 
       // alle aktuelle Gruppen einlesen  
       $whereArr = [
-          " AND NOT (tl_hy_gruppen.Gruppe LIKE '%Achtel%') AND NOT (tl_hy_gruppen.Gruppe LIKE '%Viertel%') AND NOT (tl_hy_gruppen.Gruppe LIKE '%Halb%') AND NOT (tl_hy_gruppen.Gruppe LIKE '%Finale%')",
+          " AND NOT (tl_hy_gruppen.Gruppe LIKE '%Sechz%') AND NOT (tl_hy_gruppen.Gruppe LIKE '%Achtel%') AND NOT (tl_hy_gruppen.Gruppe LIKE '%Viertel%') AND NOT (tl_hy_gruppen.Gruppe LIKE '%Halb%') AND NOT (tl_hy_gruppen.Gruppe LIKE '%Finale%')",
+          " AND tl_hy_gruppen.Gruppe LIKE '%Sechz%'",
           " AND tl_hy_gruppen.Gruppe LIKE '%Achtel%'",
           " AND tl_hy_gruppen.Gruppe LIKE '%Viertel%'",
           " AND tl_hy_gruppen.Gruppe LIKE '%Halb%'",

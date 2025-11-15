@@ -1,0 +1,294 @@
+<?php
+/**
+ * Template: ce_fe_uebersicht.html5
+ * Gruppen nebeneinander, Spiele darunter (scrollbar)
+ * Flaggen aus Bundle
+ * + Gruppentabelle (Excel-Style)
+ */
+
+
+/* ======================================================
+   FLAG-URL HELPER (Bundle-Assets)
+====================================================== */
+function flagUrl($file)
+{
+    return '/bundles/fussball/assets/flaggen/' . $file;
+}
+
+
+/* ======================================================
+   GRUPPENTABELLE AUFBEREITEN
+====================================================== */
+$gruppenInfo = [];
+
+foreach ($this->Gruppen as $row) {
+    $g = $row['Gruppe'];
+    if (!isset($gruppenInfo[$g])) {
+        $gruppenInfo[$g] = [];
+    }
+    $gruppenInfo[$g][] = $row;
+}
+
+
+/* ======================================================
+   KATEGORIE ERKENNEN
+====================================================== */
+function getKategorie(string $gruppe): int
+{
+    $g = strtolower($gruppe);
+
+    if (preg_match('/^[a-z]$/', $g)) return 1;
+    if (str_starts_with($g, 'sechz')) return 2;
+    if (str_starts_with($g, 'achtel')) return 3;
+    if (str_starts_with($g, 'viertel')) return 4;
+    if (str_starts_with($g, 'halb')) return 5;
+    if (str_starts_with($g, 'platz')) return 6;
+    if (str_starts_with($g, 'finale')) return 7;
+
+    return 99;
+}
+
+
+/* ======================================================
+   SPIELE nach Gruppen sortieren
+====================================================== */
+
+$kategorien = [
+    1 => [], 2 => [], 3 => [], 4 => [],
+    5 => [], 6 => [], 7 => [], 99 => [],
+];
+
+foreach ($this->Spiele as $spiel) {
+    $kat = getKategorie($spiel['Gruppe']);
+    $g   = $spiel['Gruppe'];
+
+    if (!isset($kategorien[$kat][$g])) {
+        $kategorien[$kat][$g] = [];
+    }
+
+    $kategorien[$kat][$g][] = $spiel;
+}
+
+$katTitel = [
+    1 => "Gruppenphase",
+    2 => "Sechzehntelfinale",
+    3 => "Achtelfinale",
+    4 => "Viertelfinale",
+    5 => "Halbfinale",
+    6 => "Spiel um Platz 3",
+    7 => "Finale",
+    99 => "Weitere Spiele",
+];
+?>
+
+
+<!-- ======================================================
+     CSS
+====================================================== -->
+<style>
+
+.kategorie-row {
+    margin-bottom: 50px;
+}
+
+.kategorie-titel {
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    border-bottom: 3px solid #9B0034;
+    padding-bottom: 5px;
+    color: #9B0034;
+}
+
+.kategorie-scroll {
+    display: flex;
+    gap: 22px;
+    overflow-x: auto;
+    padding-bottom: 12px;
+}
+
+.kategorie-scroll::-webkit-scrollbar {
+    height: 10px;
+}
+.kategorie-scroll::-webkit-scrollbar-thumb {
+    background: #9B0034;
+    border-radius: 10px;
+}
+.kategorie-scroll::-webkit-scrollbar-track {
+    background: #e0e0e0;
+}
+
+.gruppe {
+    min-width: 260px;
+    flex-shrink: 0;
+}
+
+.gruppen-titel {
+    background: #9B0034;
+    color: white;
+    text-align: center;
+    padding: 8px;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 4px 4px 0 0;
+}
+
+/* ---- GRUPPENTABELLE ---- */
+.gruppen-tabelle {
+    width: 100%;
+    border: 1px solid #ccc;
+    border-collapse: collapse;
+    margin-bottom: 12px;
+    background: white;
+    font-size: 12px;
+}
+
+.gruppen-tabelle th,
+.gruppen-tabelle td {
+    border: 1px solid #ccc;
+    padding: 4px 6px;
+    text-align: center;
+}
+
+.gruppen-tabelle .team-cell {
+    text-align: left;
+}
+
+.flag-small {
+    height: 12px;
+    vertical-align: middle;
+    margin-right: 4px;
+}
+
+/* ---- Spiele ---- */
+.spiel-box {
+    background: #fafafa;
+    border: 1px solid #d0d0d0;
+    padding: 8px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    font-size: 13px;
+}
+
+.sp-kopf {
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 4px;
+    color: #333;
+    font-size: 12px;
+}
+
+.team {
+    display: flex;
+    justify-content: space-between;
+}
+.team-name {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+.flag {
+    height: 14px;
+}
+.team-score {
+    font-weight: bold;
+}
+
+.sp-nr {
+    text-align: center;
+    margin-top: 4px;
+    font-size: 11px;
+    color: #777;
+}
+</style>
+
+
+
+<!-- ======================================================
+     AUSGABE
+====================================================== -->
+
+<?php foreach ($kategorien as $kat => $gruppen): ?>
+    <?php if (empty($gruppen)) continue; ?>
+
+    <div class="kategorie-row">
+
+        <div class="kategorie-titel">
+            <?= $katTitel[$kat] ?>
+        </div>
+
+        <div class="kategorie-scroll">
+
+            <?php foreach ($gruppen as $gruppenName => $spiele): ?>
+
+                <div class="gruppe">
+
+                    <div class="gruppen-titel">
+                        <?= $gruppenName ?>
+                    </div>
+
+                    <!-- ---- GRUPPENTABELLE ---- -->
+                    <?php if (isset($gruppenInfo[$gruppenName])): ?>
+                        <table class="gruppen-tabelle">
+                            <tr>
+                                <th>Pl.</th>
+                                <th>Team</th>
+                                <th>Sp.</th>
+                                <th>Pkt.</th>
+                                <th>Tore</th>
+                                <th>Diff</th>
+                            </tr>
+                            <?php foreach ($gruppenInfo[$gruppenName] as $team): ?>
+                                <tr>
+                                    <td><?= $team['Platz'] ?></td>
+                                    <td class="team-cell">
+                                        <img src="<?= flagUrl($team['Flagge1']) ?>" class="flag-small">
+                                        <?= $team['M1Name'] ?>
+                                    </td>
+                                    <td><?= $team['Spiele'] ?></td>
+                                    <td><?= $team['Punkte'] ?></td>
+                                    <td><?= $team['Tore'] ?>:<?= $team['Gegentore'] ?></td>
+                                    <td><?= $team['Differenz'] ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </table>
+                    <?php endif; ?>
+
+                    <!-- ---- SPIELE ---- -->
+                    <?php foreach ($spiele as $sp): ?>
+                        <div class="spiel-box">
+
+                            <div class="sp-kopf">
+                                <?= $sp['Ort'] ?><br>
+                                <?= $sp['Datum'] ?> · <?= $sp['Uhrzeit'] ?> Uhr
+                            </div>
+
+                            <div class="team">
+                                <div class="team-name">
+                                    <img src="<?= flagUrl($sp['Flagge1']) ?>" class="flag">
+                                    <?= $sp['M1Name'] ?>
+                                </div>
+                                <div class="team-score"><?= $sp['T1'] ?></div>
+                            </div>
+
+                            <div class="team">
+                                <div class="team-name">
+                                    <img src="<?= flagUrl($sp['Flagge2']) ?>" class="flag">
+                                    <?= $sp['M2Name'] ?>
+                                </div>
+                                <div class="team-score"><?= $sp['T2'] ?></div>
+                            </div>
+
+                            <div class="sp-nr">Spiel <?= $sp['Nr'] ?></div>
+                        </div>
+                    <?php endforeach; ?>
+
+                </div>
+
+            <?php endforeach; ?>
+
+        </div>
+
+    </div>
+
+<?php endforeach; ?>

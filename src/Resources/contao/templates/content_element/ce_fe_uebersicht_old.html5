@@ -1,0 +1,63 @@
+<div class="tabellenueberschrift">
+    Spielplan neu der <?= $this->Wettbewerb ?>  
+    vom <?= $this->start ?> bis <?= $this->ende ?>
+
+    <input class="druck" type="button" onclick="print()" value="Drucken">
+</div>
+
+<table class="tablecss sortierbar" rules="all" border="1">
+    <thead>
+        <tr>
+            <th class="datumcss">Datum</th>
+            <th class="gruppecss">Gruppe</th>
+            <th class="heimcss">Heim</th>
+            <th class="scorecss">Uhrzeit / Ergebnis</th>
+            <th class="auswaertscss">Auswärts</th>
+            <th class="ortcss">Ort</th>
+        </tr>
+    </thead>
+
+    <tbody>
+    <?php foreach ($this->Spiele as $row): ?>
+        <tr>
+
+            <!-- Datum -->
+            <td class="datumcss" data-label="Datum">
+                <?= $row['Datum'] ?>
+            </td>
+
+            <!-- Gruppe -->
+            <td class="gruppecss" data-label="Gruppe">
+                <?= $row['Gruppe'] ?>
+            </td>
+
+            <!-- Heim-Team -->
+            <td class="heimcss" data-label="Heim">
+                <img src="<?= $this->fussballUtil->getImagePath($row['Flagge1']) ?>" alt="">
+                <?= $row['M1Name'] ?>
+            </td>
+
+            <!-- Ergebnis oder Uhrzeit -->
+            <td class="scorecss" data-label="Ergebnis">
+                <?php if ($row['T1'] == -1): ?>
+                    <?= $row['Uhrzeit'] ?>
+                <?php else: ?>
+                    <?= $row['T1'] ?> : <?= $row['T2'] ?>
+                <?php endif; ?>
+            </td>
+
+            <!-- Auswärts-Team -->
+            <td class="auswaertscss" data-label="Auswärts">
+                <img src="<?= $this->fussballUtil->getImagePath($row['Flagge2']) ?>" alt="">
+                <?= $row['M2Name'] ?>
+            </td>
+
+            <!-- Ort -->
+            <td class="ortcss" data-label="Ort">
+                <?= $row['Ort'] ?>
+            </td>
+
+        </tr>
+    <?php endforeach; ?>
+    </tbody>
+</table>

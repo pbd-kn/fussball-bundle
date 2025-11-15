@@ -62,15 +62,17 @@ abstract class AbstractFussballController extends AbstractContentElementControll
                 // akt Wettbewerb lesen.
         $stmt = $this->connection->executeQuery("SELECT * from tl_hy_config WHERE Name='Wettbewerb' AND aktuell = 1 LIMIT 1");
         $num_rows = $stmt->rowCount(); 
-        $row = $stmt->fetchAssociative();
-        $this->aktWettbewerb['id']=$row['id'];
-        $this->aktWettbewerb['aktWettbewerbId']=$row['id'];
-        $this->aktWettbewerb['aktuell']=$row['aktuell'];
-        $this->aktWettbewerb['aktWettbewerb']=$row['value1'];
-        $this->aktWettbewerb['aktAnzgruppen']=$row['value2'];
-        $this->aktWettbewerb['aktDGruppe']=$row['value3'];
-        $this->aktWettbewerb['aktStartdatum']=$row['value4'];
-        $this->aktWettbewerb['aktEndedatum']=$row['value5'];
+        if ($num_rows != 0) {
+            $row = $stmt->fetchAssociative();
+            $this->aktWettbewerb['id']=$row['id'];
+            $this->aktWettbewerb['aktWettbewerbId']=$row['id'];
+            $this->aktWettbewerb['aktuell']=$row['aktuell'];
+            $this->aktWettbewerb['aktWettbewerb']=$row['value1'];
+            $this->aktWettbewerb['aktAnzgruppen']=$row['value2'];
+            $this->aktWettbewerb['aktDGruppe']=$row['value3'];
+            $this->aktWettbewerb['aktStartdatum']=$row['value4'];
+            $this->aktWettbewerb['aktEndedatum']=$row['value5'];
+        }
     }
 
 }

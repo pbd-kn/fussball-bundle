@@ -159,7 +159,7 @@ class WettbewerbController extends AbstractFussballController
           var par = jQuery("#inputForm :input").serialize()  + "&ID=" + id + "&aktion=a"; 
           //var url =  "bundles/hoyzer/verwaltung/bearbeiteWettbewerb.php?" +par;
           var url =  '/fussball/bearbeitewettbewerb/a/'+id;
-//console.log('wettbewerb Aktuell '+url);
+console.log('wettbewerb Aktuell '+url);
           jQuery.get(url, function(data, status){
              //jQuery("#result").html(data['data']);
              location.reload();

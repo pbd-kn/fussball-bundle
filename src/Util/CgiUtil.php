@@ -245,7 +245,7 @@ class CgiUtil
     $str .= "value='$value' />";
     if ($clickName != "") {
     $str.="<script>";
-    $str.="debugger;";
+    //$str.="debugger;";
         $str.="document.getElementById('$clickName').addEventListener('click', function() {";
             $str.="\nevent.preventDefault(); // Verhindert den Standard-Submit";
             $str.="debugger;\nthis.checked = !this.checked;\n";

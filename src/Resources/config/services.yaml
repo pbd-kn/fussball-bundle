@@ -4,17 +4,18 @@ services:
         autoconfigure: true
         public: true
 
-    _instanceof:
-        Symfony\Bundle\FrameworkBundle\Controller\AbstractController:
-            calls:
-                - [ setContainer, [ '@service_container' ] ]
-
+    # Bundle laden
     PBDKN\FussballBundle\:
-        resource: ../../
-        exclude: ../../{DependencyInjection,Resources,Model}
-        
-    PBDKN\FussballBundle\Controller\ContentElement\WettbewerbController:
-        tags:
-            - { name: container.service_subscriber }
+        resource: ../../*
+        exclude: ../../{DependencyInjection,Resources,Model,Entity}
+
+    # DependencyAggregate als Service
+    PBDKN\FussballBundle\Controller\ContentElement\DependencyAggregate: ~
+
+    # Dein CE-Controller
+    PBDKN\FussballBundle\Controller\ContentElement\FE\FeUebersichtController:
         public: true
-        
+        tags:
+            - { name: contao.content_element, category: "fussball-FE", type: "AnzeigeUebersicht" }
+        arguments:
+            $dependencyAggregate: '@PBDKN\FussballBundle\Controller\ContentElement\DependencyAggregate'

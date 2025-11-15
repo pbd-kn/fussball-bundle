@@ -78,7 +78,7 @@ class FussballUtil
       return $res;
     }
     public function createGruppenArray ($AnzahlGruppen) {
-        $gruppenNamen=array("A","B","C","D","E","F","G","H","I","K","L","M","N");
+        $gruppenNamen=array("A","B","C","D","E","F","G","H","I","J","K","L","M","N");
         $optarray= array();
         for ($i = 0; $i < $AnzahlGruppen; $i++) {
           $optarray[] = $gruppenNamen[$i];
@@ -99,6 +99,22 @@ class FussballUtil
         $optarray[]="Halb 2";
         $optarray[]="Platz3";
         $optarray[]="Finale";
+        $optarray[]="Sechzehn 1";
+        $optarray[]="Sechzehn 2";
+        $optarray[]="Sechzehn 3";
+        $optarray[]="Sechzehn 4";
+        $optarray[]="Sechzehn 5";
+        $optarray[]="Sechzehn 6";
+        $optarray[]="Sechzehn 7";
+        $optarray[]="Sechzehn 8";
+        $optarray[]="Sechzehn 9";
+        $optarray[]="Sechzehn 10";
+        $optarray[]="Sechzehn 11";
+        $optarray[]="Sechzehn 12";
+        $optarray[]="Sechzehn 13";
+        $optarray[]="Sechzehn 14";
+        $optarray[]="Sechzehn 15";
+        $optarray[]="Sechzehn 16";
         return $optarray;
       }
       public function getImagePath($image) {

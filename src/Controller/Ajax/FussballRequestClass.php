@@ -54,24 +54,24 @@ class FussballRequestClass extends AbstractController
         $this->translator=$translator;
                 // akt Wettbewerb lesen.
         $stmt = $this->connection->executeQuery("SELECT * from tl_hy_config WHERE Name='Wettbewerb' AND aktuell = 1 LIMIT 1");
-        $row = $stmt->fetchAssociative();
-        $this->aktWettbewerb['id']=$row['id'];
-        $this->aktWettbewerb['aktuell']=$row['aktuell'];
-        $this->aktWettbewerb['aktWettbewerb']=$row['value1'];
-        $this->aktWettbewerb['aktAnzgruppen']=$row['value2'];
-        $this->aktWettbewerb['aktDGruppe']=$row['value3'];
-        $this->aktWettbewerb['aktStartdatum']=$row['value4'];
-        $this->aktWettbewerb['aktEndedatum']=$row['value5'];
+        $num_rows = $stmt->rowCount(); 
+        if ($num_rows != 0) {
+            $row = $stmt->fetchAssociative();
+            $this->aktWettbewerb['id']=$row['id'];
+            $this->aktWettbewerb['aktuell']=$row['aktuell'];
+            $this->aktWettbewerb['aktWettbewerb']=$row['value1'];
+            $this->aktWettbewerb['aktAnzgruppen']=$row['value2'];
+            $this->aktWettbewerb['aktDGruppe']=$row['value3'];
+            $this->aktWettbewerb['aktStartdatum']=$row['value4'];
+            $this->aktWettbewerb['aktEndedatum']=$row['value5'];
+        }
         
     }
+    #[Route( '/fussball/anzeigewettbewerb/{aktion}/{ID}', name: 'FussballRequestClass_anzeigewettbewerb', defaults: ['_scope' => 'frontend'] ) ]
     /**
      * @throws \Exception
-     *
-     * @Route("/fussball/anzeigewettbewerb/{aktion}/{ID}", 
-     * name="FussballRequestClass::class\anzeigewettbewerb", 
-     * defaults={"_scope" = "frontend"})
+     * @throws DoctrineDBALException
      */
-
 /* erzeugt das Formular und Buttons zur Eingabe eines Wettbewerbs
  * Parameter aktion: auszuführende Aktion wird als Hidden ins Formular übernommen
  *           ID: Wettbewerb Id (-1 kein Wettbewerb ausgewaehlt)
@@ -133,11 +133,11 @@ EOT;
       $id=$ID;
       if ($id !=-1) {
         // Wettbewerb einlesen
-        $sql="SELECT * from tl_hy_config where ID='$id' LIMIT 1;";
+        $sql="SELECT * from tl_hy_config where ID='$ID' LIMIT 1;";
         $debug .= "sql: $sql  ";	
         $stmt = $this->connection->executeQuery(
             'SELECT * FROM tl_hy_config WHERE ID = ? ',
-            [$id],
+            [$ID],
         );
         /*
         while (($row = $stmt->fetchAssociative()) !== false) {
@@ -156,19 +156,19 @@ EOT;
       } else {
         $html.="Wettbewerb neu eintragen<br>\n";
       }
-      $debug.='id: '.$id.' Name: '.$Name.' Gruppen: '.$Gruppen.' DGruppe: '.$DGruppe.' StartDatum: '.$StartDatum.' EndeDatum: '.$EndeDatum;
+      $debug.='ID: '.$ID.' Name: '.$Name.' Gruppen: '.$Gruppen.' DGruppe: '.$DGruppe.' StartDatum: '.$StartDatum.' EndeDatum: '.$EndeDatum;
 
 // create output
       $html.= $c->Button(array("onClick"=>"uebernehmen();"),"&Uuml;bernehmen","uebernehmen") . "\n";
       $html.= $c->Button(array("onClick"=>"abbrechen();"),"Abbrechen","Abbrechen") . "<br>\n";
       $html.= $c->start_form("", null,null,array("id"=>"inputForm"));
-      $html.= $c->hidden("id", $id);                    // zur weitergabe bei übernehmen
+      $html.= $c->hidden("id", $ID);                    // zur weitergabe bei übernehmen
       $html.= $c->hidden("aktion", $aktion);                    // zur weitergabe bei übernehmen
   
       $html.= $c->table (array("border"=>1));
       $html.= $c->tr();
       $html.= $c->td(array("valign"=>"top"),"Wettbewerb");
-      if ($id==-1) {  // neueEingabe
+      if ($ID==-1) {  // neueEingabe
         $html.= $c->td(array("valign"=>"top"),$c->textfield(array("name"=>"Wettbewerb","value"=>""))) . "\n";
       } else {
         $html.= $c->td(array("valign"=>"top"),$c->textfield(array("name"=>"Wettbewerb","readonly"=>true,"value"=>"$Name"))) . "\n";
@@ -210,12 +210,11 @@ EOT;
  * jscript: uebernehmen ajaxrequest um den Wettbewerb zu uebernehmen
  *        : abbrechen 
  */
+
+    #[Route( '/fussball/anzeigemannschaft/{aktion}/{ID}', name: 'FussballRequestClass_anzeigemannschaft', defaults: ['_scope' => 'frontend'] ) ]
     /**
      * @throws \Exception
-     *
-     * @Route("/fussball/anzeigemannschaft/{aktion}/{ID}", 
-     * name="FussballRequestClass::class\anzeigemannschaft", 
-     * defaults={"_scope" = "frontend"})
+     * @throws DoctrineDBALException
      */
 
   public function anzeigemannschaft(string $aktion, int $ID=-1)
@@ -227,7 +226,7 @@ EOT;
       }else {
 	    $sql = "select * From tl_hy_nation where Type like '$type' ORDER BY Nation ASC";
       }
-//echo "sql $sql<br>";
+//echo "type $type sql $sql<br>";
       $stmt = $conn->executeQuery($sql);
       $optarray= array();
       while (($row = $stmt->fetchAssociative()) !== false) {
@@ -372,12 +371,11 @@ EOT;
  * jscript: uebernehmen ajaxrequest um den Wettbewerb zu uebernehmen
  *        : abbrechen 
  */
+
+    #[Route( '/fussball/anzeigeort/{aktion}/{ID}', name: 'FussballRequestClass_anzeigeort', defaults: ['_scope' => 'frontend'] ) ]
     /**
      * @throws \Exception
-     *
-     * @Route("/fussball/anzeigeort/{aktion}/{ID}", 
-     * name="FussballRequestClass::class\anzeigeort", 
-     * defaults={"_scope" = "frontend"})
+     * @throws DoctrineDBALException
      */
 
   public function anzeigeort(string $aktion, int $ID=-1)
@@ -485,12 +483,10 @@ EOT;
  *        : abbrechen 
  */
 
+    #[Route( '/fussball/anzeigegruppe/{aktion}/{ID}', name: 'FussballRequestClass_anzeigegruppe', defaults: ['_scope' => 'frontend'] ) ]
     /**
      * @throws \Exception
-     *
-     * @Route("/fussball/anzeigegruppe/{aktion}/{ID}", 
-     * name="FussballRequestClass::class\anzeigegruppe", 
-     * defaults={"_scope" = "frontend"})
+     * @throws DoctrineDBALException
      */
 
   public function anzeigegruppe(string $aktion, int $ID=-1)
@@ -626,12 +622,11 @@ EOT;
  * jscript: uebernehmen ajaxrequest um den Wettbewerb zu uebernehmen
  *        : abbrechen 
  */
-    /**
+
+    #[Route( '/fussball/anzeigespiel/{aktion}/{ID}', name: 'FussballRequestClass_anzeigespiel', defaults: ['_scope' => 'frontend'] ) ]
+     /**
      * @throws \Exception
-     *
-     * @Route("/fussball/anzeigespiel/{aktion}/{ID}", 
-     * name="FussballRequestClass::class\anzeigespiel", 
-     * defaults={"_scope" = "frontend"})
+     * @throws DoctrineDBALException
      */
 
   public function anzeigespiel(string $aktion, int $ID=-1)
@@ -800,12 +795,11 @@ EOT;
 	  return new JsonResponse(['data' => $html,'debug'=>$debug]); 
   }
 
+    #[Route( '/fussball/anzeigewette/{aktion}/{ID}/{Type}', name: 'FussballRequestClass_anzeigewette', defaults: ['_scope' => 'frontend']  ) ]
+ 
     /**
      * @throws \Exception
-     *
-     * @Route("/fussball/anzeigewette/{aktion}/{ID}/{Type}", 
-     * name="FussballRequestClass::class\anzeigewette", 
-     * defaults={"_scope" = "frontend"})
+     * @throws DoctrineDBALException
      */
 
   public function anzeigewette(string $aktion, int $ID=-1,string $Type='')
@@ -1110,12 +1104,11 @@ EOT;
     $html = utf8_encode($html);
 	return new JsonResponse(['data' => $html,'debug'=>$debug]); 
   }
+
+    #[Route( '/fussball/anzeigeteilnehmer/{aktion}/{ID}', name: 'FussballRequestClass_anzeigeteilnehmer', defaults: ['_scope' => 'frontend'] ) ]
     /**
      * @throws \Exception
-     *
-     * @Route("/fussball/anzeigeteilnehmer/{aktion}/{ID}", 
-     * name="FussballRequestClass::class\anzeigeteilnehmer", 
-     * defaults={"_scope" = "frontend"})
+     * @throws DoctrineDBALException
      */
 
   public function anzeigeteilnehmer(string $aktion, int $ID=-1)
@@ -1242,12 +1235,10 @@ EOT;
 	  return new JsonResponse(['data' => $html,'debug'=>$debug]); 
   }
 
+    #[Route( '/fussball/anzeigenation/{aktion}/{ID}', name: 'FussballRequestClass_anzeigenation',  defaults: ['_scope' => 'frontend'] ) ]
     /**
      * @throws \Exception
-     *
-     * @Route("/fussball/anzeigenation/{aktion}/{ID}", 
-     * name="FussballRequestClass::class\anzeigenation", 
-     * defaults={"_scope" = "frontend"})
+     * @throws DoctrineDBALException
      */
 
   public function anzeigenation(string $aktion, int $ID=-1)
@@ -1369,18 +1360,14 @@ EOT;
 	  return new JsonResponse(['data' => $html,'debug'=>$debug]); 
   }
   
+    #[Route( '/fussball/bearbeitewettbewerb/{aktion}/{ID}/{Wettbewerb}/{anzahlGruppen}/{deutschlandGruppe}/{startDatum}/{endeDatum}', name: 'FussballRequestClass_bearbeitewettbewerb', defaults: ['_scope' => 'frontend'] ) ]
     /**
      * @throws \Exception
      * @throws DoctrineDBALException
-     *
-     * @Route("/fussball/bearbeitewettbewerb/{aktion}/{ID}/{Wettbewerb}/{anzahlGruppen}/{deutschlandGruppe}/{startDatum}/{endeDatum}", 
-     * name="FussballRequestClass::class\bearbeitewettbewerb", 
-     * defaults={"_scope" = "frontend"})
      */
-
   public function bearbeitewettbewerb(
      string $aktion,
-     int $ID=-1,
+     $ID=null,
      string $Wettbewerb='',
      int $anzahlGruppen=-1,
      string $deutschlandGruppe='',
@@ -1401,7 +1388,14 @@ EOT;
         } 
       }
     }
-    $debug="aktion: $aktion";
+    $debug="aktion: $aktion ID $ID ";
+    // Symfony übergibt Strings → manuell in int umwandeln
+// --- hier abfangen ---
+    if ($ID === 'undefined' || $ID === '' || $ID === null) {
+        $ID = -1;
+    } else {
+        $ID = (int)$ID;
+    }
     if (!isset($aktion)) { return; }
     $c=$this->cgiUtil;
     $id = $ID;
@@ -1478,7 +1472,7 @@ EOT;
 //echo "sql: $sql<br>";
 	      //$conn->printerror=true;
           $cnt = $this->connection->executeQuery($sql);
-	      $html.="Wettbewerb neu eingetragen $w &uuml;bernommen";
+	      $html.="Wettbewerb neu eingetragen $Wettbewerb &uuml;bernommen";
           $html = utf8_encode($html);
           return new JsonResponse(['dir'=>__DIR__,'data' => $html,'debug'=>$debug]); 
         }
@@ -1537,13 +1531,10 @@ EOT;
       return new JsonResponse(['dir'=>__DIR__,'data' => $html,'debug'=>$debug]); 
   }
   
+    #[Route( '/fussball/bearbeitemannschaft/{aktion}/{ID}/{name}/{nation}/{Gruppe}', name: 'FussballRequestClass_bearbeitemannschaft', defaults: ['_scope' => 'frontend'] ) ]
     /**
      * @throws \Exception
      * @throws DoctrineDBALException
-     *
-     * @Route("/fussball/bearbeitemannschaft/{aktion}/{ID}/{name}/{nation}/{Gruppe}", 
-     * name="FussballRequestClass::class\bearbeitemannschaft", 
-     * defaults={"_scope" = "frontend"})
      */
 
   public function bearbeitemannschaft(string $aktion,int $ID=-1,string $name="",string $nation='',string $Gruppe='')
@@ -1630,13 +1621,10 @@ EOT;
     $errortxt = utf8_encode($errortxt);
     return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
   } 
+    #[Route( '/fussball/bearbeitenation/{aktion}/{ID}/{Nation}/{Type}/{Alfa2}/{Alfa3}/{Domain}/{Image}', name: 'FussballRequestClass_bearbeitenation', defaults: ['_scope' => 'frontend'] ) ]
     /**
      * @throws \Exception
      * @throws DoctrineDBALException
-     *
-     * @Route("/fussball/bearbeitenation/{aktion}/{ID}/{Nation}/{Type}/{Alfa2}/{Alfa3}/{Domain}/{Image}", 
-     * name="FussballRequestClass::class\bearbeitenation", 
-     * defaults={"_scope" = "frontend"})
      */
 
   public function bearbeitenation(string $aktion,int $ID=-1,string $Nation='',string $Type='',string $Alfa2='',string $Alfa3='',string $Domain='',string $Image='')
@@ -1716,13 +1704,10 @@ EOT;
     return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
   } 
     
+    #[Route( '/fussball/bearbeiteort/{aktion}/{ID}/{ort}/{beschreibung}', name: 'FussballRequestClass_bearbeiteort', defaults: ['_scope' => 'frontend'] ) ]
     /**
      * @throws \Exception
      * @throws DoctrineDBALException
-     *
-     * @Route("/fussball/bearbeiteort/{aktion}/{ID}/{ort}/{beschreibung}", 
-     * name="FussballRequestClass::class\bearbeiteort", 
-     * defaults={"_scope" = "frontend"})
      */
 
   public function bearbeiteort(string $aktion,int $ID=-1,string $ort="",string $beschreibung='')
@@ -1786,13 +1771,10 @@ EOT;
    * aktion u es kann nur der Platz gesetzt werden.
    * aktion a Spiele ... werden neu berehnet und gestzt. Platz wirdderzeit noch nicht gesetzt er bleibt erhalten
    */
+    #[Route( '/fussball/bearbeitegruppe/{aktion}/{ID}/{Platz}', name: 'FussballRequestClass_bearbeitegruppe', defaults: ['_scope' => 'frontend'] ) ]
     /**
      * @throws \Exception
      * @throws DoctrineDBALException
-     *
-     * @Route("/fussball/bearbeitegruppe/{aktion}/{ID}/{Platz}", 
-     * name="FussballRequestClass::class\bearbeitegruppe", 
-     * defaults={"_scope" = "frontend"})Sieg
      */
   public function bearbeitegruppe(string $aktion,int $ID=-1,int $Platz=-1)
   {
@@ -2012,13 +1994,10 @@ EOT;
     }
   }  
 
+    #[Route( '/fussball/bearbeitespiel/{aktion}/{ID}/{Nr}/{Gruppe}/{M1}/{M2}/{Ort}/{Datum}/{Uhrzeit}/{T1}/{T2}', name: 'FussballRequestClass_bearbeitespiel', defaults: ['_scope' => 'frontend'] ) ]
     /**
      * @throws \Exception
      * @throws DoctrineDBALException
-     *
-     * @Route("/fussball/bearbeitespiel/{aktion}/{ID}/{Nr}/{Gruppe}/{M1}/{M2}/{Ort}/{Datum}/{Uhrzeit}/{T1}/{T2}", 
-     * name="FussballRequestClass::class\bearbeitespiel", 
-     * defaults={"_scope" = "frontend"})
      */
 
   public function bearbeitespiel(
@@ -2144,13 +2123,10 @@ $debug.=" sql: $sql\n";
     return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
   } 
 
+    #[Route( '/fussball/bearbeitewette/{aktion}/{ID}/{Kommentar}/{Art}/{Pok}/{Ptrend}/{Tipp1}/{Tipp2}/{Tipp3}/{Tipp4}', name: 'FussballRequestClass_bearbeitewette', defaults: ['_scope' => 'frontend'] ) ]
     /**
      * @throws \Exception
      * @throws DoctrineDBALException
-     *
-     * @Route("/fussball/bearbeitewette/{aktion}/{ID}/{Kommentar}/{Art}/{Pok}/{Ptrend}/{Tipp1}/{Tipp2}/{Tipp3}/{Tipp4}", 
-     * name="FussballRequestClass::class\bearbeitewette", 
-     * defaults={"_scope" = "frontend"})
      */
 
   public function bearbeitewette(
@@ -2325,12 +2301,11 @@ $debug.=" sql: $sql\n";
     return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
   } 
     
+    
+    #[Route( '/fussball/bearbeiteteilnehmer/{aktion}/{ID}/{Art}/{Kurzname}/{Name}/{Email}/{Bezahlt}/{Erst}/{Achtel}/{Viertel}/{Halb}/{Finale}', name: 'FussballRequestClass_bearbeiteteilnehmer', defaults: ['_scope' => 'frontend'] ) ]
     /**
      * @throws \Exception
      * @throws DoctrineDBALException
-     * @Route("/fussball/bearbeiteteilnehmer/{aktion}/{ID}/{Art}/{Kurzname}/{Name}/{Email}/{Bezahlt}/{Erst}/{Achtel}/{Viertel}/{Halb}/{Finale}", 
-     * name="FussballRequestClass::class\bearbeiteteilnehmer", 
-     * defaults={"_scope" = "frontend"})
      */
 
   public function bearbeiteteilnehmer(string $aktion,int $ID=-1,string $Art="",string $Kurzname='',string $Name='',string $Email='',
@@ -2449,12 +2424,10 @@ $debug.=" sql: $sql\n";
     return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
   } 
 
+    #[Route( '/fussball/storeteilnehmerwette/{aktion}/{Idwettaktuell}/{W1}/{W2}/{W3}', name: 'FussballRequestClass_storeteilnehmerwette', defaults: ['_scope' => 'frontend'] ) ]
     /**
      * @throws \Exception
      * @throws DoctrineDBALException
-     * @Route("/fussball/storeteilnehmerwette/{aktion}/{Idwettaktuell}/{W1}/{W2}/{W3}", 
-     * name="FussballRequestClass::class\storeteilnehmerwette", 
-     * defaults={"_scope" = "frontend"})
      */
      
   public function storeteilnehmerwette(string $aktion,int $Idwettaktuell=-1,string $W1='-1',string $W2='-1',string $W3='-1')
@@ -2487,12 +2460,10 @@ $debug.=" sql: $sql\n";
     return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
   } 
   
+    #[Route( '/fussball/testAjax/{article}', name: 'FussballRequestClass_testAjax', defaults: ['_scope' => 'frontend']  )]
     /**
      * @throws \Exception
-     *
-     * @Route("/fussball/testAjax/{article}", 
-     * name="FussballRequestClass::class\testAjax", 
-     * defaults={"_scope" = "frontend"})
+     * @throws DoctrineDBALException
      */
 
 	public function testAjax(string $article)
