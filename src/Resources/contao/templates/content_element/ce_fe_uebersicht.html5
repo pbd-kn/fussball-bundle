@@ -1,4 +1,8 @@
 <?php
+
+
+
+
 /**
  * Template: ce_fe_uebersicht.html5
  * Gruppen nebeneinander, Spiele darunter (scrollbar)
@@ -82,132 +86,12 @@ $katTitel = [
 ?>
 
 
-<!-- ======================================================
-     CSS
-====================================================== -->
-<style>
 
-.kategorie-row {
-    margin-bottom: 25px;
-}
-
-.kategorie-titel {
-    font-size: 28px;
-    font-weight: bold;
-    margin-bottom: 15px;
-    border-bottom: 3px solid #9B0034;
-    padding-bottom: 5px;
-    color: #9B0034;
-}
-
-.kategorie-scroll {
-    display: flex;
-    gap: 12px;
-    overflow-x: auto;
-    padding-bottom: 12px;
-}
-
-.kategorie-scroll::-webkit-scrollbar {
-    height: 10px;
-}
-.kategorie-scroll::-webkit-scrollbar-thumb {
-    background: #9B0034;
-    border-radius: 10px;
-}
-.kategorie-scroll::-webkit-scrollbar-track {
-    background: #e0e0e0;
-}
-
-.gruppe {
-    min-width: 100px;
-    flex-shrink: 0;
-}
-
-.gruppen-titel {
-    background: #9B0034;
-    color: white;
-    text-align: center;
-    padding: 5px;
-    font-size: 18px;
-    font-weight: bold;
-    border-radius: 10px 10px 0 0;
-}
-
-/* ---- GRUPPENTABELLE ---- */
-.gruppen-tabelle {
-    width: 100%;
-    border: 1px solid #ccc;
-    border-collapse: collapse;
-    margin-bottom: 12px;
-    background: white;
-    font-size: 12px;
-    border-radius: 0 0 10px 10px;
-    }
-
-.gruppen-tabelle th,
-.gruppen-tabelle td {
-    border: 1px solid #ccc;
-    padding: 2px 4px;
-    text-align: center;
-}
-
-.gruppen-tabelle .team-cell {
-    text-align: left;
-}
-
-.flag-small {
-    height: 12px;
-    vertical-align: middle;
-    margin-right: 4px;
-}
-
-/* ---- Spiele ---- */
-.spiel-box {
-    background: #fafafa;
-    border: 1px solid #d0d0d0;
-    padding: 5px;
-    margin-bottom: 6px;
-    border-radius: 10px;
-    font-size: 13px;
-}
-
-.sp-kopf {
-    text-align: center;
-    font-weight: bold;
-    margin-bottom: 4px;
-    color: #333;
-    font-size: 12px;
-}
-
-.team {
-    display: flex;
-    justify-content: space-between;
-}
-.team-name {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-}
-.flag {
-    height: 14px;
-}
-.team-score {
-    font-weight: bold;
-}
-
-.sp-nr {
-    text-align: left;
-    margin-top: 4px;
-    font-size: 11px;
-    color: #777;
-}
-</style>
-
-
-
-<!-- ======================================================
+<!-- 
+======================================================
      AUSGABE
-====================================================== -->
+====================================================== 
+-->
 
 <?php foreach ($kategorien as $kat => $gruppen): ?>
     <?php if (empty($gruppen)) continue; ?>
