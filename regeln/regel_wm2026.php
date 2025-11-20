@@ -42,8 +42,8 @@
         <tr><td>Weltmeister</td><td> 10</td><td>	10</td></tr>
         <tr><td>Abschneiden Deutschland</td><td> 10</td><td>	 10</td></tr>
         <tr><td>Ergebnis Vorrundenspiele Deutschland</td><td> 1 oder 3 </td><td>3 x 3 = 9</td></tr>
-        <tr><td>Platzierung (Gruppenerster/Zweiter) Gruppe A - L </td><td>1 oder 3</td><td>2 x 3 x 8 = 48</td></tr>
-        <tr><td>Ergebnis Sechzentelfinalefinalspiele</td><td> 1 oder 3</td><td>8 x 3 = 24</td></tr>
+        <tr><td>Platzierung (Gruppenerster/Zweiter) Gruppe A - L </td><td>1 oder 3</td><td>2 x 3 x 12 = 72</td></tr>
+        <tr><td>Ergebnis Sechzentelfinalefinalspiele</td><td> 1 oder 3</td><td>16 x 3 = 48</td></tr>
         <tr><td>Ergebnis Achtelfinalspiele</td><td> 1 oder 3</td><td>8 x 3 = 24</td></tr>
         <tr><td>Ergebnis Viertelfinalspiele</td><td> 1 oder 3</td><td>4 x 3 = 12</td></tr>
         <tr><td>Ergebnis Halbfinalspiele</td><td> 1 oder 3</td><td>2 x 3 = 6</td></tr>
