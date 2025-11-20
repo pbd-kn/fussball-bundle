@@ -42,14 +42,17 @@
 /* Spiele Tabelle Excel like */
 /* css für übersicht */
 .kategorie-row {
+/*
     margin-bottom: 25px;
-/*    background-color: var(--pb-header-navi-bg); */
+    background-color: var(--pb-header-navi-bg); 
+*/
+    margin: 1rem;
 }
 
 .kategorie-titel {
     font-size: 28px;
     font-weight: bold;
-    margin-bottom: 15px;
+    /* margin-bottom: 15px;*/
     border-bottom: 3px solid var(--pb-text-color);
     padding-bottom: 5px;
     /*
