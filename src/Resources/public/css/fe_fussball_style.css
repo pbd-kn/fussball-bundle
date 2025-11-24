@@ -61,12 +61,27 @@
     */
 }
 
+/*
 .kategorie-scroll {
     display: flex;
     gap: 4px;
     overflow-x: auto;
     padding-bottom: 12px;
 }
+*/
+.kategorie-scroll {
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+    overflow-y: hidden;          /* verhindert vertikale Konflikte */
+    padding-bottom: 12px;
+
+    /* --- WICHTIG FÜR iPHONE --- */
+    -webkit-overflow-scrolling: touch;  /* aktiviert flüssiges Scrollen */
+    touch-action: pan-x;                /* erlaubt horizontales Wischen */
+    -webkit-touch-callout: none;
+}
+
 /* Firefox */
 .kategorie-scroll {
     scrollbar-width: thin;              /* thin | auto | none */

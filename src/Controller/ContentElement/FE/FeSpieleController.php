@@ -69,7 +69,7 @@ class FeSpieleController extends AbstractFussballController
         \System::log('PBD Spielecontroller ', __METHOD__, TL_GENERAL);
 
         parent::__construct($dependencyAggregate);  // standard Klassen plus akt. Wettbewerb lesen
-                                                    // AbstractFussballController übernimmt sie in die akt Klasse
+                                                    // AbstractFussballController Ã¼bernimmt sie in die akt Klasse
 //        \System::log('PBD Spielecontroller nach dependencyAggregate', __METHOD__, TL_GENERAL);
         $this->framework = $framework;
         $this->twig = $twig;
@@ -106,7 +106,7 @@ class FeSpieleController extends AbstractFussballController
     function replace16Bit($str) {
       // ersetze 16-bit Values
       $search  = array("\xC3\xA4", "\xC3\xB6", "\xC3\xBC", "\xC3\x84", "\xC3\x96","\xC3\x9f");
-      $replace = array('ä', 'ö', 'ü', 'Ä', 'Ö','Ü','ß');
+      $replace = array('Ã¤', 'Ã¶', 'Ã¼', 'Ã„', 'Ã–','Ãœ','ÃŸ');
       $str= str_replace($search, $replace, $str);     
       return $str;     
     }
