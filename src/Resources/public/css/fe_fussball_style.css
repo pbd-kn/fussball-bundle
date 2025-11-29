@@ -358,8 +358,9 @@
 
   .contentverwaltung {
     background-color: lightgray;
-    //height: 400px;
-    Overflow-y: auto;
+    /* height: 400px; */
+    /* overflow-y: auto; */
+    overflow: visible !important;
   }
   .verwtablecss {
 
