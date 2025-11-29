@@ -91,7 +91,10 @@ $katTitel = [
 ======================================================
      AUSGABE
 ====================================================== 
+
+Überschrift
 -->
+<div class='tabellenueberschrift'>Spielplan der <?= $this->Wettbewerb ?> vom <?= $this->start ?> bis <?= $this->ende ?></div>
 
 <?php foreach ($kategorien as $kat => $gruppen): ?>
     <?php if (empty($gruppen)) continue; ?>
