@@ -367,9 +367,12 @@ class VWTeilnehmerController extends AbstractFussballController
   	        var par = "aktion=d&ID=" + id + "&aktion=d";
             var url =  '/fussball/bearbeiteteilnehmer/d/'+id;
             console.log ('teilnehmerLoeschen url: '+url);
-            jQuery.get(url, function(data, status){
-              jQuery("#eingabe").html(data['data']);
-               location.reload();
+            jQuery.get(url, function(data, status){            
+                jQuery("#eingabe").html(data['data']);
+                // 8 Sekunden warten, dann reload
+                setTimeout(function() {
+                    location.reload();
+                }, 8000);  // 8000 ms = 8 Sekunden
             });
           }
           function wettenZeigen(obj) {

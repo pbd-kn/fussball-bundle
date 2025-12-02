@@ -297,9 +297,12 @@ console.log('res da ');
 console.log('error: '+errortxt);
                jQuery("#result").html(errortxt);
              } else {
-               location.reload();
-               //jQuery("#result").html("");
-               //jQuery("#eingabe").html(data['data']);
+               jQuery("#result").html("");
+               jQuery("#eingabe").html(data['data']);
+                setTimeout(function() {
+                    location.reload();
+                }, 8000);  // 8000 ms = 8 Sekunden
+
              }
           });
 
@@ -438,9 +441,12 @@ console.log('res da ');
 console.log('error: '+errortxt);
                jQuery("#result").html(errortxt);
              } else {
-               location.reload();
-               //jQuery("#result").html("");
-               //jQuery("#eingabe").html(data['data']);
+               jQuery("#result").html("");
+               jQuery("#eingabe").html(data['data']);
+                setTimeout(function() {
+                    location.reload();
+                }, 8000);  // 8000 ms = 8 Sekunden
+
              }
           });
 
@@ -555,9 +561,12 @@ console.log('res da ');
 console.log('error: '+errortxt);
                jQuery("#result").html(errortxt);
              } else {
-               location.reload();
-               //jQuery("#result").html("");
-               //jQuery("#eingabe").html(data['data']);
+               jQuery("#result").html("");
+               jQuery("#eingabe").html(data['data']);
+                setTimeout(function() {
+                    location.reload();
+                }, 8000);  // 8000 ms = 8 Sekunden
+
              }
           });
 
@@ -754,9 +763,12 @@ console.log('res da ');
 console.log('error: '+errortxt);
                jQuery("#result").html(errortxt);
              } else {
-               location.reload();
-               //jQuery("#result").html("");
-               //jQuery("#eingabe").html(data['data']);
+               jQuery("#result").html("");
+               jQuery("#eingabe").html(data['data']);
+                setTimeout(function() {
+                    location.reload();
+                }, 8000);  // 8000 ms = 8 Sekunden
+               
              }
           });
 
@@ -1072,7 +1084,9 @@ console.log('error: '+errortxt);
                jQuery("#result").html("");
                jQuery("#eingabe").html(data['data']);
 console.log('data: '+data['data']);
-               location.reload();
+                setTimeout(function() {
+                    location.reload();
+                }, 8000);  // 8000 ms = 8 Sekunden
              }
           });
 
@@ -1268,7 +1282,9 @@ console.log('error: '+errortxt);
              } else {
                jQuery("#result").html("");
                jQuery("#eingabe").html(data['data']);
-               location.reload();
+                setTimeout(function() {
+                    location.reload();
+                }, 8000);  // 8000 ms = 8 Sekunden
              }
           });
 
@@ -1408,6 +1424,10 @@ console.log('error: '+errortxt);
                //location.reload();
                jQuery("#result").html("");
                jQuery("#eingabe").html(data['data']);
+                setTimeout(function() {
+                    location.reload();
+                }, 8000);  // 8000 ms = 8 Sekunden
+               
              }
           });
 
