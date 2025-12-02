@@ -368,7 +368,7 @@ class VWTeilnehmerController extends AbstractFussballController
             var url =  '/fussball/bearbeiteteilnehmer/d/'+id;
             console.log ('teilnehmerLoeschen url: '+url);
             jQuery.get(url, function(data, status){            
-                jQuery("#eingabe").html(data['data']);
+                jQuery("#eingabe").html("&#x23F1; 8 sec<br>" + data['data']);
                 // 8 Sekunden warten, dann reload
                 setTimeout(function() {
                     location.reload();

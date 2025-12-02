@@ -298,7 +298,7 @@ console.log('error: '+errortxt);
                jQuery("#result").html(errortxt);
              } else {
                jQuery("#result").html("");
-               jQuery("#eingabe").html(data['data']);
+                jQuery("#eingabe").html("&#x23F1; 8 sec<br>" + data['data']);
                 setTimeout(function() {
                     location.reload();
                 }, 8000);  // 8000 ms = 8 Sekunden
@@ -442,7 +442,7 @@ console.log('error: '+errortxt);
                jQuery("#result").html(errortxt);
              } else {
                jQuery("#result").html("");
-               jQuery("#eingabe").html(data['data']);
+                jQuery("#eingabe").html("&#x23F1; 8 sec<br>" + data['data']);
                 setTimeout(function() {
                     location.reload();
                 }, 8000);  // 8000 ms = 8 Sekunden
@@ -562,7 +562,7 @@ console.log('error: '+errortxt);
                jQuery("#result").html(errortxt);
              } else {
                jQuery("#result").html("");
-               jQuery("#eingabe").html(data['data']);
+                jQuery("#eingabe").html("&#x23F1; 8 sec<br>" + data['data']);
                 setTimeout(function() {
                     location.reload();
                 }, 8000);  // 8000 ms = 8 Sekunden
@@ -764,7 +764,7 @@ console.log('error: '+errortxt);
                jQuery("#result").html(errortxt);
              } else {
                jQuery("#result").html("");
-               jQuery("#eingabe").html(data['data']);
+                jQuery("#eingabe").html("&#x23F1; 8 sec<br>" + data['data']);
                 setTimeout(function() {
                     location.reload();
                 }, 8000);  // 8000 ms = 8 Sekunden
@@ -1082,7 +1082,7 @@ console.log('error: '+errortxt);
                jQuery("#result").html(errortxt);
              } else {
                jQuery("#result").html("");
-               jQuery("#eingabe").html(data['data']);
+                jQuery("#eingabe").html("&#x23F1; 8 sec<br>" + data['data']);
 console.log('data: '+data['data']);
                 setTimeout(function() {
                     location.reload();
@@ -1188,13 +1188,13 @@ EOT;
 	  $Name=$row['Name'];
       $Email=$row['Email'];
       $Kurzname=$row['Kurzname'];
-$Bezahlt   = $row['Bezahlt'] ?? 0;
-$Erst      = $row['Erst'] ?? 0;
-$Sechzehn  = $row['Sechzehn'] ?? 0;
-$Achtel    = $row['Achtel'] ?? 0;
-$Viertel   = $row['Viertel'] ?? 0;
-$Halb      = $row['Halb'] ?? 0;
-$Finale    = $row['Finale'] ?? 0;
+        $Bezahlt   = $row['Bezahlt'] ?? 0;
+        $Erst      = $row['Erst'] ?? 0;
+        $Sechzehn  = $row['Sechzehn'] ?? 0;
+        $Achtel    = $row['Achtel'] ?? 0;
+        $Viertel   = $row['Viertel'] ?? 0;
+        $Halb      = $row['Halb'] ?? 0;
+        $Finale    = $row['Finale'] ?? 0;
       $str="";
 	  if ($ID == -1) {
         $str.="<center><h3>Neuer Teilnehmer eintragen</h3></center><br>\n";
@@ -1281,7 +1281,8 @@ console.log('error: '+errortxt);
                jQuery("#result").html(errortxt);
              } else {
                jQuery("#result").html("");
-               jQuery("#eingabe").html(data['data']);
+                jQuery("#eingabe").html("&#x23F1; 8 sec<br>" + data['data']);
+
                 setTimeout(function() {
                     location.reload();
                 }, 8000);  // 8000 ms = 8 Sekunden
@@ -1423,7 +1424,8 @@ console.log('error: '+errortxt);
              } else {
                //location.reload();
                jQuery("#result").html("");
-               jQuery("#eingabe").html(data['data']);
+                jQuery("#eingabe").html("&#x23F1; 8 sec<br>" + data['data']);
+
                 setTimeout(function() {
                     location.reload();
                 }, 8000);  // 8000 ms = 8 Sekunden
@@ -2447,13 +2449,14 @@ $debug.=" sql: $sql\n";
     if (!isset($Finale)) $Finale = 0;
     // checkboxwerte prüfen
     if ( ($Erst != "0" && $Erst != 1) ||
+         ($Sechzehn != "0" && $Sechzehn != 1) ||
          ($Achtel != "0" && $Achtel != 1) ||
          ($Viertel != "0" && $Viertel != 1) ||
          ($Halb != "0" && $Halb != 1) ||
          ($Finale != "0" && $Finale != 1) 
       ) {
-      $html.="fehlerhafte Werte bei Bezahlt $Bezahlt, Erst $Erst, Achtel $Achtel, Viertel $Viertel, Halb $Halb, Finale $Finale nur 0 oder 1 zugelassen<br>";
-      $errortxt.="fehlerhafte Werte bei Bezahlt $Bezahlt, Erst $Erst, Achtel $Achtel, Viertel $Viertel, Halb $Halb, Finale $Finale nur 0 odeer 1 zugelassen<br><br>";
+      $html.="fehlerhafte Werte bei Bezahlt $Bezahlt, Erst $Erst, Sechzehn $Sechzehn, Achtel $Achtel, Viertel $Viertel, Halb $Halb, Finale $Finale nur 0 oder 1 zugelassen<br>";
+      $errortxt.="fehlerhafte Werte bei Bezahlt $Bezahlt, Erst $Erst, Sechzehn $Sechzehn, Achtel $Achtel, Viertel $Viertel, Halb $Halb, Finale $Finale nur 0 odeer 1 zugelassen<br><br>";
       $errortxt = utf8_encode($errortxt);
       return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
     } 
@@ -2527,7 +2530,21 @@ $debug.=" sql: $sql\n";
       return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
     }
     if ($aktion == "d" ) {   
-      $tid=$id;
+        // TeilnehmerId besorgen/pruefen
+	    $sql = "Select ID,Kurzname from tl_hy_teilnehmer where Wettbewerb = '$Wettbewerb'  and ID='$id.';";
+        $debug.="sql: $sql<br>";	
+        $stmt = $this->connection->executeQuery($sql);
+        $anz = $stmt->rowCount();
+        if ($anz > 0) {
+          $row = $stmt->fetchAssociative();
+          $tid=$row['ID'];
+        } else {
+          $html.="Teilnehmer bearbeiten ID nicht vorhanden ($ID)<br>";
+          $errortxt.="Teilnehmer bearbeiten ID nicht vorhanden ($ID)<br>";
+          $errortxt = utf8_encode($errortxt);
+          return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+        }
+        $Kurzname=$row['Kurzname'];
 	  $sql = "Delete from tl_hy_teilnehmer WHERE ID=$tid LIMIT 1";
       $cnt = $this->connection->executeStatement($sql);
       //$html.="in Tabelle tl_hy_teilnehmer betroffene Saetze $cnt<br>";
@@ -2535,8 +2552,8 @@ $debug.=" sql: $sql\n";
                                                              // geloescht werden
 	  $sql = "Delete from  tl_hy_wetteaktuell where Wettbewerb = '$Wettbewerb' AND Teilnehmer =$tid";
       $cnt = $this->connection->executeStatement($sql);
-      $debug.="Teilnehmer $id und in Tabelle  tl_hy_wetteaktuell betroffene Saetze $cnt<br>";
-      $html.="Teilnehmer $id und in Tabelle  tl_hy_wetteaktuell betroffene Saetze $cnt<br>";
+      $debug.="Teilnehmer $Kurzname($id) und in Tabelle  tl_hy_wetteaktuell betroffene Saetze $cnt<br>";
+      $html.="Teilnehmer $Kurzname($id) und in Tabelle  tl_hy_wetteaktuell betroffene Saetze $cnt<br>";
       $html = utf8_encode($html);
       return new JsonResponse(['data' => $html,'error'=>$errortxt,'debug'=>$debug]); 
     }
