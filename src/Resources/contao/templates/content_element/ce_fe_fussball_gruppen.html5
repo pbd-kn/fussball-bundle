@@ -1,0 +1,52 @@
+<div class="tabellenueberschrift">
+    Gruppenplan der <?= $this->wettbewerb ?>
+    vom <?= $this->datumStart ?>
+    bis <?= $this->datumEnde ?>
+</div>
+
+<table class="tablecss sortierbar" rules="all" border="1">
+    <thead>
+        <tr>
+            <th class="vorsortiert">Gr</th>
+            <th>M</th>
+            <th>Pl</th>
+            <th>Sp</th>
+            <th>G</th>
+            <th>U</th>
+            <th>N</th>
+            <th>T</th>
+            <th>GT</th>
+            <th>Di</th>
+            <th>Pkt</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+    <?php foreach ($this->gruppenListen as $gruppen): ?>
+        <?php foreach ($gruppen as $row): ?>
+
+            <tr>
+                <td><?= $row['Gruppe'] ?></td>
+
+                <td>
+                    <img src="<?= $this->fussballUtil->getImagePath($row['Flagge1']) ?>" />
+                    <?= $row['M1Name'] ?>
+                </td>
+
+                <td><?= $row['Platz'] ?></td>
+                <td><?= $row['Spiele'] ?></td>
+                <td><?= $row['Sieg'] ?></td>
+                <td><?= $row['Unentschieden'] ?></td>
+                <td><?= $row['Niederlage'] ?></td>
+                <td><?= $row['Tore'] ?></td>
+                <td><?= $row['Gegentore'] ?></td>
+                <td><?= $row['Differenz'] ?></td>
+                <td><?= $row['Punkte'] ?></td>
+            </tr>
+
+        <?php endforeach; ?>
+    <?php endforeach; ?>
+
+    </tbody>
+</table>

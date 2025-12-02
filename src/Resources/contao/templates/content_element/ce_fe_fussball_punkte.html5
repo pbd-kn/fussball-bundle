@@ -1,0 +1,217 @@
+<div class="punkte-wrapper">
+
+    <h2 class="punkte-title">
+        Punkteübersicht – <?= $this->wettbewerb ?>
+    </h2>
+
+    <div class="punkte-list">
+
+        <?php foreach ($this->teilnehmer as $t): ?>
+            <?php 
+                $tid = $t['ID']; 
+                $gesamt = $this->summe[$tid] ?? 0;
+                $wetten = $this->wetten[$tid] ?? [];
+            ?>
+
+            <div class="punkte-card">
+
+                <div class="punkte-head">
+                    <div class="punkte-name">
+                        <?= $t['Name'] ?>
+                    </div>
+                    <div class="punkte-score">
+                        <?= $gesamt ?> Punkte
+                    </div>
+
+                    <button class="punkte-toggle" data-target="detail-<?= $tid ?>">
+                        Details
+                    </button>
+                </div>
+
+                <div id="detail-<?= $tid ?>" class="punkte-details">
+
+                    <?php foreach ($wetten as $w): ?>
+                        <div class="wette-item">
+
+                            <div class="wette-header">
+                                <span class="wette-art"><?= strtoupper($w['Art']) ?></span>
+                                <span class="wette-kommentar"><?= $w['Kommentar'] ?></span>
+                                <span class="wette-punkte"><?= $w['Punkte'] ?> Pkt</span>
+                            </div>
+
+                            <div class="wette-body">
+
+                                <?php if ($w['Art'] === 's'): ?>
+                                    <div class="wette-row">
+                                        <strong>Ergebnis:</strong>
+                                        <?= $w['Tipp2'] ?>/<?= $w['Tipp3'] ?>
+                                    </div>
+                                    <div class="wette-row">
+                                        <strong>Getippt:</strong>
+                                        <?= $w['W1'] ?>/<?= $w['W2'] ?>
+                                    </div>
+
+                                <?php elseif ($w['Art'] === 'g'): ?>
+                                    <div class="wette-row">
+                                        <strong>Gruppe:</strong> <?= $w['Tipp1'] ?>
+                                    </div>
+
+                                <?php elseif ($w['Art'] === 'p'): ?>
+                                    <div class="wette-row">
+                                        <strong>Meister:</strong>
+                                        <?= $this->mannschaften[$w['Tipp1']]['Name'] ?? '-' ?>
+                                    </div>
+                                    <div class="wette-row">
+                                        <strong>Getippt:</strong>
+                                        <?= $this->mannschaften[$w['W1']]['Name'] ?? '-' ?>
+                                    </div>
+
+                                <?php elseif ($w['Art'] === 'v'): ?>
+                                    <div class="wette-row">
+                                        <strong>Vergleich:</strong>
+                                        <?= $w['Tipp1'] ?>
+                                    </div>
+                                    <div class="wette-row">
+                                        <strong>Getippt:</strong>
+                                        <?= $w['W1'] ?>
+                                    </div>
+
+                                <?php endif; ?>
+
+                            </div>
+
+                        </div>
+                    <?php endforeach; ?>
+
+                </div>
+
+            </div>
+
+        <?php endforeach; ?>
+
+    </div>
+</div>
+
+
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+
+    document.querySelectorAll(".punkte-toggle").forEach(function(btn) {
+        btn.addEventListener("click", function() {
+            let target = document.getElementById(this.dataset.target);
+            target.classList.toggle("open");
+        });
+    });
+
+});
+</script>
+
+
+<style>
+
+.punkte-wrapper {
+    padding: 1rem;
+}
+
+.punkte-title {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.punkte-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.punkte-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+}
+
+.punkte-head {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 1rem;
+    align-items: center;
+}
+
+.punkte-name {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.punkte-score {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: green;
+}
+
+.punkte-toggle {
+    padding: .4rem .8rem;
+    background: #007bff;
+    color: white;
+    border: 0;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.punkte-details {
+    display: none;
+    margin-top: 1rem;
+}
+
+.punkte-details.open {
+    display: block;
+}
+
+.wette-item {
+    margin-bottom: 1rem;
+    padding: .8rem;
+    border-radius: 10px;
+    background: #f5f7fa;
+}
+
+.wette-header {
+    display: grid;
+    grid-template-columns: 70px 1fr 80px;
+    gap: .5rem;
+    padding-bottom: .5rem;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: .5rem;
+}
+
+.wette-art {
+    font-weight: bold;
+}
+
+.wette-punkte {
+    text-align: right;
+    font-weight: bold;
+    color: #444;
+}
+
+.wette-row {
+    margin-bottom: .3rem;
+}
+
+@media (max-width: 540px) {
+
+    .punkte-head {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .wette-header {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .wette-punkte {
+        text-align: left;
+    }
+}
+
+</style>

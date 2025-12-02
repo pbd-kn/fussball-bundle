@@ -142,6 +142,13 @@ $GLOBALS['TL_DCA']['tl_hy_teilnehmer'] = [
             'default' => true,
             'sql' => "char(2) NOT NULL default '0'",
         ],
+        'Sechzehn' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_hy_teilnehmer']['Sechzehn'],
+            'exclude' => true,
+            'inputType' => 'checkbox',
+            'default' => true,
+            'sql' => "char(2) NOT NULL default '0'",
+        ],
         'Achtel' => [
             'label' => &$GLOBALS['TL_LANG']['tl_hy_teilnehmer']['Achtel'],
             'exclude' => true,

@@ -167,6 +167,7 @@ $GLOBALS['TL_LANG']['tl_hy_teilnehmer']['Kurzname'] = ['Kurzname', 'Kurzname'];
 $GLOBALS['TL_LANG']['tl_hy_teilnehmer']['Email'] = ['Email', 'Email'];
 $GLOBALS['TL_LANG']['tl_hy_teilnehmer']['Punkte'] = ['Punkte', 'Punkte'];
 $GLOBALS['TL_LANG']['tl_hy_teilnehmer']['Erst'] = ['Erstwette', 'Erstwette'];
+$GLOBALS['TL_LANG']['tl_hy_teilnehmer']['Sechzehn'] = ['Sechzehnfinalwette', 'Sechzehnfinalwette'];
 $GLOBALS['TL_LANG']['tl_hy_teilnehmer']['Achtel'] = ['Achtelfinalwette', 'Achtelfinalwette'];
 $GLOBALS['TL_LANG']['tl_hy_teilnehmer']['Viertel'] = ['Viertelfinalwette', 'Viertelfinalwette'];
 $GLOBALS['TL_LANG']['tl_hy_teilnehmer']['Halb'] = ['Halbfinalwette', 'Halbfinalwette'];

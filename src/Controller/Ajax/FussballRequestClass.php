@@ -104,7 +104,7 @@ class FussballRequestClass extends AbstractController
         <script language="javascript" type="text/javascript">
         function uebernehmen() {     /* neuer aktueller Wettbewerb */
           var _par = jQuery("#inputForm :input").serialize();   // ich habe den Eindruck nur so bekomme ich die Werte
-console.log('par: '+_par);
+//console.log('par: '+_par);
           var _inputArr = _par.split("&");
           let myA=[];
           for (var x = 0; x < _inputArr.length; x++) {
@@ -112,7 +112,16 @@ console.log('par: '+_par);
             myA[_kv[0]] = _kv[1];
             //console.log(_kv);
           }
-          var url =  '/fussball/bearbeitewettbewerb/'+myA['aktion']+'/'+myA['ID']+'/'+myA['Wettbewerb']+'/'+myA['anzahlGruppen']+'/'+myA['deutschlandGruppe']+'/'+myA['startDatum']+'/'+myA['endeDatum'];
+          //var url =  '/fussball/bearbeitewettbewerb/'+myA['aktion']+'/'+myA['ID']+'/'+myA['Wettbewerb']+'/'+myA['anzahlGruppen']+'/'+myA['deutschlandGruppe']+'/'+myA['startDatum']+'/'+myA['endeDatum'];
+        var url = '/fussball/bearbeitewettbewerb/'
+            + (myA['aktion']    || 'n') + '/'
+            + (myA['ID']        || -1) + '/'
+            + (myA['Wettbewerb']      || '??') + '/'
+            + (myA['anzahlGruppen']    || 4) + '/'
+            + (myA['deutschlandGruppe']    || 'A') + '/'
+            + (myA['startDatum']        || '2000-01-01') + '/'
+            + (myA['endeDatum']    || '2000-01-01');
+
 console.log('url: '+url);
           jQuery.get(url, function(data, status){
              errortxt=data['error'];
@@ -261,7 +270,7 @@ EOT;
         <script language="javascript" type="text/javascript">
         function uebernehmen() {     /* neuer aktueller Wettbewerb */
           var _par = jQuery("#inputForm :input").serialize();   // ich habe den Eindruck nur so bekomme ich die Werte
-console.log('par: '+_par);
+//console.log('par: '+_par);
           var _inputArr = _par.split("&");
           let myA=[];
           for (var x = 0; x < _inputArr.length; x++) {
@@ -269,7 +278,17 @@ console.log('par: '+_par);
             myA[_kv[0]] = _kv[1];
             //console.log(_kv);
           }
-          var url =  '/fussball/bearbeitemannschaft/'+myA['aktion']+'/'+myA['ID']+'/'+myA['name']+'/'+myA['nation']+'/'+myA['Gruppe'];
+          //var url =  '/fussball/bearbeitemannschaft/'+myA['aktion']+'/'+myA['ID']+'/'+myA['name']+'/'+myA['nation']+'/'+myA['Gruppe'];
+
+        var url = '/fussball/bearbeitemannschaft/'
+            + (myA['aktion']    || 'n') + '/'
+            + (myA['ID']        || -1) + '/'
+            + (myA['name']      || -1) + '/'
+            + (myA['nation']    || -1) + '/'
+            + (myA['Gruppe']    || 'A') + '/'
+            + (myA['M2']        || -1) + '/'
+            + (myA['T1']        || -1) + '/'
+            + (myA['Gruppe']    || 'A');
 console.log('url: '+url);
           jQuery.get(url, function(data, status){
 console.log('res da ');
@@ -392,7 +411,7 @@ EOT;
         <script language="javascript" type="text/javascript">
         function uebernehmen() {     /* neuer aktueller Wettbewerb */
           var _par = jQuery("#inputForm :input").serialize();   // ich habe den Eindruck nur so bekomme ich die Werte
-console.log('par: '+_par);
+//console.log('par: '+_par);
           var _inputArr = _par.split("&");
           let myA=[];
           for (var x = 0; x < _inputArr.length; x++) {
@@ -400,7 +419,17 @@ console.log('par: '+_par);
             myA[_kv[0]] = _kv[1];
             //console.log(_kv);
           }
-          var url =  '/fussball/bearbeiteort/'+myA['aktion']+'/'+myA['ID']+'/'+myA['ort']+'/'+myA['beschreibung'];
+          //var url =  '/fussball/bearbeiteort/'+myA['aktion']+'/'+myA['ID']+'/'+myA['ort']+'/'+myA['beschreibung'];
+        var url = '/fussball/bearbeiteort/'
+            + (myA['aktion']    || 'n') + '/'
+            + (myA['ID']        || -1) + '/'
+            + (myA['ort']       || -1) + '/'
+            + (myA['Gruppe']    || 'A') + '/'
+            + (myA['M1']        || -1) + '/'
+            + (myA['M2']        || -1) + '/'
+            + (myA['T1']        || -1) + '/'
+            + (myA['beschreibung']        || '_');
+
 console.log('url: '+url);
           jQuery.get(url, function(data, status){
 console.log('res da ');
@@ -503,7 +532,7 @@ EOT;
         <script language="javascript" type="text/javascript">
         function uebernehmen() {     /* neuer aktueller Gruppe */
           var _par = jQuery("#inputForm :input").serialize();   // ich habe den Eindruck nur so bekomme ich die Werte
-console.log('par: '+_par);
+//console.log('par: '+_par);
           var _inputArr = _par.split("&");
           let myA=[];
           for (var x = 0; x < _inputArr.length; x++) {
@@ -512,7 +541,12 @@ console.log('par: '+_par);
             console.log(_kv);
           }
     //      1342/1/-1//-1/-1/-1/-1/-1
-          var url =  '/fussball/bearbeitegruppe/'+myA['aktion']+'/'+myA['ID']+'/'+myA['Platz'];
+          //var url =  '/fussball/bearbeitegruppe/'+myA['aktion']+'/'+myA['ID']+'/'+myA['Platz'];
+        var url = '/fussball/bearbeitegruppe/'
+            + (myA['aktion']    || 'n') + '/'
+            + (myA['ID']        || -1) + '/'
+            + (myA['Platz']        || -1);
+
 console.log('url: '+url);
           jQuery.get(url, function(data, status){
 console.log('res da ');
@@ -693,7 +727,7 @@ EOT;
         <script language="javascript" type="text/javascript">
         function uebernehmen() {     /* neuer aktueller Wettbewerb */
           var _par = jQuery("#inputForm :input").serialize();   // ich habe den Eindruck nur so bekomme ich die Werte
-console.log('par: '+_par);
+//console.log('par: '+_par);
           var _inputArr = _par.split("&");
           let myA=[];
           for (var x = 0; x < _inputArr.length; x++) {
@@ -701,7 +735,17 @@ console.log('par: '+_par);
             myA[_kv[0]] = _kv[1];
             //console.log(_kv);
           }
-          var url='/fussball/bearbeitespiel/'+myA['aktion']+'/'+myA['ID']+'/'+myA['Nr']+'/'+myA['Gruppe']+'/'+myA['M1']+'/'+myA['M2']+'/'+myA['Ort']+'/'+myA['Datum']+'/'+myA['Uhrzeit']+'/'+myA['T1']+'/'+myA['T2'];
+          //var url='/fussball/bearbeitespiel/'+myA['aktion']+'/'+myA['ID']+'/'+myA['Nr']+'/'+myA['Gruppe']+'/'+myA['M1']+'/'+myA['M2']+'/'+myA['Ort']+'/'+myA['Datum']+'/'+myA['Uhrzeit']+'/'+myA['T1']+'/'+myA['T2'];
+        var url = '/fussball/bearbeitespiel/'
+            + (myA['aktion']    || 'n') + '/'
+            + (myA['ID']        || -1) + '/'
+            + (myA['Nr']        || -1) + '/'
+            + (myA['Gruppe']    || 'A') + '/'
+            + (myA['M1']        || -1) + '/'
+            + (myA['M2']        || -1) + '/'
+            + (myA['T1']        || -1) + '/'
+            + (myA['T2']        || -1);
+
 console.log('url: '+url);
           jQuery.get(url, function(data, status){
 console.log('res da ');
@@ -996,7 +1040,7 @@ EOT;
         <script language="javascript" type="text/javascript">
         function uebernehmen() {     /* neuer aktuelle Wette */
           var _par = jQuery("#inputForm :input").serialize();   // ich habe den Eindruck nur so bekomme ich die Werte
-console.log('par: '+_par);
+//console.log('par: '+_par);
           var _inputArr = _par.split("&");
           let myA=[];
           for (var x = 0; x < _inputArr.length; x++) {
@@ -1004,7 +1048,19 @@ console.log('par: '+_par);
             myA[_kv[0]] = _kv[1];
             //console.log(_kv);
           }
-          var url='/fussball/bearbeitewette/'+myA['aktion']+'/'+myA['ID']+'/'+myA['Kommentar']+'/'+myA['Art']+'/'+myA['Pok']+'/'+myA['Ptrend']+'/'+myA['Tipp1']+'/'+myA['Tipp2']+'/'+myA['Tipp3']+'/'+myA['Tipp4'];
+          //var url='/fussball/bearbeitewette/'+myA['aktion']+'/'+myA['ID']+'/'+myA['Kommentar']+'/'+myA['Art']+'/'+myA['Pok']+'/'+myA['Ptrend']+'/'+myA['Tipp1']+'/'+myA['Tipp2']+'/'+myA['Tipp3']+'/'+myA['Tipp4'];
+        var url = '/fussball/bearbeitewette/'
+            + (myA['aktion']    || 'n') + '/'
+            + (myA['ID']        || -1) + '/'
+            + (myA['Kommentar'] || 'K') + '/'
+            + (myA['Art']       || 'S') + '/'
+            + (myA['Pok']       || '2') + '/'
+            + (myA['Ptrend']    || '5') + '/'
+            + (myA['Tipp1']     || '-1') + '/'
+            + (myA['Tipp2']     || '-1') + '/'
+            + (myA['Tipp3']     || '-1') + '/'
+            + (myA['Tipp4']     || '-1');
+
 console.log('url: '+url);
           jQuery.get(url, function(data, status){
              errortxt=data['error'];
@@ -1118,13 +1174,13 @@ EOT;
 	  $Name=$row['Name'];
       $Email=$row['Email'];
       $Kurzname=$row['Kurzname'];
-      $Bezahlt=$row['Bezahlt'];
-      //$Bezahlt=0;
-      $Erst=$row['Erst'];
-      $Achtel=$row['Achtel'];
-      $Viertel=$row['Viertel'];
-      $Halb=$row['Halb'];
-      $Finale=$row['Finale'];
+$Bezahlt   = $row['Bezahlt'] ?? 0;
+$Erst      = $row['Erst'] ?? 0;
+$Sechzehn  = $row['Sechzehn'] ?? 0;
+$Achtel    = $row['Achtel'] ?? 0;
+$Viertel   = $row['Viertel'] ?? 0;
+$Halb      = $row['Halb'] ?? 0;
+$Finale    = $row['Finale'] ?? 0;
       $str="";
 	  if ($ID == -1) {
         $str.="<center><h3>Neuer Teilnehmer eintragen</h3></center><br>\n";
@@ -1152,6 +1208,8 @@ EOT;
       $str.=$cgi->td(array("valign"=>"top"),$cgi->textfield(array("name"=>"Bezahlt","id"=>"Bezahlt","value"=>"$Bezahlt"))) . "\n";
       $str.=$cgi->td(array("valign"=>"top"),"1. W");
       $str.=$cgi->td(array("valign"=>"top"),$cgi->textfield(array("name"=>"Erst","id"=>"Erst","value"=>"$Erst"))) . "\n";
+      $str.=$cgi->td(array("valign"=>"top"),"Sechzehn");
+      $str.=$cgi->td(array("valign"=>"top"),$cgi->textfield(array("name"=>"Sechzehn","id"=>"Sechzehn","value"=>"$Sechzehn"))) . "\n";
       $str.=$cgi->td(array("valign"=>"top"),"Achtel");
       $str.=$cgi->td(array("valign"=>"top"),$cgi->textfield(array("name"=>"Achtel","id"=>"Achtel","value"=>"$Achtel"))) . "\n";
       $str.=$cgi->td(array("valign"=>"top"),"Viertel");
@@ -1173,7 +1231,7 @@ EOT;
       $debug="";     //  debuginfo
       $my_script_txt = <<< EOT
         <script language="javascript" type="text/javascript">
-        function uebernehmen() {     /* neuer Teilnehmer */
+        function uebernehmen() {     /* neuer Teilnehmer */        
           var _par = jQuery("#inputForm :input").serialize();   // ich habe den Eindruck nur so bekomme ich die Werte
 console.log('Teilnehmer uebernehmen: '+_par);
           var _inputArr = _par.split("&");
@@ -1183,8 +1241,24 @@ console.log('Teilnehmer uebernehmen: '+_par);
             myA[_kv[0]] = _kv[1];
             console.log(_kv);
           }
-          var url =  '/fussball/bearbeiteteilnehmer/'+myA['aktion']+'/'+myA['ID']+'/'+myA['Art']+'/'+myA['Kurzname']+'/'+myA['Name']+'/'+myA['Email']+'/'+myA['Bezahlt']+'/'+myA['Erst']+'/'+myA['Achtel']+'/'+myA['Viertel']+'/'+myA['Halb']+'/'+myA['Finale'];
+
+        var url = '/fussball/bearbeiteteilnehmer/'
+            + (myA['aktion']    || 'n') + '/'
+            + (myA['ID']        || -1) + '/'
+            + (myA['Art']       || 'T') + '/'
+            + (myA['Kurzname']  || 'KN') + '/'
+            + (myA['Name']      || '-') + '/'
+            + (myA['Email']     || '-') + '/'
+            + (myA['Bezahlt']   || '0') + '/'
+            + (myA['Erst']      || '0') + '/'
+            + (myA['Sechzehn']  || '0') + '/'
+            + (myA['Achtel']    || '0') + '/'
+            + (myA['Viertel']   || '0') + '/'
+            + (myA['Halb']      || '0') + '/'
+            + (myA['Finale']    || '0');
+
 console.log('url: '+url);
+
           jQuery.get(url, function(data, status){
 console.log('res da ');
              errortxt=data['error'];
@@ -1192,9 +1266,9 @@ console.log('res da ');
 console.log('error: '+errortxt);
                jQuery("#result").html(errortxt);
              } else {
-               //location.reload();
                jQuery("#result").html("");
                jQuery("#eingabe").html(data['data']);
+               location.reload();
              }
           });
 
@@ -1216,7 +1290,8 @@ EOT;
 	    $Row['Art'] = "T";                // Teilnehmerdaten
 	    $Row['Bezahlt'] = false;   
 	    $Row['Erst'] = false;   
-	    $Row['Achtel'] = false;   
+	    $Row['Sechzehn'] = false;
+        $Row['Achtel'] = false;   
 	    $Row['Viertel'] = false;   
 	    $Row['Halb'] = false;   
 	    $Row['Finale'] = false;   
@@ -1312,7 +1387,16 @@ console.log('Nation uebernehmen: '+_par);
             myA[_kv[0]] = _kv[1];
             console.log(_kv);
           }
-          var url =  '/fussball/bearbeitenation/'+myA['aktion']+'/'+myA['ID']+'/'+myA['Nation']+'/'+myA['Type']+'/'+myA['Alfa2']+'/'+myA['Alfa3']+'/'+myA['Domain']+'/'+myA['Image'];
+          //var url =  '/fussball/bearbeitenation/'+myA['aktion']+'/'+myA['ID']+'/'+myA['Nation']+'/'+myA['Type']+'/'+myA['Alfa2']+'/'+myA['Alfa3']+'/'+myA['Domain']+'/'+myA['Image'];
+        var url = '/fussball/bearbeitenation/'
+            + (myA['aktion']    || 'n') + '/'
+            + (myA['ID']        || -1) + '/'
+            + (myA['Nation']    || '-1') + '/'
+            + (myA['Type']      || '-') + '/'
+            + (myA['Alfa2']     || '-') + '/'
+            + (myA['Alfa3']     || '-') + '/'
+            + (myA['Domain']   || '0') + '/'
+            + (myA['Image']    || '0');
 console.log('url: '+url);
           jQuery.get(url, function(data, status){
 console.log('res da ');
@@ -2123,25 +2207,42 @@ $debug.=" sql: $sql\n";
     return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
   } 
 
-    #[Route( '/fussball/bearbeitewette/{aktion}/{ID}/{Kommentar}/{Art}/{Pok}/{Ptrend}/{Tipp1}/{Tipp2}/{Tipp3}/{Tipp4}', name: 'FussballRequestClass_bearbeitewette', defaults: ['_scope' => 'frontend'] ) ]
-    /**
+    #[Route(
+        '/fussball/bearbeitewette/{aktion}/{ID}/{Kommentar}/{Art}/{Pok}/{Ptrend}/{Tipp1}/{Tipp2}/{Tipp3}/{Tipp4}',
+        name: 'FussballRequestClass_bearbeitewette',
+        defaults: [
+            '_scope' => 'frontend',
+            'Kommentar' => '_'   // <- WICHTIG!
+        ],
+        requirements: [
+            'Kommentar' => '.+',   // mindestens 1 Zeichen
+        ]
+    )]
+   /**
      * @throws \Exception
      * @throws DoctrineDBALException
      */
 
-  public function bearbeitewette(
-    string $aktion,
-    int $ID=-1,
-    string $Kommentar='',
-    string $Art='',
-    int $Pok=-1,
-    int $Ptrend=-1,
-    string $Tipp1='',        
-    string $Tipp2='',
-    string $Tipp3='',
-    string $Tipp4='',
+    public function bearbeitewette(
+        string $aktion,
+        string $ID,
+        string $Kommentar,
+        string $Art,
+        string $Pok,
+        string $Ptrend,
+        string $Tipp1,
+        string $Tipp2,
+        string $Tipp3,
+        string $Tipp4
     )
-  {
+    {
+        $ID = (int)$ID;
+        $Pok = (int)$Pok;
+        $Ptrend = (int)$Ptrend;
+        $Tipp2 = (int)$Tipp2;
+        $Tipp3 = (int)$Tipp3;
+        $Tipp4 = (int)$Tipp4;
+
     $aktion=trim(strtolower($aktion));
     if (!isset($aktion)) {
       $html.="fehlerhafte Aktion empty<br>";
@@ -2152,13 +2253,13 @@ $debug.=" sql: $sql\n";
     $c=$this->cgiUtil;
     $id = $ID;
     $html="";
-    $debug="aktion: |$aktion|";
+    $debug = "aktion: |$aktion| Kommentar: |$Kommentar| Art: |$Art|";
     $errortxt="";
     $Wettbewerb = $this->aktWettbewerb['aktWettbewerb'];
     // check kein leerer Parameter
     if ($aktion != 'd' && $aktion != 'u' && ($Kommentar=='' || $Art=='')) {
-	  $errortxt.="Fehlerhafte Eingabe ";
-      $errortxt.="Kommentar: $Kommentar Art: $Art";
+	  $errortxt.="Fehlerhafte Eingabe Kommentar oder Art dürfen nicht leer sein";
+      $errortxt.="Kommentar: |$Kommentar| Art: |$Art|";
       //$errortxt = utf8_encode($errortxt);
       return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
     }
@@ -2302,14 +2403,14 @@ $debug.=" sql: $sql\n";
   } 
     
     
-    #[Route( '/fussball/bearbeiteteilnehmer/{aktion}/{ID}/{Art}/{Kurzname}/{Name}/{Email}/{Bezahlt}/{Erst}/{Achtel}/{Viertel}/{Halb}/{Finale}', name: 'FussballRequestClass_bearbeiteteilnehmer', defaults: ['_scope' => 'frontend'] ) ]
+    #[Route( '/fussball/bearbeiteteilnehmer/{aktion}/{ID}/{Art}/{Kurzname}/{Name}/{Email}/{Bezahlt}/{Erst}/{Sechzehn}/{Achtel}/{Viertel}/{Halb}/{Finale}', name: 'FussballRequestClass_bearbeiteteilnehmer', defaults: ['_scope' => 'frontend'] ) ]
     /**
      * @throws \Exception
      * @throws DoctrineDBALException
      */
 
   public function bearbeiteteilnehmer(string $aktion,int $ID=-1,string $Art="",string $Kurzname='',string $Name='',string $Email='',
-    string $Bezahlt="0", string $Erst="0", string $Achtel="0", string $Viertel="0", string $Halb="0", string $Finale="0")
+    string $Bezahlt="0", string $Erst="0", string $Sechzehn="0", string $Achtel="0", string $Viertel="0", string $Halb="0", string $Finale="0")
   {
     if (!isset($aktion)) {
       $html.="fehlerhafte Aktion empty<br>";
@@ -2319,6 +2420,7 @@ $debug.=" sql: $sql\n";
     }
     if (!isset($Bezahlt) || $Bezahlt == 'undefined') $Bezahlt = 0;
     if (!isset($Erst)) $Erst = 0;
+    if (!isset($Sechzehn)) $Sechzehn = 0;
     if (!isset($Achtel)) $Achtel = 0;
     if (!isset($Viertel)) $Viertel = 0;
     if (!isset($Halb)) $Halb = 0;
@@ -2349,10 +2451,10 @@ $debug.=" sql: $sql\n";
           $errortxt.="Kurzname fehlerhafter Wert ($Kurzname)<br>";
           $errortxt = utf8_encode($errortxt);
           return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
-      }
+        }
       if ($aktion == "n" ) {   // neueintrag
-        $value = "( '$Wettbewerb' ,'$Kurzname' , '$Name' , '$Email', '$Bezahlt', '$Erst', '$Achtel', '$Viertel', '$Halb', '$Finale' )" ; 
-        $sql="INSERT INTO tl_hy_teilnehmer(Wettbewerb,Kurzname,Name,Email,Bezahlt,Erst,Achtel,Viertel,Halb,Finale) VALUES $value";
+        $value = "( '$Wettbewerb' ,'$Kurzname' , '$Name' , '$Email', '$Bezahlt', '$Erst', $Sechzehn, '$Achtel', '$Viertel', '$Halb', '$Finale' )" ; 
+        $sql="INSERT INTO tl_hy_teilnehmer(Wettbewerb,Kurzname,Name,Email,Bezahlt,Erst,Sechzehn,Achtel,Viertel,Halb,Finale) VALUES $value";
         $cnt = $this->connection->executeStatement($sql);
 	    $html.="Wettbewerb $Wettbewerb Teilnehmer $Kurzname Name $Name Email $Email neu gesetzt";
       // TeilnehmerId besorgen
@@ -2395,7 +2497,7 @@ $debug.=" sql: $sql\n";
           return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
         }
         $value = "SET Wettbewerb='$Wettbewerb' ,Kurzname='$Kurzname', Name='$Name', Email='$Email'" ; 
-        $value .= " ,Bezahlt='$Bezahlt' ,Erst='$Erst', Achtel='$Achtel', Viertel='$Viertel', Halb='$Halb', Finale='$Finale'" ; 
+        $value .= " ,Bezahlt='$Bezahlt' ,Erst='$Erst', Sechzehn = '$Sechzehn', Achtel='$Achtel', Viertel='$Viertel', Halb='$Halb', Finale='$Finale'" ; 
 	    $sql = "UPDATE tl_hy_teilnehmer $value where ID='$id'";
         $debug.="UPDATE Teilnehmer sql: $sql<br>";	
         $cnt = $this->connection->executeStatement($sql);
@@ -2428,7 +2530,7 @@ $debug.=" sql: $sql\n";
     /**
      * @throws \Exception
      * @throws DoctrineDBALException
-     */
+    */
      
   public function storeteilnehmerwette(string $aktion,int $Idwettaktuell=-1,string $W1='-1',string $W2='-1',string $W3='-1')
   {

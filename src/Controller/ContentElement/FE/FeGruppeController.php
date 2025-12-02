@@ -109,86 +109,70 @@ class FeGruppeController extends AbstractFussballController
      */
     protected function getResponse(Template $template, ContentModel $model, Request $request): ?Response
     {
-      function getGruppen($conn,$Wettbewerb,$strWhere,&$debug) {
-        $arrRes=[];
-        $sql  = "SELECT";
-        $sql .= " tl_hy_gruppen.ID as 'ID',";
-        $sql .= " tl_hy_gruppen.Gruppe as 'Gruppe',";
-        $sql .= " tl_hy_gruppen.M1 as 'M1Ind',";
-        $sql .= " mannschaft1.Nation as 'M1',";
-        $sql .= " mannschaft1.Name as 'M1Name',";
-        $sql .= " mannschaft1.Flagge as 'Flagge1',";
-        $sql .= " tl_hy_gruppen.Spiele as 'Spiele',";
-        $sql .= " tl_hy_gruppen.Sieg as 'Sieg',";
-        $sql .= " tl_hy_gruppen.Unentschieden as 'Unentschieden',";
-        $sql .= " tl_hy_gruppen.Niederlage as 'Niederlage',";
-        $sql .= " tl_hy_gruppen.Tore as 'Tore',";
-        $sql .= " tl_hy_gruppen.Gegentore as 'Gegentore',";
-        $sql .= " tl_hy_gruppen.Differenz as 'Differenz',";
-        $sql .= " tl_hy_gruppen.Platz as 'Platz',";
-        $sql .= " tl_hy_gruppen.Punkte as 'Punkte'";
-        $sql .= " FROM tl_hy_gruppen";
-        $sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft1 ON tl_hy_gruppen.M1 = mannschaft1.ID";
-        $sql .= " WHERE tl_hy_gruppen.Wettbewerb  ='$Wettbewerb' "; 
-        if ($strWhere != '') $sql .= $strWhere;             
-        $sql .= " ORDER BY tl_hy_gruppen.Gruppe ASC , tl_hy_gruppen.Platz ASC ;";
-        //$debug.="sql: $sql<br>";
-        $stmt = $conn->executeQuery($sql);
-        $num_rows = $stmt->rowCount();    
-        while (($row = $stmt->fetchAssociative()) !== false) {
-          $arrRes[]=$row;
-        }
-        return $arrRes;
-      }
-    
-      //$template->text = $model->text;
-      $c=$this->cgiUtil;
-      $html="";
-      $Wettbewerb=$this->aktWettbewerb['aktWettbewerb'];
+        $Wettbewerb = $this->aktWettbewerb['aktWettbewerb'];
 
-      // alle aktuelle Gruppen einlesen  
-      $whereArr = [
-          " AND NOT (tl_hy_gruppen.Gruppe LIKE '%Sechz%') AND NOT (tl_hy_gruppen.Gruppe LIKE '%Achtel%') AND NOT (tl_hy_gruppen.Gruppe LIKE '%Viertel%') AND NOT (tl_hy_gruppen.Gruppe LIKE '%Halb%') AND NOT (tl_hy_gruppen.Gruppe LIKE '%Finale%')",
-          " AND tl_hy_gruppen.Gruppe LIKE '%Sechz%'",
-          " AND tl_hy_gruppen.Gruppe LIKE '%Achtel%'",
-          " AND tl_hy_gruppen.Gruppe LIKE '%Viertel%'",
-          " AND tl_hy_gruppen.Gruppe LIKE '%Halb%'",
-          " AND tl_hy_gruppen.Gruppe LIKE '%Platz%'",
-          " AND tl_hy_gruppen.Gruppe LIKE '%Finale%'"
-      ];
-      $html.="<div class='tabellenueberschrift'>Gruppenplan der ".$Wettbewerb." vom ".$this->fussballUtil->getDatum($this->aktWettbewerb,'start').' bis '.$this->fussballUtil->getDatum($this->aktWettbewerb,'ende')."&nbsp;<input class='druck' type='button' onclick='print()' value='Drucken'></div>\n";
-      $html.=$c->table(array("class"=>"tablecss sortierbar","rules"=>"all","border"=>"1"));
-      $html.=$c->thead().$c->tr();
-      $html.=$c->th(array("class"=>"vorsortiert"),"Gr");
-      $html.=$c->th("M");
-      $html.=$c->th("Pl").$c->th("Sp").$c->th("G").$c->th("U").$c->th("N").$c->th("T").$c->th("GT").$c->th("Di").$c->th("Pkt");
-      $html.=$c->end_tr().$c->end_thead().$c->tbody() . "\n";
-      foreach ($whereArr as $k=>$strWhere) {
-        $arr = getGruppen($this->connection,$Wettbewerb,$strWhere,$html);
-        
-        if (count($arr) > 0 ) {
-          foreach ($arr as $k=>$row) {
-	        $html.=$c->tr();
-	          $html.=$c->td($row['Gruppe']);
-	          $str="<img src='".$this->fussballUtil->getImagePath($row['Flagge1']). "' >&nbsp;" . $row['M1Name'] ;
-              $html.=$c->td($str);
-              $html.=$c->td((string)$row['Platz']);
-              $html.=$c->td((string)$row['Spiele']);
-              $html.=$c->td((string)$row['Sieg']);
-              $html.=$c->td((string)$row['Unentschieden']);
-              $html.=$c->td((string)$row['Niederlage']);
-              $html.=$c->td((string)$row['Tore']);
-              $html.=$c->td((string)$row['Gegentore']);
-              $html.=$c->td((string)$row['Differenz']);
-              $html.=$c->td((string)$row['Punkte']);
-            $html.=$c->end_tr() . "\n";
-          }
-        }
-      }    
-      $html.=$c->end_tbody();
-      $html.=$c->end_table();
+        // Definition der WHERE-Bedingungen für die Gruppen
+        $whereArr = [
+            " AND NOT (tl_hy_gruppen.Gruppe LIKE '%Sechz%') 
+              AND NOT (tl_hy_gruppen.Gruppe LIKE '%Achtel%')
+              AND NOT (tl_hy_gruppen.Gruppe LIKE '%Viertel%')
+              AND NOT (tl_hy_gruppen.Gruppe LIKE '%Halb%')
+              AND NOT (tl_hy_gruppen.Gruppe LIKE '%Finale%')",
 
-      $response = new Response($html,Response::HTTP_OK,['content-type' => 'text/html']);
-      return $response;
+            " AND tl_hy_gruppen.Gruppe LIKE '%Sechz%'",
+            " AND tl_hy_gruppen.Gruppe LIKE '%Achtel%'",
+            " AND tl_hy_gruppen.Gruppe LIKE '%Viertel%'",
+            " AND tl_hy_gruppen.Gruppe LIKE '%Halb%'",
+            " AND tl_hy_gruppen.Gruppe LIKE '%Platz%'",
+            " AND tl_hy_gruppen.Gruppe LIKE '%Finale%'"
+        ];
+
+        // Funktion zum Laden der Gruppen
+        $loadGruppen = function($strWhere) use ($Wettbewerb) {
+            $sql = "
+                SELECT
+                    tl_hy_gruppen.ID,
+                    tl_hy_gruppen.Gruppe,
+                    mannschaft1.Name AS M1Name,
+                    mannschaft1.Flagge AS Flagge1,
+                    tl_hy_gruppen.Spiele,
+                    tl_hy_gruppen.Sieg,
+                    tl_hy_gruppen.Unentschieden,
+                    tl_hy_gruppen.Niederlage,
+                    tl_hy_gruppen.Tore,
+                    tl_hy_gruppen.Gegentore,
+                    tl_hy_gruppen.Differenz,
+                    tl_hy_gruppen.Platz,
+                    tl_hy_gruppen.Punkte
+                FROM tl_hy_gruppen
+                LEFT JOIN tl_hy_mannschaft AS mannschaft1 
+                    ON tl_hy_gruppen.M1 = mannschaft1.ID
+                WHERE tl_hy_gruppen.Wettbewerb = ?
+                $strWhere
+                ORDER BY tl_hy_gruppen.Gruppe ASC, tl_hy_gruppen.Platz ASC
+            ";
+
+            return $this->connection->fetchAllAssociative($sql, [$Wettbewerb]);
+        };
+
+        // Alle Gruppensätze laden
+        $gruppenListen = [];
+        foreach ($whereArr as $strWhere) {
+            $gruppen = $loadGruppen($strWhere);
+            if (!empty($gruppen)) {
+                $gruppenListen[] = $gruppen;
+            }
+        }
+
+        // Template erstellen
+        $tpl = new \Contao\FrontendTemplate('ce_fe_fussball_gruppen');
+
+        $tpl->wettbewerb = $Wettbewerb;
+        $tpl->datumStart = $this->fussballUtil->getDatum($this->aktWettbewerb,'start');
+        $tpl->datumEnde  = $this->fussballUtil->getDatum($this->aktWettbewerb,'ende');
+        $tpl->gruppenListen = $gruppenListen;
+        $tpl->fussballUtil = $this->fussballUtil;
+
+        return new Response($tpl->parse());
     }
 }

@@ -1,0 +1,52 @@
+<div class="tabellenueberschrift">
+    Wetten der <?= $this->wettbewerb ?> 
+    vom <?= $this->datumStart ?> 
+    bis <?= $this->datumEnde ?>
+</div>
+
+<table class="tablecss" rules="all" border="1">
+    <thead>
+        <tr>
+            <th>Kommentar</th>
+            <th>Pok</th>
+            <th>Ptrend</th>
+            <th>Art</th>
+            <th>Tipp1</th>
+            <th>Tipp2</th>
+            <th>Tipp3</th>
+            <th>Tipp4</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <?php foreach ($this->wetten as $item): ?>
+            <?php $w = $item['row']; ?>
+            <?php $d = $item['details']; ?>
+
+            <tr>
+                <td><?= $w['Kommentar'] ?></td>
+                <td><?= $w['Pok'] ?></td>
+                <td><?= $w['Ptrend'] ?></td>
+                <td><?= $w['Art'] ?></td>
+
+                <?php if ($w['Art'] === 's'): ?>
+                    <td>
+                        <img src="<?= $this->fussballUtil->getImagePath($d['Flagge1']) ?>" />
+                        <?= $d['M1Name'] ?> :
+                        <img src="<?= $this->fussballUtil->getImagePath($d['Flagge2']) ?>" />
+                        <?= $d['M2Name'] ?>
+                    </td>
+                    <td><?= $w['Tipp2'] ?></td>
+                    <td><?= $w['Tipp3'] ?></td>
+                    <td><?= $w['Tipp4'] ?></td>
+
+                <?php else: ?>
+                    <td><?= $w['Tipp1'] ?></td>
+                    <td><?= $w['Tipp2'] ?></td>
+                    <td><?= $w['Tipp3'] ?></td>
+                    <td><?= $w['Tipp4'] ?></td>
+                <?php endif; ?>
+            </tr>
+        <?php endforeach; ?>
+    </tbody>
+</table>

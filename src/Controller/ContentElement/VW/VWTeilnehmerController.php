@@ -77,7 +77,7 @@ class VWTeilnehmerController extends AbstractFussballController
         \System::log('PBD TeilnehmerController ', __METHOD__, TL_GENERAL);
 
         parent::__construct($dependencyAggregate);  // standard Klassen plus akt. Wettbewerb lesen
-                                                    // AbstractFussballController übernimmt sie in die akt Klasse
+                                                    // AbstractFussballController Ã¼bernimmt sie in die akt Klasse
         \System::log('PBD TeilnehmerController nach dependencyAggregate', __METHOD__, TL_GENERAL);
         $this->framework = $framework;
         $this->twig = $twig;
@@ -212,7 +212,7 @@ class VWTeilnehmerController extends AbstractFussballController
 	      $kommentar=$w['Kommentar'];
 	      $id=$w['ID'];
 	      $Hywettenindex=$w['Hywettenindex'];
-          //$str.=$cgi->hidden("Wette$wettindex", -1);                 // zur weitergabe bei speichern übernehmen
+          //$str.=$cgi->hidden("Wette$wettindex", -1);                 // zur weitergabe bei speichern Ã¼bernehmen
 	      $str.=$cgi->tr();
           $str.=$cgi->td($cgi->Button(array("onClick"=>"wetteSpeichern(this);","title"=>"Wette speichern"),"S",$id)) . "\n";
 	      $str.=$cgi->td((string)$id);
@@ -247,15 +247,15 @@ class VWTeilnehmerController extends AbstractFussballController
             $T1=$w['Tipp2'];
             $T2=$w['Tipp3'];
 
-            $str.=$cgi->hidden("W3$wettindex", -1);                    // zur weitergabe bei übernehmen
-            $str.=$cgi->hidden("W4$wettindex", -1);                    // zur weitergabe bei übernehmen
+            $str.=$cgi->hidden("W3$wettindex", -1);                    // zur weitergabe bei Ã¼bernehmen
+            $str.=$cgi->hidden("W4$wettindex", -1);                    // zur weitergabe bei Ã¼bernehmen
 	  	    $str.=$cgi->td($row['M1Name']."/".$row['M2Name']."<br>".$T1.":".$T2);
             $str.=$cgi->td(array("valign"=>"top"),"T1: ".$cgi->textfield(array("name"=>"W1$wettindex","id"=>"W1$wettindex","value"=>"$W1","size"=>"4"))) . "\n";
             $str.=$cgi->td(array("valign"=>"top"),"T2: ".$cgi->textfield(array("name"=>"W2$wettindex","id"=>"W2$wettindex","value"=>"$W2","size"=>"4"))) . "\n";
 	      }
 	      if ($Art == 'v') {    // Zahl Platz
-            $str.=$cgi->hidden("W2$wettindex", -1);                    // zur weitergabe bei übernehmen
-            $str.=$cgi->hidden("W3$wettindex", -1);                    // zur weitergabe bei übernehmen
+            $str.=$cgi->hidden("W2$wettindex", -1);                    // zur weitergabe bei Ã¼bernehmen
+            $str.=$cgi->hidden("W3$wettindex", -1);                    // zur weitergabe bei Ã¼bernehmen
             // werte 1 2 4 8 16
             $infotext="1: Europameister
 2: Ausscheiden in Finale
@@ -269,8 +269,8 @@ class VWTeilnehmerController extends AbstractFussballController
 	        $str.=$cgi->td("&nbsp;");
           }
 	      if ($Art == 'p') {    // Mannschaft 
-            $str.=$cgi->hidden("W2$wettindex", -1);                    // zur weitergabe bei übernehmen
-            $str.=$cgi->hidden("W3$wettindex", -1);                    // zur weitergabe bei übernehmen
+            $str.=$cgi->hidden("W2$wettindex", -1);                    // zur weitergabe bei Ã¼bernehmen
+            $str.=$cgi->hidden("W3$wettindex", -1);                    // zur weitergabe bei Ã¼bernehmen
 	        //$str.=$cgi->td($w['Tipp1'].'abc');
   	        $sql =  "SELECT tl_hy_mannschaft.Name as 'M1Name',tl_hy_mannschaft.ID as 'M1Ind' FROM tl_hy_mannschaft WHERE Wettbewerb ='".$Wettbewerb."' AND ID=".$w['Tipp1'].";";
             $stmt = $conn->executeQuery($sql); 
@@ -292,7 +292,17 @@ class VWTeilnehmerController extends AbstractFussballController
             while (($row = $stmt->fetchAssociative()) !== false) {
               $Pl[] = $row;
             }     
-	        $str.=$cgi->td('Gruppe: '.$w['Tipp1']."<br>1) ".$Pl[0]['M1Name']."<br>2) ".$Pl[1]['M1Name']."<br>3) ".$Pl[2]['M1Name']); 
+//	        $str.=$cgi->td('Gruppe: '.$w['Tipp1']."<br>1) ".$Pl[0]['M1Name']."<br>2) ".$Pl[1]['M1Name']."<br>3) ".$Pl[2]['M1Name']); 
+            $str .= $cgi->td(
+                sprintf(
+                    "Gruppe: %s<br>1) %s<br>2) %s<br>3) %s",
+                    $w['Tipp1'],
+                    $Pl[0]['M1Name'] ?? '-',
+                    $Pl[1]['M1Name'] ?? '-',
+                    $Pl[2]['M1Name'] ?? '-'
+                )
+            );
+
 		    $g1=createMannschaftOption ($conn,$cgi,$Wettbewerb,"W1$wettindex",$W1,$w['Tipp1']);
 		    $g2=createMannschaftOption ($conn,$cgi,$Wettbewerb,"W2$wettindex",$W2,$w['Tipp1']);
 		    $g3=createMannschaftOption ($conn,$cgi,$Wettbewerb,"W3$wettindex",$W3,$w['Tipp1']);
@@ -339,7 +349,7 @@ class VWTeilnehmerController extends AbstractFussballController
             var url =  '/fussball/anzeigeteilnehmer/n/-1';
             console.log ('neuerSpieler url: '+url);
             jQuery.get(url, function(data, status){
-              console.log ('res da');
+              console.log ('res da ');
               jQuery("#eingabe").html(data['data']);
             });
           }
@@ -355,11 +365,11 @@ class VWTeilnehmerController extends AbstractFussballController
           function teilnehmerLoeschen(obj) {
             var id=obj.name;	 
   	        var par = "aktion=d&ID=" + id + "&aktion=d";
-            //var url =  "bundles/hoyzer/verwaltung/bearbeiteTeilnehmer.php?" + par;
             var url =  '/fussball/bearbeiteteilnehmer/d/'+id;
             console.log ('teilnehmerLoeschen url: '+url);
             jQuery.get(url, function(data, status){
               jQuery("#eingabe").html(data['data']);
+               location.reload();
             });
           }
           function wettenZeigen(obj) {
@@ -414,7 +424,7 @@ EOT;
         $html.=$c->table(array("class"=>"verwtablecss","border"=>1));
         $html.=$c->thead();
           $html.=$c->tr();
-            $html.=$c->th("Bez, Er, AF, VF, HF, FI").$c->th("ID").$c->th("Name").$c->th("Kurzname").$c->th("Email");
+            $html.=$c->th("Bez, Er, SZ, AF, VF, HF, FI").$c->th("ID").$c->th("Name").$c->th("Kurzname").$c->th("Email");
           $html.=$c->end_tr();
         $html.=$c->end_thead();
         $html.=$c->tbody();
@@ -426,7 +436,7 @@ EOT;
             $html.=$c->Button(array("onClick"=>"teilnehmerBearbeiten(this);","title"=>"Teilnehmer bearbeiten"),"B",$tid) . "\n";
             $html.=$c->Button(array("onClick"=>"teilnehmerLoeschen(this);","title"=>"Teilnehmer l&ouml;schen"),"L",$tid) . "\n";
             $html.=$c->Button(array("onClick"=>"wettenZeigen(this);","title"=>"Wetten anzeigen"),"W",$tid) . "\n";
-            $s=$tln['Bezahlt'].",".$tln['Erst'].",".$tln['Achtel'].",".$tln['Viertel'].",".$tln['Halb'].",".$tln['Finale'];
+            $s=$tln['Bezahlt'].",".$tln['Erst'].",".$tln['Sechzehn'].",".$tln['Achtel'].",".$tln['Viertel'].",".$tln['Halb'].",".$tln['Finale'];
             //$s="bez: ".$tln['Bezahlt'];
             $html.=$c->textfield(array("value"=>"$s","disabled"=>"true")) . "\n";
           $html.=$c->end_td();

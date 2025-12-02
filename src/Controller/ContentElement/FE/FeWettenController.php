@@ -110,156 +110,50 @@ class FeWettenController extends AbstractFussballController
      */
     protected function getResponse(Template $template, ContentModel $model, Request $request): ?Response
     {
-      function getGruppen($conn,$Wettbewerb,$strWhere,&$debug) {
-        $arrRes=[];
-        $sql  = "SELECT";
-        $sql .= " tl_hy_gruppen.ID as 'ID',";
-        $sql .= " tl_hy_gruppen.Gruppe as 'Gruppe',";
-        $sql .= " tl_hy_gruppen.M1 as 'M1Ind',";
-        $sql .= " mannschaft1.Nation as 'M1',";
-        $sql .= " mannschaft1.Name as 'M1Name',";
-        $sql .= " mannschaft1.Flagge as 'Flagge1',";
-        $sql .= " tl_hy_gruppen.Spiele as 'Spiele',";
-        $sql .= " tl_hy_gruppen.Sieg as 'Sieg',";
-        $sql .= " tl_hy_gruppen.Unentschieden as 'Unentschieden',";
-        $sql .= " tl_hy_gruppen.Niederlage as 'Niederlage',";
-        $sql .= " tl_hy_gruppen.Tore as 'Tore',";
-        $sql .= " tl_hy_gruppen.Gegentore as 'Gegentore',";
-        $sql .= " tl_hy_gruppen.Differenz as 'Differenz',";
-        $sql .= " tl_hy_gruppen.Platz as 'Platz',";
-        $sql .= " tl_hy_gruppen.Punkte as 'Punkte'";
-        $sql .= " FROM tl_hy_gruppen";
-        $sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft1 ON hy_gtl_hy_gruppenruppen.M1 = mannschaft1.ID";
-        $sql .= " WHERE tl_hy_gruppen.Wettbewerb  ='$Wettbewerb' "; 
-        if ($strWhere != '') $sql .= $strWhere;             
-        $sql .= " ORDER BY tl_hy_gruppen.Gruppe ASC , tl_hy_gruppen.Platz ASC ;";
-        //$debug.="sql: $sql<br>";
-        $stmt = $conn->executeQuery($sql);
-        $num_rows = $stmt->rowCount();    
-        while (($row = $stmt->fetchAssociative()) !== false) {
-          $arrRes[]=$row;
-        }
-        return $arrRes;
-      }
-    
-      //$template->text = $model->text;
-      $c=$this->cgiUtil;
-      $html="";
-      $Wettbewerb=$this->aktWettbewerb['aktWettbewerb'];
-        $sql  = "SELECT";
-        $sql .= " tl_hy_wetten.ID as 'ID',";
-        $sql .= " tl_hy_wetten.Kommentar as 'Kommentar',";
-        $sql .= " tl_hy_wetten.Art as 'Art',";
-        $sql .= " tl_hy_wetten.Tipp1 as 'Tipp1',";
-        $sql .= " tl_hy_wetten.Tipp2 as 'Tipp2',";
-        $sql .= " tl_hy_wetten.Tipp3 as 'Tipp3',";
-        $sql .= " tl_hy_wetten.Tipp4 as 'Tipp4',";
-        $sql .= " tl_hy_wetten.Pok as 'Pok',";
-        $sql .= " tl_hy_wetten.Ptrend as 'Ptrend'";
-        $sql .= " FROM tl_hy_wetten";
-        $sql .= " WHERE tl_hy_wetten.Wettbewerb  ='".$this->aktWettbewerb['aktWettbewerb']."' ";
-        $sql .= " ORDER by tl_hy_wetten.Art ASC, tl_hy_wetten.Kommentar ASC  ;";
-        $stmt = $this->connection->executeQuery($sql);
-        $num_rows = $stmt->rowCount();    
-        //$html.="num_rows $num_rows sql:<br>$sql<br>";
-        while (($row = $stmt->fetchAssociative()) !== false) {
-          $this->Wetten[]=$row;
-          $this->WettenArten[$row['Art']] = $row['Art'];
+        $Wettbewerb = $this->aktWettbewerb['aktWettbewerb'];
 
-        }
-      $html.="<div class='tabellenueberschrift'>Gruppenplan der ".$Wettbewerb." vom ".$this->fussballUtil->getDatum($this->aktWettbewerb,'start').' bis '.$this->fussballUtil->getDatum($this->aktWettbewerb,'ende')."&nbsp;<input class='druck' type='button' onclick='print()' value='Drucken'></div>\n";
-      $html.=$c->table(array("class"=>"tablecss","rules"=>"all","border"=>"1"));
-      $html.=$c->thead().$c->tr();
-      $html.=$c->th("Kommentar").$c->th("Pok").$c->th("Ptrend").$c->th("Art").$c->th("Tipp1").$c->th("Tipp2").$c->th("Tipp3").$c->th("Tipp4");
-/*
-        foreach ($this->WettenArten as $Art) {
-          $html.=$c->tr();
-          $html.=$c->th("Kommentar").$c->th("Pok").$c->th("Ptrend").$c->th("Art").$c->th("Tipp1").$c->th("Tipp2").$c->th("Tipp3").$c->th("Tipp4");
+        // --- Wetten laden
+        $sql = "SELECT ID, Kommentar, Art, Tipp1, Tipp2, Tipp3, Tipp4, Pok, Ptrend
+            FROM tl_hy_wetten
+            WHERE Wettbewerb = ?
+            ORDER BY Art ASC, Kommentar ASC";
 
-          switch(strtolower($Art))
-          {
-            case 's': {   // Spielwette Tipp1 Spiel Tipp2 Tore M1 Tipp 2 Tore M2
-              $html.=$c->th("Spiel").$c->th("T1").$c->th("T2");
-              break;
-            }
-            case 'g': {   // Gruppenwette Tipp1 Gruppe Tipp2 M1 Tipp 3 M2 Tipp3 M3
-              $html.=$c->th("Gruppe").$c->th("M1").$c->th("M2").$c->th("M3").$c->th("M4");
-              break;
-            }
-            case 'p': {   // Platzwette Tipp1 M1 Tipp2 Tipp 3 Tipp4 irrelevant ??
-              $html.=$c->th("M1");
-              break;
-            }
-            case 'v': {   // Vergleichwette Tipp1 Vergleichswert Tipp2 Tipp 3 Tipp4 irrelevant ??
-              $html.=$c->th("V");
-              break;
-            }
-          }
-          $html.=$c->end_tr();
-        }
-*/
-        $html.=$c->end_tr().$c->end_thead().$c->tbody() . "\n";
-        foreach ($this->Wetten as $k=>$row) {
-          $html.=$c->tr("&nbsp");
-            $html.=$c->td((string)$row['Kommentar']). "\n";
-            $html.=$c->td((string)$row['Pok']). "\n";
-            $html.=$c->td((string)$row['Ptrend']). "\n";
-            $html.=$c->td((string)$row['Art']). "\n";
-/*
-            $html.=$c->td($row['Spiel']). "\n";
-	          $str="<img src='".$this->fussballUtil->getImagePath($row['Flagge1']). "' >&nbsp;" . $row['M1Name'];
-            $html.=$c->td($str). "\n";
-            $html.=$c->td($row['T1']). "\n";
-	          $str="<img src='".$this->fussballUtil->getImagePath($row['Flagge2']). "' >&nbsp;" . $row['M2Name'] ;
-            $html.=$c->td($str). "\n";
-            $html.=$c->td($row['T2']). "\n";
-*/
-            switch(strtolower($row['Art']))
-            {
-              case 's': {   // Spielwette Tipp1 Spiel Tipp2 Tore M1 Tipp 2 Tore M2
-                $sql  = "SELECT";
-                $sql .= " tl_hy_spiele.ID as 'ID',";
-                $sql .= " tl_hy_spiele.Nr as 'Nr',";
-                $sql .= " tl_hy_spiele.Gruppe as 'Gruppe',";
-                $sql .= " tl_hy_spiele.M1 as 'M1Ind',";
-                $sql .= " mannschaft1.Nation as 'M1',";
-                $sql .= " mannschaft1.Name as 'M1Name',";
-                $sql .= " mannschaft1.Flagge as 'Flagge1',";
-                $sql .= " tl_hy_spiele.M2 as 'M2Ind',";
-                $sql .= " mannschaft2.Nation as 'M2',";
-                $sql .= " mannschaft2.Flagge as 'M2Name',";
-                $sql .= " mannschaft2.Flagge as 'Flagge2'";
-                $sql .= " FROM tl_hy_spiele";
-                $sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft1 ON tl_hy_spiele.M1 = mannschaft1.ID";
-                $sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft2 ON tl_hy_spiele.M2 = mannschaft2.ID";
-                $sql .= " WHERE tl_hy_spiele.ID='".$row['Tipp1']."'";
-                $stmt = $this->connection->executeQuery($sql);
-                $rowsp = $stmt->fetchAssociative();
-	             $str1="<img src='".$this->fussballUtil->getImagePath($rowsp['Flagge1']). "' >&nbsp;" . $rowsp['M1Name'];
-	             $str2="<img src='".$this->fussballUtil->getImagePath($rowsp['Flagge2']). "' >&nbsp;" . $rowsp['M2Name'];
-                $html.=$c->td($str1.':'.$str2);
-                $html.=$c->td((string)$row['Tipp2']).$c->td((string)$row['Tipp3']).$c->td((string)$row['Tipp4']);
-               break;
-              }
-              case 'g': {   // Gruppenwette Tipp1 Gruppe Tipp2 M1 Tipp 3 M2 Tipp3 M3
-                $html.=$c->td((string)$row['Tipp1']).$c->td((string)$row['Tipp2']).$c->td((string)$row['Tipp3']).$c->td((string)$row['Tipp4']);
-               break;
-              }
-              case 'p': {   // Platzwette Tipp1 M1 Tipp2 Tipp 3 Tipp4 irrelevant ??
-                $html.=$c->td((string)$row['Tipp1']).$c->td((string)$row['Tipp2']).$c->td((string)$row['Tipp3']).$c->td((string)$row['Tipp4']);
-               break;
-              }
-              case 'v': {   // Vergleichwette Tipp1 Vergleichswert Tipp2 Tipp 3 Tipp4 irrelevant ??
-                $html.=$c->td((string)$row['Tipp1']).$c->td((string)$row['Tipp2']).$c->td((string)$row['Tipp3']).$c->td((string)$row['Tipp4']);
-               break;
-              }
+        $stmt = $this->connection->executeQuery($sql, [$Wettbewerb]);
+
+        $wetten = [];
+        while ($row = $stmt->fetchAssociative()) {
+            $details = [];
+
+            // Zusatzdaten für Spielwetten
+            if ($row['Art'] === 's') {
+                $sqlSp = "
+                    SELECT
+                        tl_hy_spiele.ID,
+                        man1.Name AS M1Name,
+                        man1.Flagge AS Flagge1,
+                        man2.Name AS M2Name,
+                        man2.Flagge AS Flagge2
+                    FROM tl_hy_spiele
+                    LEFT JOIN tl_hy_mannschaft AS man1 ON man1.ID = tl_hy_spiele.M1
+                    LEFT JOIN tl_hy_mannschaft AS man2 ON man2.ID = tl_hy_spiele.M2
+                    WHERE tl_hy_spiele.ID = ?
+                ";
+                $details = $this->connection->executeQuery($sqlSp, [$row['Tipp1']])->fetchAssociative();
             }
 
-	      $html.=$c->end_tr() . "\n";
-        }  
-      $html.=$c->end_tbody();
-      $html.=$c->end_table();
-      $response = new Response($html,Response::HTTP_OK,['content-type' => 'text/html']);
-      return $response;
+            $wetten[] = [
+                'row'     => $row,
+                'details' => $details
+            ];
+        }
+
+        // --- Ausgabe über HTML5-Template
+        $tpl = new \Contao\FrontendTemplate('ce_fe_fussball_wetten');
+        $tpl->wettbewerb = $Wettbewerb;
+        $tpl->datumStart = $this->fussballUtil->getDatum($this->aktWettbewerb,'start');
+        $tpl->datumEnde  = $this->fussballUtil->getDatum($this->aktWettbewerb,'ende');
+        $tpl->wetten     = $wetten;
+
+        return new Response($tpl->parse());
     }
 }

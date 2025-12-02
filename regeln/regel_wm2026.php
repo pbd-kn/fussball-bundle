@@ -41,29 +41,25 @@
         <td>Punkte pro Tipp</td><td>Max. erreichbar</td></tr>
         <tr><td>Weltmeister</td><td> 10</td><td>	10</td></tr>
         <tr><td>Abschneiden Deutschland</td><td> 10</td><td>	 10</td></tr>
-        <tr><td>Ergebnis Vorrundenspiele Deutschland</td><td> 1 oder 3 </td><td>3 x 3 = 9</td></tr>
+        <tr><td>Ergebnis Vorrundenspiele Deutschland</td><td> 2 oder 5 </td><td>3 x 5 = 15</td></tr>
         <tr><td>Platzierung (Gruppenerster/Zweiter) Gruppe A - L </td><td>1 oder 3</td><td>2 x 3 x 12 = 72</td></tr>
-        <tr><td>Ergebnis Sechzentelfinalefinalspiele</td><td> 1 oder 3</td><td>16 x 3 = 48</td></tr>
-        <tr><td>Ergebnis Achtelfinalspiele</td><td> 1 oder 3</td><td>8 x 3 = 24</td></tr>
-        <tr><td>Ergebnis Viertelfinalspiele</td><td> 1 oder 3</td><td>4 x 3 = 12</td></tr>
-        <tr><td>Ergebnis Halbfinalspiele</td><td> 1 oder 3</td><td>2 x 3 = 6</td></tr>
-        <tr><td>Ergebnis Finale</td><td>1 oder 3</td><td>3</td></tr>
+        <tr><td>Ergebnis Sechzentelfinalspiele</td><td> 2 oder 5</td><td>16 x 5 = 80</td></tr>
+        <tr><td>Ergebnis Achtelfinalspiele</td><td> 2 oder 5</td><td>8 x 5 = 40</td></tr>
+        <tr><td>Ergebnis Viertelfinalspiele</td><td> 2 oder 5</td><td>4 x 5 = 20</td></tr>
+        <tr><td>Ergebnis Halbfinalspiele</td><td> 2 oder 5</td><td>2 x 5 = 10</td></tr>
+        <tr><td>Ergebnis Finale</td><td>2 oder 5</td><td>5</td></tr>
       </table>
       <br />
-      <br />
-      <br />
-      <p>Für den richtigen Tipp eines Spieles bekommt man entweder 1 Punkt (Tendenz richtig getippt) oder 3 Punkte (Ergebnis richtig getippt).
+      <p>Für den richtigen Tipp eines Spieles bekommt man entweder 2 Punkt (Tendenz richtig getippt) oder 5 Punkte (Ergebnis richtig getippt).
       </p>
-      <br />
-      <br />
 	  <p>
       <br />Für den richtigen Tipp der Gruppenplazierung bekommt man entweder 1 Punkt oder 3 Punkte.
       <br /> 1 Punkt erhält man, wenn sich die getippte Mannschaft sich qualifiziert, aber die Platzierung falsch ist.
       <br /> 3 Punkte erhält man, wenn die getippte Platzierung korrekt ist. Somit kann man pro Gruppe max. 9 Punkte bekommen.
       <br />
-      <br />Für den richtigen Tipp der jeweiligen Finale bekommt man entweder 1 Punkt oder 3 Punkte.
-      <br /> 1 Punkt erhält man, wenn sich die getippte Mannschaft gewinnt.
-      <br /> 3 Punkte erhält man, wenn sich die getippte Mannschaft gewinnt und der Spielstand stimmt. Somit kann man pro Gruppe max. 9 Punkte bekommen.
+      <br />Für den richtigen Tipp der jeweiligen Finale bekommt man entweder 2 Punkt oder 5 Punkte.
+      <br /> 2 Punkt erhält man, wenn sich die getippte Mannschaft gewinnt.
+      <br /> 5 Punkte erhält man, wenn sich die getippte Mannschaft gewinnt und der Spielstand stimmt. Somit kann man pro Gruppe max. 9 Punkte bekommen.
       <br />
       <br />Das war es schon an Spielregeln ?
       <br />

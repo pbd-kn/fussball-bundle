@@ -1,374 +1,312 @@
-/* CSS Document */
-
-  /* --- Startseite --- */
-
-  .divhoyzerwetten {
-    text-shadow:
-      -2px -2px 0 #fff,
-      3px 2px 0 #000,
-      3px 3px 5px #216477;
-    color: #A65400;
-    font-size: 60px;
-  }
-  .divhoyzerwetten p {
-    margin: 0;
-  }
-
-  .divpraesentiert {
-    text-shadow:
-      -1px -1px 0 #fff,
-      2px 1px 0 #000,
-      3px 3px 5px #216477;
-    color: #a67400;
-    font-size: 40px;
-  }
-  .divpraesentiert p {
-    margin: 0;
-  }
-
-  .divwetttabelle {
-    margin-top: 10px;
-    text-shadow:
-      2px 1px 0 #000,
-      3px 3px 5px #216477;
-    color: #a61700;
-    font-size: 30px;
-  }
-  .divwetttabelle p {
-    margin: 0;
-  }
+/* =========================================================
+   HOYZER-WETTEN – BEREINIGTES CSS
+   - Startseite
+   - Kategorien / Scrollbereich
+   - Spiel-Boxen
+   - Standardtabellen / Spieletabelle
+   - Wetten-Tabellen
+   - Verwaltungsbereich
+   - Regeltabelle
+   ========================================================= */
 
 
-/* Spiele Tabelle Excel like */
-/* css für übersicht */
+/* ---------------------------------------------------------
+   STARTSEITE – Überschriften
+   --------------------------------------------------------- */
+
+.divhoyzerwetten {
+  text-shadow:
+    -2px -2px 0 #fff,
+    3px 2px 0 #000,
+    3px 3px 5px #216477;
+  color: #A65400;
+  font-size: 60px;
+}
+
+.divhoyzerwetten p {
+  margin: 0;
+}
+
+.divpraesentiert {
+  text-shadow:
+    -1px -1px 0 #fff,
+    2px 1px 0 #000,
+    3px 3px 5px #216477;
+  color: #a67400;
+  font-size: 40px;
+}
+
+.divpraesentiert p {
+  margin: 0;
+}
+
+.divwetttabelle {
+  margin-top: 10px;
+  text-shadow:
+    2px 1px 0 #000,
+    3px 3px 5px #216477;
+  color: #a61700;
+  font-size: 30px;
+}
+
+.divwetttabelle p {
+  margin: 0;
+}
+
+
+/* ---------------------------------------------------------
+   KATEGORIEN / HORIZONTALES SCROLLEN
+   (Gruppen-Übersichten mit Spielboxen)
+   --------------------------------------------------------- */
+
 .kategorie-row {
-/*
-    margin-bottom: 25px;
-    background-color: var(--pb-header-navi-bg); 
-*/
-    margin: 1rem;
+  margin: 1rem;
 }
 
 .kategorie-titel {
-    font-size: 28px;
-    font-weight: bold;
-    /* margin-bottom: 15px;*/
-    border-bottom: 3px solid var(--pb-text-color);
-    padding-bottom: 5px;
-    /*
-    color: var(--pb-text-color);
-    background-color: var(--pb-header-navi-bg);
-    */
+  font-size: 28px;
+  font-weight: bold;
+  border-bottom: 3px solid var(--pb-text-color);
+  padding-bottom: 5px;
 }
 
-/*
+/* Scrollbereich mit horizontalem Scrollen (für iPhone optimiert) */
 .kategorie-scroll {
-    display: flex;
-    gap: 4px;
-    overflow-x: auto;
-    padding-bottom: 12px;
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 12px;
+
+  -webkit-overflow-scrolling: touch;  /* flüssiges Scrollen auf iOS */
+  touch-action: pan-x;                /* horizontales Wischen erlauben */
+  -webkit-touch-callout: none;
 }
-*/
+
+/* Firefox-Scrollbar */
 .kategorie-scroll {
-    display: flex;
-    gap: 4px;
-    overflow-x: auto;
-    overflow-y: hidden;          /* verhindert vertikale Konflikte */
-    padding-bottom: 12px;
-
-    /* --- WICHTIG FÜR iPHONE --- */
-    -webkit-overflow-scrolling: touch;  /* aktiviert flüssiges Scrollen */
-    touch-action: pan-x;                /* erlaubt horizontales Wischen */
-    -webkit-touch-callout: none;
+  scrollbar-width: thin;              /* thin | auto | none */
 }
 
-/* Firefox */
-.kategorie-scroll {
-    scrollbar-width: thin;              /* thin | auto | none */
-/*    scrollbar-color: green yellow;      thumb | track */
-}
-
-
+/* WebKit-Scrollbars (Chrome, Safari, Edge) */
 .kategorie-scroll::-webkit-scrollbar {
-    height: 10px;
+  height: 10px;
 }
+
 .kategorie-scroll::-webkit-scrollbar-thumb {
-/*
-    background: #9B0034;
-*/
-    border-radius: 10px;
+  border-radius: 10px;
 }
+
 .kategorie-scroll::-webkit-scrollbar-track {
-    background: #e0e0e0;
-    /* background: yellow; */
+  background: #e0e0e0;
 }
 
+/* Einzelne Gruppe im Scrollbereich */
 .gruppe {
-    min-width: 100px;
-    flex-shrink: 0;
+  min-width: 100px;
+  flex-shrink: 0;                     /* verhindert Zusammenquetschen */
 }
 
+/* Titel einer Gruppe */
 .gruppen-titel {
-/*
-    background: #9B0034;
-    color: white;
-*/    
-    text-align: center;
-    padding: 5px;
-    font-size: 18px;
-    font-weight: bold;
-    border-radius: 10px 10px 0 0;
+  text-align: center;
+  padding: 5px;
+  font-size: 18px;
+  font-weight: bold;
+  border-radius: 10px 10px 0 0;
 }
 
-/* ---- GRUPPENTABELLE ---- */
+/* Tabelle innerhalb einer Gruppe */
 .gruppen-tabelle {
-    width: 100%;
-    border: 1px solid var(--pb-text-color);
-    border-collapse: collapse;
-    margin-bottom: 4px;
-/*
-    background: white;
-*/
-    font-size: 12px;
-    border-radius: 10px;
-    }
+  width: 100%;
+  border: 1px solid var(--pb-text-color);
+  border-collapse: collapse;
+  margin-bottom: 4px;
+  font-size: 12px;
+  border-radius: 10px;
+}
 
 .gruppen-tabelle th,
 .gruppen-tabelle td {
-    border: 1px solid var(--pb-text-color);
-    padding: 2px 4px;
-    text-align: center;
+  border: 1px solid var(--pb-text-color);
+  padding: 2px 4px;
+  text-align: center;
 }
 
 .gruppen-tabelle .team-cell {
-    text-align: left;
+  text-align: left;
 }
 
+/* kleine Flaggen in Gruppentabellen */
 .flag-small {
-    height: 12px;
-    vertical-align: middle;
-    margin-right: 4px;
+  height: 12px;
+  vertical-align: middle;
+  margin-right: 4px;
 }
 
-/* ---- Spiele ---- */
+
+/* ---------------------------------------------------------
+   SPIEL-BOXEN (unterhalb der Gruppentabellen)
+   --------------------------------------------------------- */
+
 .spiel-box {
-/*
-    background: #fafafa;
-*/
-    border: 1px solid var(--pb-text-color);
-    padding: 5px;
-    margin-bottom: 6px;
-    border-radius: 10px;
-    font-size: 13px;
+  border: 1px solid var(--pb-text-color);
+  padding: 5px;
+  margin-bottom: 6px;
+  border-radius: 10px;
+  font-size: 13px;
 }
 
 .sp-kopf {
-    text-align: center;
-    font-weight: bold;
-    margin-bottom: 4px;
-    color: #333;
-    font-size: 12px;
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 4px;
+  color: #333;
+  font-size: 12px;
 }
 
 .team {
-    display: flex;
-    justify-content: space-between;
+  display: flex;
+  justify-content: space-between;
 }
+
 .team-name {
-    display: flex;
-    align-items: center;
-    gap: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
+
 .flag {
-    height: 14px;
+  height: 14px;
 }
+
 .team-score {
-    font-weight: bold;
+  font-weight: bold;
 }
 
 .sp-nr {
-    text-align: left;
-    margin-top: 4px;
-    font-size: 11px;
-    color: #777;
+  text-align: left;
+  margin-top: 4px;
+  font-size: 11px;
+  color: #777;
 }
 
-/* restliche tebellen mit table */
 
-  /*   Tabellen */
+/* ---------------------------------------------------------
+   TABELLEN – Allgemein / Standard
+   --------------------------------------------------------- */
 
-  .tabellenueberschrift {
-    font-size:30px;
-    font-weight:bold;
-    margin-bottom:20px;
-    text-align:center;
-  }
-
-  /* Standardtabellen */
-
-  .tablecss{
-    width:90%;
-    margin:2rem;
-    table-layout:fixed;
-    border-collapse:collapse;
-    border-spacing:0;
-    border:1px solid black;
-
-
-
-  }
-.tablecss td,th {
-        padding-left:0.5%;
-        padding-right:0.5%;
-        border:1px solid black;
-        width:initial;
-}
-.tablecss tr:nth-child(odd){              /* alternierende Farbe 1 */
-      background-color:var(--pb-tableodd);
-}
-.tablecss tr:nth-child(even){              /* alternierende Farbe 1 */
-      background-color:var(--pb-tableeven);
+.tabellenueberschrift {
+  font-size: 30px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  text-align: center;
 }
 
-#regeltabelle {
-    width: 100%;
-  }
-  
-  #regeltabelle p,#regeltabelle table {
-    margin-left:15px;
-    //color:#025167;
-  }
-  #regeltabelle table {
-    width:50% !important;
-  }
-  
+/* Standard-Tabellenlayout (Spieletabelle, Übersichten etc.) */
+.tablecss {
+  width: 90%;
+  margin: 2rem;
+  table-layout: fixed;
+  border-collapse: collapse;
+  border-spacing: 0;
+  border: 1px solid #000;
+}
 
-  // Spieletabelle  (Class ist .tablecss )
+.tablecss td,
+.tablecss th {
+  padding: 0 0.5%;
+  border: 1px solid #000;
+  width: initial;
+}
 
-  /* css für spieluebersicht */
-  .spielnrcss, .datumcss, .gruppecss, .heimcss, .scorecss, .ortcss, .auswaertscss { vertical-align:top;}
-  .spielnrcss,  .gruppecss, .scorecss, .ortcss {text-align:right;}.heimcss, .auswaertscss {text-align:left;}
-  .datumcss {text-align:center;}
-  .spielnrcss{width:15px;}
-  .gruppecss {width:2rem;}
-  .scorecss{width:50px;}
-  .ortcss {width:130px;}
-  .datumcss {width:35px;}
-  .heimcss {width:5rem;}
-  .auswaertscss {width:5rem;}
+.tablecss tr:nth-child(odd) {
+  background-color: var(--pb-tableodd);
+}
 
-  // Wetten
-  
-
-#tblOnlinWette table,#tblOnlinWette td, #tblOnlinWette th {
-      border: 1px solid black;
-    }
-
-/* restliche tabellen mit table */
-  /* --- Tabellenüberschriften --- */
-
-  .tabellenueberschrift {
-    font-size: 30px;
-    font-weight: bold;
-    margin-bottom: 20px;
-    text-align: center;
-  }
+.tablecss tr:nth-child(even) {
+  background-color: var(--pb-tableeven);
+}
 
 
-  /* --- Standardtable --- */
+/* ---------------------------------------------------------
+   SPIELETABELLE – Zellenbreiten / Ausrichtung
+   (Classen: .spielnrcss, .datumcss, .gruppecss, .heimcss, etc.)
+   --------------------------------------------------------- */
 
-  .tablecss {
-    width: 90%;
-    margin: 2rem;
-    table-layout: fixed;
-    border-collapse: collapse;
-    border-spacing: 0;
-    border: 1
-    10px solid #000;
-  }
-  .tablecss td,
-  .tablecss th {
-    padding: 0 0.5%;
-    border: 1px solid #000;
-    width: initial;
-  }
-  .tablecss tr:nth-child(odd) {
-    background-color: var(--pb-tableodd);
-  }
-  .tablecss tr:nth-child(even) {
-    background-color: var(--pb-tableeven);
-  }
+.spielnrcss,
+.datumcss,
+.gruppecss,
+.heimcss,
+.scorecss,
+.ortcss,
+.auswaertscss {
+  vertical-align: top;
+}
 
+.spielnrcss,
+.gruppecss,
+.scorecss,
+.ortcss {
+  text-align: right;
+}
 
-  /* --- Regeltabelle --- */
+.heimcss,
+.auswaertscss {
+  text-align: left;
+}
 
-  #regeltabelle p,
-  #regeltabelle table {
-    margin-left: 15px;
-  }
-  #regeltabelle table {
-    width: inherit;
-  }
+.datumcss {
+  text-align: center;
+}
 
-
-  /* --- Spieletabelle Layout als table --- */
-
-  .spielnrcss,
-  .datumcss,
-  .gruppecss,
-  .heimcss,
-  .scorecss,
-  .ortcss,
-  .auswaertscss {
-    vertical-align: top;
-  }
-
-  .spielnrcss,
-  .gruppecss,
-  .scorecss,
-  .ortcss {
-    text-align: right;
-  }
-
-  .heimcss,
-  .auswaertscss {
-    text-align: left;
-  }
-
-  .datumcss {
-    text-align: center;
-  }
-
-  .spielnrcss { width: 15px; }
-  .gruppecss  { width: 2rem; }
-  .scorecss   { width: 50px; }
-  .ortcss     { width: 130px; }
-  .datumcss   { width: 35px; }
-  .heimcss    { width: 5rem; }
-  .auswaertscss { width: 5rem; }
+.spielnrcss  { width: 15px; }
+.gruppecss   { width: 2rem; }
+.scorecss    { width: 50px; }
+.ortcss      { width: 130px; }
+.datumcss    { width: 35px; }
+.heimcss     { width: 5rem; }
+.auswaertscss { width: 5rem; }
 
 
-  /* --- Wetten --- */
+/* ---------------------------------------------------------
+   WETTEN – Tabellenbereich (#tblOnlinWette)
+   --------------------------------------------------------- */
 
-  #tblOnlinWette table,
-  #tblOnlinWette td,
-  #tblOnlinWette th {
-    border: 1px solid #000;
-  }
+#tblOnlinWette table,
+#tblOnlinWette td,
+#tblOnlinWette th {
+  border: 1px solid #000;
+}
 
-  .contentverwaltung {
-    background-color: lightgray;
-    /* height: 400px; */
-    overflow-y: auto;
-  }
-  .verwtablecss {
 
-    table, td, th {
-      border: 1px solid black;
-    }
- 
-  }
-  
-  /* eingabe formular anmelden */
-  
-  
+/* ---------------------------------------------------------
+   REGELTABELLE
+   --------------------------------------------------------- */
+
+#regeltabelle p,
+#regeltabelle table {
+  margin-left: 15px;
+}
+
+/* Breite der Regeltabelle – ggf. anpassen */
+#regeltabelle table {
+  width: inherit;
+}
+
+
+/* ---------------------------------------------------------
+   VERWALTUNG
+   --------------------------------------------------------- */
+
+.contentverwaltung {
+  background-color: lightgray;
+  overflow-y: auto;
+}
+
+/* Tabellen im Verwaltungsbereich */
+.verwtablecss table,
+.verwtablecss td,
+.verwtablecss th {
+  border: 1px solid #000;
+}
