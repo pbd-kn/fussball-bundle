@@ -70,7 +70,7 @@ class FeWettenController extends AbstractFussballController
         \System::log('PBD FeWettenController ', __METHOD__, TL_GENERAL);
 
         parent::__construct($dependencyAggregate);  // standard Klassen plus akt. Wettbewerb lesen
-                                                    // AbstractFussballController übernimmt sie in die akt Klasse
+                                                    // AbstractFussballController Ã¼bernimmt sie in die akt Klasse
 //        \System::log('PBD Spielecontroller nach dependencyAggregate', __METHOD__, TL_GENERAL);
         $this->framework = $framework;
         $this->twig = $twig;
@@ -124,7 +124,7 @@ class FeWettenController extends AbstractFussballController
         while ($row = $stmt->fetchAssociative()) {
             $details = [];
 
-            // Zusatzdaten für Spielwetten
+            // Zusatzdaten fÃ¼r Spielwetten
             if ($row['Art'] === 's') {
                 $sqlSp = "
                     SELECT
@@ -147,7 +147,7 @@ class FeWettenController extends AbstractFussballController
             ];
         }
 
-        // --- Ausgabe über HTML5-Template
+        // --- Ausgabe Ã¼ber HTML5-Template
         $tpl = new \Contao\FrontendTemplate('ce_fe_fussball_wetten');
         $tpl->wettbewerb = $Wettbewerb;
         $tpl->datumStart = $this->fussballUtil->getDatum($this->aktWettbewerb,'start');

@@ -70,7 +70,7 @@ class FeEndstandController extends AbstractFussballController
         \System::log('PBD FeEndstandController ', __METHOD__, TL_GENERAL);
 
         parent::__construct($dependencyAggregate);  // standard Klassen plus akt. Wettbewerb lesen
-                                                    // AbstractFussballController ¸bernimmt sie in die akt Klasse
+                                                    // AbstractFussballController √ºbernimmt sie in die akt Klasse
 //        \System::log('PBD Spielecontroller nach dependencyAggregate', __METHOD__, TL_GENERAL);
         $this->framework = $framework;
         $this->twig = $twig;
@@ -121,7 +121,7 @@ class FeEndstandController extends AbstractFussballController
       * Parameter 
       * Art = Arte der Wette (s  .
       * W1, W2 abgegebne Werte
-      * Tipp1,Tipp2,Tipp3 tats‰chliche werte
+      * Tipp1,Tipp2,Tipp3 tats√§chliche werte
       * Bedeutung von Art
       * s  Spiele Wette  auf Tore
       *     W1 = Anzahl Tore Mannnschaft 1 (gewettet)
@@ -175,7 +175,7 @@ class FeEndstandController extends AbstractFussballController
 	        } else {
 	          $erg = 1;
 	        }
-            //echo "tats‰chlich $erg ";
+            //echo "tats√§chlich $erg ";
             $werg = 0;             // -1 = Mannnschaft 1 gewonnen 0 unentschieden 1 Mannnschaft 2 gewonnen
 	        if ($W1 == $W2) {
 	          $werg = 0;
@@ -210,12 +210,12 @@ class FeEndstandController extends AbstractFussballController
 	    }  
      }
   
-      // extrafunktion f¸r Gruppenpunkte
+      // extrafunktion f√ºr Gruppenpunkte
       /*
        * Parameter 
        * Art = Arte der Wette (s  .
        * W1, W2, W3 abgegebne Werte
-       * Tipp1,Tipp2,Tipp3 tats‰chliche werte
+       * Tipp1,Tipp2,Tipp3 tats√§chliche werte
        * Bedeutung von Art
        * g  Spiele Wette  Platz 1 Platz 2
        *     W1 = Manschaftsindex Platz 1 (gewettet)
@@ -443,7 +443,7 @@ class FeEndstandController extends AbstractFussballController
         $res="";           // Result html
         $rowcnt=0;
         if ($debug) echo "Start Gruppenerzeugung<br>\n";
-	    // selectiere alle Gruppen mit den aktuellen Pl‰tzen Gruppen einlesen
+	    // selectiere alle Gruppen mit den aktuellen Pl√§tzen Gruppen einlesen
         $sql  = "SELECT";
         $sql .= " tl_hy_gruppen.ID as 'ID',";
         $sql .= " tl_hy_gruppen.Gruppe as 'Gruppe',";
@@ -542,14 +542,14 @@ class FeEndstandController extends AbstractFussballController
        $res.=$c->end_thead();$res.=$c->tbody();
        $rowcnt++;
        $akttlnmr="";         // aktueller Teilnehmername. bei aenderung nue Zeile ausgeben
-       $gesamtsumme=0;       // Summe der Punkte f¸r diesen Teilnehmer (akttlnmr)
-	   $gesamttext="";       // Text der Punkte f¸r diesen Teilnehmer (akttlnmr)
+       $gesamtsumme=0;       // Summe der Punkte f√ºr diesen Teilnehmer (akttlnmr)
+	   $gesamttext="";       // Text der Punkte f√ºr diesen Teilnehmer (akttlnmr)
        if($debug) echo "tkn lng ".count($teilnehmer)."<br>";
        foreach ($teilnehmer as $tln) {
 	     if (strtolower ($tln['Art']) == 'g' ) {     // nur Gruppenwetten Auswerten
            if ($tln['Kurzname'] != $akttlnmr) { // neue Zeile
              if ( $akttlnmr != "") {
-		      // Vorher noch Gesamtsumme ausgeben in der aktuellen Zeile f¸r akttlnmr ausgeben
+		      // Vorher noch Gesamtsumme ausgeben in der aktuellen Zeile f√ºr akttlnmr ausgeben
 		      $res.=$c->td("$gesamttext = $gesamtsumme");
 		      $gesamttext="";
 		      $gesamtsumme=0;
@@ -626,9 +626,9 @@ class FeEndstandController extends AbstractFussballController
       *    tl_hy_wetten.Pok as 'Pok'";   // 
       *    tl_hy_wetten.Ptrend as 'Ptrend'";   
       *    tl_hy_wetten.Kommentar as 'Kommentar'";   
-      *    mannschaftP.Nation as 'MPNation'";      Gilt f¸r Platzwette Mannschafts id aus Tipp1
-      *    mannschaftP.Flagge as 'MPFlagge'";      Gilt f¸r Platzwette Mannschafts id aus Tipp1
-      *    mannschaftP.ID as 'MPInd'";             Gilt f¸r Platzwette Mannschafts id aus Tipp1    
+      *    mannschaftP.Nation as 'MPNation'";      Gilt f√ºr Platzwette Mannschafts id aus Tipp1
+      *    mannschaftP.Flagge as 'MPFlagge'";      Gilt f√ºr Platzwette Mannschafts id aus Tipp1
+      *    mannschaftP.ID as 'MPInd'";             Gilt f√ºr Platzwette Mannschafts id aus Tipp1    
       * 
       * $teilnehmeraktWetten = Akutelle Wetten aller Teilnehmer index strtolower(Name)
       *    tl_hy_teilnehmer.ID as 'ID'";
@@ -810,7 +810,7 @@ class FeEndstandController extends AbstractFussballController
     $teilnehmeraktWetten=array();
     $stmt = $conn->executeQuery ($sql);
     $num_rows = $stmt->rowCount();    
-    while ($row = $stmt->fetchAssociative()) {   // teilnehmer merken sortiert nach Wettart incl. zugehˆrigen Wettaktuall und wette
+    while ($row = $stmt->fetchAssociative()) {   // teilnehmer merken sortiert nach Wettart incl. zugeh√∂rigen Wettaktuall und wette
       $teilnehmer[strtolower((string)$row['Art'])][]=$row;
       $teilnehmeraktWetten[strtolower((string)$row['Name'])][]=$row;
 	}
@@ -872,13 +872,13 @@ class FeEndstandController extends AbstractFussballController
      *                                             // Halb
      *                                             // Finale
      *                                             // Meister (EM oder WM)
-     *     mannschaft1.Nation as 'M1'";            // mannschaft1 mannschaft ausgew‰hlt aus M1 (bei Spielewette);
+     *     mannschaft1.Nation as 'M1'";            // mannschaft1 mannschaft ausgew√§hlt aus M1 (bei Spielewette);
      *     mannschaft1.ID as 'M1Ind'";
-     *     mannschaft2.Nation as 'M2'";            // mannschaft2 mannschaft ausgew‰hlt aus M2 (bei Spielewette);
+     *     mannschaft2.Nation as 'M2'";            // mannschaft2 mannschaft ausgew√§hlt aus M2 (bei Spielewette);
      *     mannschaft2.ID as 'M2Ind'";
-     *     mannschaft3.Nation as 'M3'";            // mannschaft3 mannschaft ausgew‰hlt aus M3 (bei Spielewette);
+     *     mannschaft3.Nation as 'M3'";            // mannschaft3 mannschaft ausgew√§hlt aus M3 (bei Spielewette);
      *     mannschaft3.ID as 'M3Ind'";
-     *     mannschaftP.Nation as 'MPNation'";      // mannschaftP mannschaft ausgew‰hlt aus tl_hy_wetten.Tipp1 as 'Tipp1' (P-Wette);
+     *     mannschaftP.Nation as 'MPNation'";      // mannschaftP mannschaft ausgew√§hlt aus tl_hy_wetten.Tipp1 as 'Tipp1' (P-Wette);
      *     mannschaftP.ID as 'MPInd'";
      */
 

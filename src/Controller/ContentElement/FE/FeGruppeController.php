@@ -69,7 +69,7 @@ class FeGruppeController extends AbstractFussballController
         \System::log('PBD Gruppecontroller ', __METHOD__, TL_GENERAL);
 
         parent::__construct($dependencyAggregate);  // standard Klassen plus akt. Wettbewerb lesen
-                                                    // AbstractFussballController ¸bernimmt sie in die akt Klasse
+                                                    // AbstractFussballController √ºbernimmt sie in die akt Klasse
 //        \System::log('PBD Spielecontroller nach dependencyAggregate', __METHOD__, TL_GENERAL);
         $this->framework = $framework;
         $this->twig = $twig;
@@ -111,7 +111,7 @@ class FeGruppeController extends AbstractFussballController
     {
         $Wettbewerb = $this->aktWettbewerb['aktWettbewerb'];
 
-        // Definition der WHERE-Bedingungen f¸r die Gruppen
+        // Definition der WHERE-Bedingungen f√ºr die Gruppen
         $whereArr = [
             " AND NOT (tl_hy_gruppen.Gruppe LIKE '%Sechz%') 
               AND NOT (tl_hy_gruppen.Gruppe LIKE '%Achtel%')
@@ -155,7 +155,7 @@ class FeGruppeController extends AbstractFussballController
             return $this->connection->fetchAllAssociative($sql, [$Wettbewerb]);
         };
 
-        // Alle Gruppens‰tze laden
+        // Alle Gruppens√§tze laden
         $gruppenListen = [];
         foreach ($whereArr as $strWhere) {
             $gruppen = $loadGruppen($strWhere);

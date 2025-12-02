@@ -69,7 +69,7 @@ class FeRegelController extends AbstractFussballController
         \System::log('PBD FeRegelController ', __METHOD__, TL_GENERAL);
 
         parent::__construct($dependencyAggregate);  // standard Klassen plus akt. Wettbewerb lesen
-                                                    // AbstractFussballController übernimmt sie in die akt Klasse
+                                                    // AbstractFussballController Ã¼bernimmt sie in die akt Klasse
 //        \System::log('PBD FeRegelController nach dependencyAggregate', __METHOD__, TL_GENERAL);
         $this->framework = $framework;
         $this->twig = $twig;

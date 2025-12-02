@@ -76,7 +76,7 @@ class WettbewerbController extends AbstractFussballController
         \System::log('PBD Wettbewerbcontroller ', __METHOD__, TL_GENERAL);
 
         parent::__construct($dependencyAggregate);  // standard Klassen plus akt. Wettbewerb lesen
-                                                    // AbstractFussballController übernimmt sie in die akt Klasse
+                                                    // AbstractFussballController Ã¼bernimmt sie in die akt Klasse
         \System::log('PBD Wettbewerbcontroller nach dependencyAggregate', __METHOD__, TL_GENERAL);
         $this->framework = $framework;
         $this->twig = $twig;
@@ -148,7 +148,7 @@ class WettbewerbController extends AbstractFussballController
   	       var par = "ID=" + id + "&aktion=d";
            var par = jQuery("#inputForm :input").serialize() + "&ID=" + id + "&aktion=d"; 
            var url =  '/fussball/bearbeitewettbewerb/d/'+id;
-//alert('wettbewerb Löschen '+url);
+//alert('wettbewerb LÃ¶schen '+url);
            jQuery.get(url, function(data, status){
              jQuery("#result").html(data['data']);        // ergebnis in div result ablegen
            });
