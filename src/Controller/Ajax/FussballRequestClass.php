@@ -285,9 +285,6 @@ EOT;
             + (myA['ID']        || -1) + '/'
             + (myA['name']      || -1) + '/'
             + (myA['nation']    || -1) + '/'
-            + (myA['Gruppe']    || 'A') + '/'
-            + (myA['M2']        || -1) + '/'
-            + (myA['T1']        || -1) + '/'
             + (myA['Gruppe']    || 'A');
 console.log('url: '+url);
           jQuery.get(url, function(data, status){
