@@ -888,6 +888,7 @@ class FeEndstandController extends AbstractFussballController
      loescheTlnPunkte($this->connection,$Wettbewerb);
      //echo "<br>Alle Teilnehmerpunkte gel&ouml;scht<br>";
      //echo "<br>erzeuge Deutschlandgruppe<br>";
+     if (count($teilnehmer) !=  0) {
      $html.=createSpielegruppe($this->cgiUtil,$this->fussballUtil,$conn,$Wettbewerb,$deutschlandgruppe,$teilnehmer['s'],'Deutschland Gruppenspiele','Deutschland');
      $html.=createGruppen($this->cgiUtil,$this->fussballUtil,$conn,$Wettbewerb,$teilnehmer['g']);
      $html.=createSpielegruppe($this->cgiUtil,$this->fussballUtil,$conn,$Wettbewerb,'achtel%',$teilnehmer['s'],'Achtelfinale');
@@ -895,7 +896,9 @@ class FeEndstandController extends AbstractFussballController
      $html.=createSpielegruppe($this->cgiUtil,$this->fussballUtil,$conn,$Wettbewerb,'halb%',$teilnehmer['s'],'Halbfinale');
      $html.=createSpielegruppe($this->cgiUtil,$this->fussballUtil,$conn,$Wettbewerb,'finale',$teilnehmer['s'],'Finale');
      $html.=createPuV($this->cgiUtil,$this->fussballUtil,$conn,$Wettbewerb,$wetten,$teilnehmeraktWetten,["p","v"],'Platz und Vergleich');
-
+     } else {
+        $html.= "<p>es existierern noch keine Teilnehmer</p>";             
+     }
 
      $response = new Response($html,Response::HTTP_OK,['content-type' => 'text/html']);
      return $response;
