@@ -233,7 +233,7 @@ EOT;
             $stmt = $conn->executeQuery($sql);
             $optarray= array();
             while (($row = $stmt->fetchAssociative()) !== false) {
-                $optarray[$nation] = $row['Nation'];
+                $optarray[$row['Nation']] = $row['Nation'];
             }     
             $res=$cgi->select($name, $optarray,$selected);
             return $res;
