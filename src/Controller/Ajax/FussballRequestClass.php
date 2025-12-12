@@ -92,115 +92,109 @@ class FussballRequestClass extends AbstractController
  */
   public function anzeigewettbewerb(string $aktion, int $ID=-1)
   {
-      $c=$this->cgiUtil;
-      $Name="";   // Wettbewerb Name
-      $Gruppen="";   // Wettbewerb Anzahl Gruppen
-      $DGruppe="";   // Wettbewerb Deutschland Gruppe
-      $StartDatum="";   // Wettbewerb startDatum
-      $EndeDatum="";   // Wettbewerb endeDatum
-      $html="";      // gerenderte
-      $debug="";     //  debuginfo
+        $c=$this->cgiUtil;
+        $Name="";   // Wettbewerb Name
+        $Gruppen="";   // Wettbewerb Anzahl Gruppen
+        $DGruppe="";   // Wettbewerb Deutschland Gruppe
+        $StartDatum="";   // Wettbewerb startDatum
+        $EndeDatum="";   // Wettbewerb endeDatum
+        $html="";      // gerenderte
+        $debug="";     //  debuginfo
         $my_script_txt = <<< EOT
-        <script language="javascript" type="text/javascript">
-        function uebernehmen() {     /* neuer aktueller Wettbewerb */
-          var _par = jQuery("#inputForm :input").serialize();   // ich habe den Eindruck nur so bekomme ich die Werte
-//console.log('par: '+_par);
-          var _inputArr = _par.split("&");
-          let myA=[];
-          for (var x = 0; x < _inputArr.length; x++) {
-            var _kv = _inputArr[x].split("=");
-            myA[_kv[0]] = _kv[1];
-            //console.log(_kv);
-          }
-          //var url =  '/fussball/bearbeitewettbewerb/'+myA['aktion']+'/'+myA['ID']+'/'+myA['Wettbewerb']+'/'+myA['anzahlGruppen']+'/'+myA['deutschlandGruppe']+'/'+myA['startDatum']+'/'+myA['endeDatum'];
-        var url = '/fussball/bearbeitewettbewerb/'
-            + (myA['aktion']    || 'n') + '/'
-            + (myA['ID']        || -1) + '/'
-            + (myA['Wettbewerb']      || '??') + '/'
-            + (myA['anzahlGruppen']    || 4) + '/'
-            + (myA['deutschlandGruppe']    || 'A') + '/'
-            + (myA['startDatum']        || '2000-01-01') + '/'
-            + (myA['endeDatum']    || '2000-01-01');
-
-console.log('url: '+url);
-          jQuery.get(url, function(data, status){
-             errortxt=data['error'];
-             if (errortxt != '') {
-               jQuery("#result").html(errortxt);
-             } else {
-               location.reload();
-             }
-          });
-
-        }
-        function abbrechen() {
-          location.reload();
-        }
-        </script>
+<script>
+function uebernehmen() {
+    // Form auslesen (ersetzt serialize())
+    const form = document.querySelector("#inputForm");
+    const fd   = new FormData(form);
+    const myA  = Object.fromEntries(fd.entries());
+    // URL zusammenbauen
+    const url = "/fussball/bearbeitewettbewerb/"
+        + (myA['aktion']            || 'n')        + "/"
+        + (myA['ID']                || -1)         + "/"
+        + encodeURIComponent(myA['Wettbewerb']      || '??') + "/"
+        + (myA['anzahlGruppen']     || 4)          + "/"
+        + (myA['deutschlandGruppe'] || 'A')        + "/"
+        + (myA['startDatum']        || '2000-01-01') + "/"
+        + (myA['endeDatum']         || '2000-01-01');
+    console.log("url:", url);
+    // fetch statt jQuery.get
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                document.querySelector("#result").innerHTML = data.error;
+            } else {
+                location.reload();
+            }
+        })
+        .catch(err => {
+            document.querySelector("#result").innerHTML =
+                "Fetch-Fehler: " + err;
+        });
+}
+function abbrechen() {
+    location.reload();
+}
+</script>
 EOT;
-      $html.=$my_script_txt;              
-      $id=$ID;
-      if ($id !=-1) {
-        // Wettbewerb einlesen
-        $sql="SELECT * from tl_hy_config where ID='$ID' LIMIT 1;";
-        $debug .= "sql: $sql  ";	
-        $stmt = $this->connection->executeQuery(
-            'SELECT * FROM tl_hy_config WHERE ID = ? ',
-            [$ID],
-        );
-        /*
-        while (($row = $stmt->fetchAssociative()) !== false) {
-          echo $row['headline'];
-        } 
-        */  
-        $num_rows = $stmt->rowCount();    
-        $debug .= "Anzahl: $num_rows  ";	
-        $row = $stmt->fetchAssociative();  // s. Doctrine\DBAL
-        $Name=$row['value1'];
-        $Gruppen=$row['value2'];
-        $DGruppe=$row['value3'];
-        $StartDatum=$row['value4'];
-        $EndeDatum=$row['value5'];
-        $html.="Wettbewerb &auml;ndern<br>\n";
-      } else {
-        $html.="Wettbewerb neu eintragen<br>\n";
-      }
-      $debug.='ID: '.$ID.' Name: '.$Name.' Gruppen: '.$Gruppen.' DGruppe: '.$DGruppe.' StartDatum: '.$StartDatum.' EndeDatum: '.$EndeDatum;
+        $html.=$my_script_txt;              
+        $id=$ID;
+        if ($id !=-1) {
+            // Wettbewerb einlesen
+            $sql="SELECT * from tl_hy_config where ID='$ID' LIMIT 1;";
+            $debug .= "sql: $sql  ";	
+            $stmt = $this->connection->executeQuery(
+                'SELECT * FROM tl_hy_config WHERE ID = ? ',
+                [$ID],
+            );
+            $num_rows = $stmt->rowCount();    
+            $debug .= "Anzahl: $num_rows  ";	
+            $row = $stmt->fetchAssociative();  // s. Doctrine\DBAL
+            $Name=$row['value1'];
+            $Gruppen=$row['value2'];
+            $DGruppe=$row['value3'];
+            $StartDatum=$row['value4'];
+            $EndeDatum=$row['value5'];
+            $html.="Wettbewerb &auml;ndern<br>\n";
+        } else {
+            $html.="Wettbewerb neu eintragen<br>\n";
+        }
+        $debug.='ID: '.$ID.' Name: '.$Name.' Gruppen: '.$Gruppen.' DGruppe: '.$DGruppe.' StartDatum: '.$StartDatum.' EndeDatum: '.$EndeDatum;
 
-// create output
-      $html.= $c->Button(array("onClick"=>"uebernehmen();"),"&Uuml;bernehmen","uebernehmen") . "\n";
-      $html.= $c->Button(array("onClick"=>"abbrechen();"),"Abbrechen","Abbrechen") . "<br>\n";
-      $html.= $c->start_form("", null,null,array("id"=>"inputForm"));
-      $html.= $c->hidden("id", $ID);                    // zur weitergabe bei übernehmen
-      $html.= $c->hidden("aktion", $aktion);                    // zur weitergabe bei übernehmen
+        // create output
+        $html.= $c->Button(array("onClick"=>"uebernehmen();"),"&Uuml;bernehmen","uebernehmen") . "\n";
+        $html.= $c->Button(array("onClick"=>"abbrechen();"),"Abbrechen","Abbrechen") . "<br>\n";
+        $html.= $c->start_form("", null,null,array("id"=>"inputForm"));
+        $html.= $c->hidden("id", $ID);                    // zur weitergabe bei übernehmen
+        $html.= $c->hidden("aktion", $aktion);                    // zur weitergabe bei übernehmen
   
-      $html.= $c->table (array("border"=>1));
-      $html.= $c->tr();
-      $html.= $c->td(array("valign"=>"top"),"Wettbewerb");
-      if ($ID==-1) {  // neueEingabe
-        $html.= $c->td(array("valign"=>"top"),$c->textfield(array("name"=>"Wettbewerb","value"=>""))) . "\n";
-      } else {
-        $html.= $c->td(array("valign"=>"top"),$c->textfield(array("name"=>"Wettbewerb","readonly"=>true,"value"=>"$Name"))) . "\n";
-      }
-      $html.= $c->end_tr() . $c->tr() . "\n";
-      $html.= $c->td(array("valign"=>"top"),"Anzahl Gruppen");
-      $html.= $c->td(array("valign"=>"top"),$c->textfield(array("name"=>"anzahlGruppen","value"=>"$Gruppen"))) . "\n";
-      $html.= $c->end_tr() . $c->tr() . "\n";
-      $html.= $c->td(array("valign"=>"top"),"Deutschlandgruppe");
-      $html.= $c->td(array("valign"=>"top"),$c->textfield(array("name"=>"deutschlandGruppe","value"=>"$DGruppe"))) . "\n";
-      $html.= $c->end_tr() . "\n";
-      $html.= $c->td(array("valign"=>"top"),"Beginn JJJJ-MM-TT");
-      $html.= $c->td(array("valign"=>"top"),$c->textfield(array("name"=>"startDatum","value"=>"$StartDatum"))) . "\n";
-      $html.= $c->end_tr() . "\n";
-      $html.= $c->td(array("valign"=>"top"),"Ende JJJJ-MM-TT");
-      $html.= $c->td(array("valign"=>"top"),$c->textfield(array("name"=>"endeDatum","value"=>"$EndeDatum"))) . "\n";
-      $html.= $c->end_tr() . "\n";
-      $html.= $c->end_table() . "\n";
-      $html.= $c->end_form();
+        $html.= $c->table (array("border"=>1));
+        $html.= $c->tr();
+        $html.= $c->td(array("valign"=>"top"),"Wettbewerb");
+        if ($ID==-1) {  // neueEingabe
+            $html.= $c->td(array("valign"=>"top"),$c->textfield(array("name"=>"Wettbewerb","value"=>""))) . "\n";
+        } else {
+            $html.= $c->td(array("valign"=>"top"),$c->textfield(array("name"=>"Wettbewerb","readonly"=>true,"value"=>"$Name"))) . "\n";
+        }
+        $html.= $c->end_tr() . $c->tr() . "\n";
+        $html.= $c->td(array("valign"=>"top"),"Anzahl Gruppen");
+        $html.= $c->td(array("valign"=>"top"),$c->textfield(array("name"=>"anzahlGruppen","value"=>"$Gruppen"))) . "\n";
+        $html.= $c->end_tr() . $c->tr() . "\n";
+        $html.= $c->td(array("valign"=>"top"),"Deutschlandgruppe");
+        $html.= $c->td(array("valign"=>"top"),$c->textfield(array("name"=>"deutschlandGruppe","value"=>"$DGruppe"))) . "\n";
+        $html.= $c->end_tr() . "\n";
+        $html.= $c->td(array("valign"=>"top"),"Beginn JJJJ-MM-TT");
+        $html.= $c->td(array("valign"=>"top"),$c->textfield(array("name"=>"startDatum","value"=>"$StartDatum"))) . "\n";
+        $html.= $c->end_tr() . "\n";
+        $html.= $c->td(array("valign"=>"top"),"Ende JJJJ-MM-TT");
+        $html.= $c->td(array("valign"=>"top"),$c->textfield(array("name"=>"endeDatum","value"=>"$EndeDatum"))) . "\n";
+        $html.= $c->end_tr() . "\n";
+        $html.= $c->end_table() . "\n";
+        $html.= $c->end_form();
   
-      $html = utf8_encode($html);
-	  return new JsonResponse(['dir'=>__DIR__,'data' => $html,'debug'=>$debug]); 
-  }
+        $html = utf8_encode($html);
+        return new JsonResponse(['dir'=>__DIR__,'data' => $html,'debug'=>$debug]); 
+    }
   
 
 /* erzeugt das Formular und Buttons zur Eingabe einer Mannschaft
@@ -220,158 +214,151 @@ EOT;
  *        : abbrechen 
  */
 
+
     #[Route( '/fussball/anzeigemannschaft/{aktion}/{ID}', name: 'FussballRequestClass_anzeigemannschaft', defaults: ['_scope' => 'frontend'] ) ]
     /**
      * @throws \Exception
      * @throws DoctrineDBALException
      */
 
-  public function anzeigemannschaft(string $aktion, int $ID=-1)
-  {
+    public function anzeigemannschaft(string $aktion, int $ID=-1)
+    {
 
-    function createNationOption ($conn,$cgi,$name,$selected,$type) {
-      if (empty($type)) {
-	    $sql = "select * From tl_hy_nation ORDER BY Nation ASC";
-      }else {
-	    $sql = "select * From tl_hy_nation where Type like '$type' ORDER BY Nation ASC";
-      }
-//echo "type $type sql $sql<br>";
-      $stmt = $conn->executeQuery($sql);
-      $optarray= array();
-      while (($row = $stmt->fetchAssociative()) !== false) {
-        $optarray[$row['Nation']] = $row['Nation'];
-      }     
-      // ersetze 16-bit Values
-      $res=$cgi->select($name, $optarray,$selected);
-      $search  = array("\xC3\xA4", "\xC3\xB6", "\xC3\xBC", "\xC3\x84", "\xC3\x96","\xC3\x9f");
-      $replace = array('ä', 'ö', 'ü', 'Ä', 'Ö','Ü','ß');
-      $res= str_replace($search, $replace, $res);          
-      return $res;
-    }
-    function createGruppenOption ($cgi,$name,$GruppenArray,$selected) {
-      $res=$cgi->select($name,$GruppenArray,$selected);
-      $search  = array("\xC3\xA4", "\xC3\xB6", "\xC3\xBC", "\xC3\x84", "\xC3\x96","\xC3\x9f");
-      $replace = array('ä', 'ö', 'ü', 'Ä', 'Ö','Ü','ß');
-      $res= str_replace($search, $replace, $res);          
-      return $res;
-    }
+        $createNationOption = function  ($conn,$cgi,$name,$selected,$type) {   // als variable abspeichern, da nested fuction eigentlich nicht mehr gehen
+            if (empty($type)) {
+	          $sql = "select * From tl_hy_nation where ORDER BY Nation ASC";
+         } else {
+	          $sql = "select * From tl_hy_nation where Type like '$type' ORDER BY Nation ASC";
+            }
+            $stmt = $conn->executeQuery($sql);
+            $optarray= array();
+            while (($row = $stmt->fetchAssociative()) !== false) {
+                $optarray[$nation] = $row['Nation'];
+            }     
+            $res=$cgi->select($name, $optarray,$selected);
+            return $res;
+        };
+        function createGruppenOption ($cgi,$name,$GruppenArray,$selected) {
+            $res=$cgi->select($name,$GruppenArray,$selected);
+            $search  = array("\xC3\xA4", "\xC3\xB6", "\xC3\xBC", "\xC3\x84", "\xC3\x96","\xC3\x9f");
+            $replace = array('ä', 'ö', 'ü', 'Ä', 'Ö','Ü','ß');
+            $res= str_replace($search, $replace, $res);          
+            return $res;
+        }
     
   
-      $c=$this->cgiUtil;
-      $fkt=$this->fussballUtil;
-      $id=$ID;
-      $Name="";
-      $Nation="";
-      $Flagge="";
-      $Gruppe="";
-      $html="";      // gerenderte
-      $debug="";     //  debuginfo
-      $my_script_txt = <<< EOT
-        <script language="javascript" type="text/javascript">
-        function uebernehmen() {     /* neuer aktueller Wettbewerb */
-          var _par = jQuery("#inputForm :input").serialize();   // ich habe den Eindruck nur so bekomme ich die Werte
-//console.log('par: '+_par);
-          var _inputArr = _par.split("&");
-          let myA=[];
-          for (var x = 0; x < _inputArr.length; x++) {
-            var _kv = _inputArr[x].split("=");
-            myA[_kv[0]] = _kv[1];
-            //console.log(_kv);
-          }
-          //var url =  '/fussball/bearbeitemannschaft/'+myA['aktion']+'/'+myA['ID']+'/'+myA['name']+'/'+myA['nation']+'/'+myA['Gruppe'];
+        $my_script_txt = <<< EOT
+<script>
+function uebernehmen() {
 
-        var url = '/fussball/bearbeitemannschaft/'
-            + (myA['aktion']    || 'n') + '/'
-            + (myA['ID']        || -1) + '/'
-            + (myA['name']      || -1) + '/'
-            + (myA['nation']    || -1) + '/'
-            + (myA['Gruppe']    || 'A');
-console.log('url: '+url);
-          jQuery.get(url, function(data, status){
-console.log('res da ');
-             errortxt=data['error'];
-             if (errortxt != '') {
-console.log('error: '+errortxt);
-               jQuery("#result").html(errortxt);
-             } else {
-               jQuery("#result").html("");
-                jQuery("#eingabe").html("&#x23F1; 8 sec<br>" + data['data']);
-                setTimeout(function() {
-                    location.reload();
-                }, 8000);  // 8000 ms = 8 Sekunden
+    // Form auslesen (ersetzt jQuery serialize)
+    const form = document.querySelector("#inputForm");
+    const fd   = new FormData(form);
+    const myA  = Object.fromEntries(fd.entries());
 
-             }
-          });
+    // URL zusammenbauen
+    const url = "/fussball/bearbeitemannschaft/"
+        + (myA['aktion'] || 'n') + "/"
+        + (myA['ID']     || -1) + "/"
+        + encodeURIComponent(myA['name']   || "-1") + "/"
+        + encodeURIComponent(myA['nation'] || "-1") + "/"
+        + (myA['Gruppe'] || 'A');
 
-        }
-        function abbrechen() {
-          location.reload();
-        }
-        </script>
+    console.log("url:", url);
+
+    // AJAX ersetzt durch fetch()
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+
+            if (data.error) {
+                document.querySelector("#result").innerHTML = data.error;
+            } else {
+                document.querySelector("#result").innerHTML = "";
+                document.querySelector("#eingabe").innerHTML =
+                    "&#x23F1; 5 sec<br>" + data.data;
+
+                setTimeout(() => location.reload(), 5000);
+            }
+
+        })
+        .catch(err => {
+            document.querySelector("#result").innerHTML =
+                "Fetch-Fehler: " + err;
+        });
+}
+
+function abbrechen() {
+    location.reload();
+}
+</script>
 EOT;
-      $html.=$my_script_txt;              
+        $c=$this->cgiUtil;
+        $fkt=$this->fussballUtil;
+        $id=$ID;
+        $Name="";
+        $Nation="";
+        $Flagge="";
+        $Gruppe="";
+        $html="";      // gerenderte
+        $debug="";     //  debuginfo
+        $html.=$my_script_txt;              
 
-      $id=$ID;
-      if ($id !=-1) {
-        // Mannschaft einlesen
-        $sql="SELECT * from tl_hy_mannschaft where ID='$id' LIMIT 1;";
-        $debug .= "sql: $sql  ";	
-        $stmt = $this->connection->executeQuery($sql);
-        /*
-        while (($row = $stmt->fetchAssociative()) !== false) {
-          echo $row['headline'];
-        } 
-        */   
-        $num_rows = $stmt->rowCount();    
-        $debug .= "Anzahl: $num_rows  ";	
-        $row = $stmt->fetchAssociative();  // s. Doctrine\DBAL
-        $Name=$row['Name'];
-        $Nation=$row['Nation'];
-        $Flagge=$row['Flagge'];
-        $Gruppe=$row['Gruppe'];
-        $html.="Mannschaft &auml;ndern<br>\n";
-      } else {
-        $html.="Mannschaft neu<br>\n";
-      }
-      $debug.='id: '.$id.' Name: '.$Name.' Nation: '.$Nation.' Flagge: '.$Flagge.' Gruppe: '.$Gruppe;
+        $id=$ID;
+        if ($id !=-1) {
+            // Mannschaft einlesen
+            $sql="SELECT * from tl_hy_mannschaft where ID='$id' LIMIT 1;";
+            //$debug .= "sql: $sql  ";	
+            $stmt = $this->connection->executeQuery($sql);
+            $num_rows = $stmt->rowCount();    
+            //$debug .= "Anzahl: $num_rows  ";	
+            $row = $stmt->fetchAssociative();  // s. Doctrine\DBAL
+            $Name=$row['Name'];
+            $Nation=$row['Nation'];
+            $Flagge=$row['Flagge'];
+            $Gruppe=$row['Gruppe'];
+            $html.="Mannschaft &auml;ndern<br>\n";
+        } else {
+            $html.="Mannschaft neu<br>\n";
+        }
+        //$debug.='id: '.$id.' Name: '.$Name.' Nation: '.$Nation.' Flagge: '.$Flagge.' Gruppe: '.$Gruppe;
 
 // create output
-      $html.=$c->Button(array("onClick"=>"uebernehmen();"),"&Uuml;bernehmen","uebernehmen") . "\n";
-      $html.=$c->Button(array("onClick"=>"abbrechen();"),"Abbrechen","Abbrechen") . "<br>\n";
-      $html.=$c->start_form("", null,null,array("id"=>"inputForm"));
-      $html.=$c->hidden("ID", $id);                    // zur weitergabe bei übernehmen
-      $html.=$c->hidden("aktion", $aktion);                    // zur weitergabe bei übernehmen
+        $html.=$c->Button(array("onClick"=>"uebernehmen();"),"&Uuml;bernehmen","uebernehmen") . "\n";
+        $html.=$c->Button(array("onClick"=>"abbrechen();"),"Abbrechen","Abbrechen") . "<br>\n";
+        $html.=$c->start_form("", null,null,array("id"=>"inputForm"));
+            $html.=$c->hidden("ID", $id);                    // zur weitergabe bei übernehmen
+            $html.=$c->hidden("aktion", $aktion);                    // zur weitergabe bei übernehmen
   
-      $html.=$c->table (array("border"=>1));
-      $html.=$c->tr();
-        $html.=$c->td(array("valign"=>"top"),"Mannschaft");
-        $html.=$c->td(array("valign"=>"top"),"Name").$c->td(array("valign"=>"top"),$c->textfield(array("name"=>"name","id"=>"name","value"=>"$Name")))."\n";
-  //echo td(array("valign"=>"top"),"Nation") . td(array("valign"=>"top"),textfield(array("name"=>"nation","id"=>"nation","value"=>"$Nation"))) . "\n";
-        $Type="";         // WM oder EM zeigt nur die entsprechenden Nationen an
-        if (strpos(strtolower ($this->aktWettbewerb['aktWettbewerb']),'em')!== false) $Type='%:EU:%';
-        if (strpos(strtolower ($this->aktWettbewerb['aktWettbewerb']),'wm')!== false) $Type='%:WE:%';
-        // %:EU:%  Europa 
-        // %:WE:%  Welt 
-        // %:AS:%  Asien 
-        // %:AF:%  Afrika 
-        // %:SA:%  Südamerika 
-        // %:MA:%  Mittelamerika 
-        // %:NA:%  Nordamerika 
-        $html.=$c->td(array("valign"=>"top"),"Nation").$c->td(array("valign"=>"top"),createNationOption ($this->connection,$c,"nation",$Nation,$Type))."\n";
-        //$html.=$c->td(array("valign"=>"top"),"Gruppe").$c->td(array("valign"=>"top"),$c->textfield(array("name"=>"Gruppe","id"=>"name","value"=>"$Gruppe")))."\n";
-        $html.=$c->td(array("valign"=>"top"),"Gruppe");
-        $grpArray=$fkt->createGruppenArray($this->aktWettbewerb['aktAnzgruppen']);
-        $html.=$c->td(array("valign"=>"top"),createGruppenOption ($c,"Gruppe",$grpArray,$Gruppe))."\n";
-  
-        //$html.=$c->td(array("valign"=>"top"),"Flagge") . "\n";
-        //$html.=$c->td(array("valign"=>"top")) . "\n";
-      $html.= $c->end_tr()."\n";
-      $html.= $c->end_table() . "\n";
-      $html.= $c->end_form();
-  
-      $html = utf8_encode($html);
-	  return new JsonResponse(['data' => $html,'debug'=>$debug]); 
-  }
+            $html.=$c->table (array("border"=>1));
+                $html.=$c->tr();
+                    $html.=$c->td(array("valign"=>"top"),"Mannschaft");
+                    $html.=$c->td(array("valign"=>"top"),"Name").$c->td(array("valign"=>"top"),$c->textfield(array("name"=>"name","id"=>"name","value"=>"$Name")))."\n";
+                    $Type="";         // WM oder EM zeigt nur die entsprechenden Nationen an
+                    if (strpos(strtolower ($this->aktWettbewerb['aktWettbewerb']),'em')!== false) $Type='%:EU:%';
+                    if (strpos(strtolower ($this->aktWettbewerb['aktWettbewerb']),'wm')!== false) $Type='%:WE:%';
+                    // %:EU:%  Europa 
+                    // %:WE:%  Welt 
+                    // %:AS:%  Asien 
+                    // %:AF:%  Afrika 
+                    // %:SA:%  Südamerika 
+                    // %:MA:%  Mittelamerika 
+                    // %:NA:%  Nordamerika 
+                    $html.=$c->td(array("valign"=>"top"),"Nation").$c->td(array("valign"=>"top"),$createNationOption ($this->connection,$c,"nation",$Nation,$Type))."\n";
+                    $html.=$c->td(array("valign"=>"top"),"Gruppe");
+                    $grpArray=$fkt->createGruppenArray($this->aktWettbewerb['aktAnzgruppen']);
+                    $html.=$c->td(array("valign"=>"top"),createGruppenOption ($c,"Gruppe",$grpArray,$Gruppe))."\n";
+                $html.= $c->end_tr()."\n";
+            $html.= $c->end_table() . "\n";
+        $html.= $c->end_form();
+        // 1) Entfernt ungültige UTF-8-Bytes
+        $html = mb_convert_encoding($html, 'UTF-8', 'UTF-8');
+        // 2) Entfernt Steuerzeichen (0x00–0x1F), die JSON zerstören
+        $html = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F]/u', '', $html);
+        $json = json_encode(['data' => $html, 'debug' => $debug],JSON_UNESCAPED_UNICODE);
+        $response = new JsonResponse($json,200,[],true);
+        return $response;
+    }
   
 
 /* erzeugt das Formular und Buttons zur Eingabe eines Spielorts
@@ -407,51 +394,53 @@ EOT;
 
       $html="";      // gerenderte
       $debug="";     //  debuginfo
-      $my_script_txt = <<< EOT
-        <script language="javascript" type="text/javascript">
-        function uebernehmen() {     /* neuer aktueller Wettbewerb */
-          var _par = jQuery("#inputForm :input").serialize();   // ich habe den Eindruck nur so bekomme ich die Werte
-//console.log('par: '+_par);
-          var _inputArr = _par.split("&");
-          let myA=[];
-          for (var x = 0; x < _inputArr.length; x++) {
-            var _kv = _inputArr[x].split("=");
-            myA[_kv[0]] = _kv[1];
-            //console.log(_kv);
-          }
-          //var url =  '/fussball/bearbeiteort/'+myA['aktion']+'/'+myA['ID']+'/'+myA['ort']+'/'+myA['beschreibung'];
-        var url = '/fussball/bearbeiteort/'
-            + (myA['aktion']    || 'n') + '/'
-            + (myA['ID']        || -1) + '/'
-            + (myA['ort']       || -1) + '/'
-            + (myA['Gruppe']    || 'A') + '/'
-            + (myA['M1']        || -1) + '/'
-            + (myA['M2']        || -1) + '/'
-            + (myA['T1']        || -1) + '/'
-            + (myA['beschreibung']        || '_');
+$my_script_txt = <<< EOT
+<script>
+function uebernehmen() {
 
-console.log('url: '+url);
-          jQuery.get(url, function(data, status){
-console.log('res da ');
-             errortxt=data['error'];
-             if (errortxt != '') {
-console.log('error: '+errortxt);
-               jQuery("#result").html(errortxt);
-             } else {
-               jQuery("#result").html("");
-                jQuery("#eingabe").html("&#x23F1; 8 sec<br>" + data['data']);
-                setTimeout(function() {
-                    location.reload();
-                }, 8000);  // 8000 ms = 8 Sekunden
+    // Form einlesen (ersetzt jQuery serialize)
+    const form = document.querySelector("#inputForm");
+    const fd   = new FormData(form);
+    const myA  = Object.fromEntries(fd.entries());
 
-             }
-          });
+    // URL zusammenbauen
+    const url = "/fussball/bearbeiteort/"
+        + (myA['aktion'] || 'n') + "/"
+        + (myA['ID']     || -1) + "/"
+        + encodeURIComponent(myA['ort'] || "-1") + "/"
+        + (myA['Gruppe'] || "A") + "/"
+        + (myA['M1']     || -1) + "/"
+        + (myA['M2']     || -1) + "/"
+        + (myA['T1']     || -1) + "/"
+        + encodeURIComponent(myA['beschreibung'] || "_");
 
-        }
-        function abbrechen() {
-          location.reload();
-        }
-        </script>
+    console.log("url:", url);
+
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+
+            if (data.error) {
+                document.querySelector("#result").innerHTML = data.error;
+            } else {
+                document.querySelector("#result").innerHTML = "";
+                document.querySelector("#eingabe").innerHTML =
+                    "&#x23F1; 5 sec<br>" + data.data;
+
+                setTimeout(() => location.reload(), 5000);
+            }
+
+        })
+        .catch(err => {
+            document.querySelector("#result").innerHTML =
+                "Fetch-Fehler: " + err;
+        });
+}
+
+function abbrechen() {
+    location.reload();
+}
+</script>
 EOT;
       $html.=$my_script_txt;              
 
@@ -531,47 +520,48 @@ EOT;
 
       $html="";      // gerenderte
       $debug="";     //  debuginfo
-      $my_script_txt = <<< EOT
-        <script language="javascript" type="text/javascript">
-        function uebernehmen() {     /* neuer aktueller Gruppe */
-          var _par = jQuery("#inputForm :input").serialize();   // ich habe den Eindruck nur so bekomme ich die Werte
-//console.log('par: '+_par);
-          var _inputArr = _par.split("&");
-          let myA=[];
-          for (var x = 0; x < _inputArr.length; x++) {
-            var _kv = _inputArr[x].split("=");
-            myA[_kv[0]] = _kv[1];
-            console.log(_kv);
-          }
-    //      1342/1/-1//-1/-1/-1/-1/-1
-          //var url =  '/fussball/bearbeitegruppe/'+myA['aktion']+'/'+myA['ID']+'/'+myA['Platz'];
-        var url = '/fussball/bearbeitegruppe/'
-            + (myA['aktion']    || 'n') + '/'
-            + (myA['ID']        || -1) + '/'
-            + (myA['Platz']        || -1);
+$my_script_txt = <<< EOT
+<script>
+function uebernehmen() {
 
-console.log('url: '+url);
-          jQuery.get(url, function(data, status){
-console.log('res da ');
-             errortxt=data['error'];
-             if (errortxt != '') {
-console.log('error: '+errortxt);
-               jQuery("#result").html(errortxt);
-             } else {
-               jQuery("#result").html("");
-                jQuery("#eingabe").html("&#x23F1; 8 sec<br>" + data['data']);
-                setTimeout(function() {
-                    location.reload();
-                }, 8000);  // 8000 ms = 8 Sekunden
+    // Form einlesen (ersetzt jQuery serialize)
+    const form = document.querySelector("#inputForm");
+    const fd   = new FormData(form);
+    const myA  = Object.fromEntries(fd.entries());
 
-             }
-          });
+    // URL zusammenbauen
+    const url = "/fussball/bearbeitegruppe/"
+        + (myA['aktion'] || 'n') + "/"
+        + (myA['ID']     || -1) + "/"
+        + (myA['Platz']  || -1);
 
-        }
-        function abbrechen() {
-          location.reload();
-        }
-        </script>
+    console.log("url:", url);
+
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+
+            if (data.error) {
+                document.querySelector("#result").innerHTML = data.error;
+            } else {
+                document.querySelector("#result").innerHTML = "";
+                document.querySelector("#eingabe").innerHTML =
+                    "&#x23F1; 5 sec<br>" + data.data;
+
+                setTimeout(() => location.reload(), 5000);
+            }
+
+        })
+        .catch(err => {
+            document.querySelector("#result").innerHTML =
+                "Fetch-Fehler: " + err;
+        });
+}
+
+function abbrechen() {
+    location.reload();
+}
+</script>
 EOT;
       $html.=$my_script_txt;              
 
@@ -729,51 +719,59 @@ EOT;
 
       $html="";      // gerenderte
       $debug="";     //  debuginfo
-      $my_script_txt = <<< EOT
-        <script language="javascript" type="text/javascript">
-        function uebernehmen() {     /* neuer aktueller Wettbewerb */
-          var _par = jQuery("#inputForm :input").serialize();   // ich habe den Eindruck nur so bekomme ich die Werte
-//console.log('par: '+_par);
-          var _inputArr = _par.split("&");
-          let myA=[];
-          for (var x = 0; x < _inputArr.length; x++) {
-            var _kv = _inputArr[x].split("=");
-            myA[_kv[0]] = _kv[1];
-            //console.log(_kv);
-          }
-          //var url='/fussball/bearbeitespiel/'+myA['aktion']+'/'+myA['ID']+'/'+myA['Nr']+'/'+myA['Gruppe']+'/'+myA['M1']+'/'+myA['M2']+'/'+myA['Ort']+'/'+myA['Datum']+'/'+myA['Uhrzeit']+'/'+myA['T1']+'/'+myA['T2'];
-        var url = '/fussball/bearbeitespiel/'
-            + (myA['aktion']    || 'n') + '/'
-            + (myA['ID']        || -1) + '/'
-            + (myA['Nr']        || -1) + '/'
-            + (myA['Gruppe']    || 'A') + '/'
-            + (myA['M1']        || -1) + '/'
-            + (myA['M2']        || -1) + '/'
-            + (myA['T1']        || -1) + '/'
-            + (myA['T2']        || -1);
+$my_script_txt = <<< EOT
+<script>
+function uebernehmen() {
 
-console.log('url: '+url);
-          jQuery.get(url, function(data, status){
-console.log('res da ');
-             errortxt=data['error'];
-             if (errortxt != '') {
-console.log('error: '+errortxt);
-               jQuery("#result").html(errortxt);
-             } else {
-               jQuery("#result").html("");
-                jQuery("#eingabe").html("&#x23F1; 8 sec<br>" + data['data']);
-                setTimeout(function() {
-                    location.reload();
-                }, 8000);  // 8000 ms = 8 Sekunden
-               
-             }
-          });
+    // Form auslesen (ersetzt serialize())
+    const form = document.querySelector("#inputForm");
+    const fd   = new FormData(form);
+    const myA  = Object.fromEntries(fd.entries());
 
-        }
-        function abbrechen() {
-          location.reload();
-        }
-        </script>
+    // URL zusammenbauen
+    const url = "/fussball/bearbeitespiel/"
+        + (myA['aktion']  || 'n') + "/"
+        + (myA['ID']      || -1) + "/"
+        + (myA['Nr']      || -1) + "/"
+        + (myA['Gruppe']  || 'A') + "/"
+        + (myA['M1']      || -1) + "/"
+        + (myA['M2']      || -1) + "/"
+        + encodeURIComponent(myA['Ort'] || ' ') + "/"
+        + (myA['Datum']   || '0000-00-00') + "/"
+        + (myA['Uhrzeit'] || '00:00:00') + "/"
+        + (myA['T1']      || -1) + "/"
+        + (myA['T2']      || -1);
+
+    console.log("fetch URL:", url);
+
+    // AJAX ersetzt durch fetch()
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+
+            if (data.error) {
+                document.querySelector("#result").innerHTML = data.error;
+                return;
+            }
+
+            document.querySelector("#result").innerHTML = "";
+            document.querySelector("#eingabe").innerHTML =
+                "&#x23F1; 5 sec<br>" + data.data;
+
+            setTimeout(() => {
+                location.reload();
+            }, 5000);
+        })
+        .catch(err => {
+            document.querySelector("#result").innerHTML =
+                "Fetch-Fehler: " + err;
+        });
+}
+
+function abbrechen() {
+    location.reload();
+}
+</script>
 EOT;
       $html.=$my_script_txt;              
 
@@ -1045,53 +1043,60 @@ EOT;
 
       $html="";      // gerenderte
       $debug="";     //  debuginfo
-      $my_script_txt = <<< EOT
-        <script language="javascript" type="text/javascript">
-        function uebernehmen() {     /* neuer aktuelle Wette */
-          var _par = jQuery("#inputForm :input").serialize();   // ich habe den Eindruck nur so bekomme ich die Werte
-//console.log('par: '+_par);
-          var _inputArr = _par.split("&");
-          let myA=[];
-          for (var x = 0; x < _inputArr.length; x++) {
-            var _kv = _inputArr[x].split("=");
-            myA[_kv[0]] = _kv[1];
-            //console.log(_kv);
-          }
-          //var url='/fussball/bearbeitewette/'+myA['aktion']+'/'+myA['ID']+'/'+myA['Kommentar']+'/'+myA['Art']+'/'+myA['Pok']+'/'+myA['Ptrend']+'/'+myA['Tipp1']+'/'+myA['Tipp2']+'/'+myA['Tipp3']+'/'+myA['Tipp4'];
-        var url = '/fussball/bearbeitewette/'
-            + (myA['aktion']    || 'n') + '/'
-            + (myA['ID']        || -1) + '/'
-            + (myA['Kommentar'] || 'K') + '/'
-            + (myA['Art']       || 'S') + '/'
-            + (myA['Pok']       || '2') + '/'
-            + (myA['Ptrend']    || '5') + '/'
-            + (myA['Tipp1']     || '-1') + '/'
-            + (myA['Tipp2']     || '-1') + '/'
-            + (myA['Tipp3']     || '-1') + '/'
-            + (myA['Tipp4']     || '-1');
+$my_script_txt = <<< EOT
+<script>
+function uebernehmen() {
 
-console.log('url: '+url);
-          jQuery.get(url, function(data, status){
-             errortxt=data['error'];
-console.log('res da errortxt '+errortxt);
-             if (errortxt != '') {
-console.log('error: '+errortxt);
-               jQuery("#result").html(errortxt);
-             } else {
-               jQuery("#result").html("");
-                jQuery("#eingabe").html("&#x23F1; 8 sec<br>" + data['data']);
-console.log('data: '+data['data']);
-                setTimeout(function() {
-                    location.reload();
-                }, 8000);  // 8000 ms = 8 Sekunden
-             }
-          });
+    // Form auslesen (ersetzt jQuery serialize)
+    const form = document.querySelector("#inputForm");
+    const fd   = new FormData(form);
+    const myA  = Object.fromEntries(fd.entries());
 
-        }
-        function abbrechen() {
-          location.reload();
-        }
-        </script>
+    // URL zusammenbauen
+    const url = "/fussball/bearbeitewette/"
+        + (myA['aktion']    || 'n') + "/"
+        + (myA['ID']        || -1) + "/"
+        + encodeURIComponent(myA['Kommentar'] || "K") + "/"
+        + (myA['Art']       || "S") + "/"
+        + (myA['Pok']       || "2") + "/"
+        + (myA['Ptrend']    || "5") + "/"
+        + (myA['Tipp1']     || "-1") + "/"
+        + (myA['Tipp2']     || "-1") + "/"
+        + (myA['Tipp3']     || "-1") + "/"
+        + (myA['Tipp4']     || "-1");
+
+    console.log("url:", url);
+
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+
+            const errortxt = data.error || "";
+
+            console.log("res da errortxt:", errortxt);
+
+            if (errortxt !== "") {
+                document.querySelector("#result").innerHTML = errortxt;
+            } else {
+                document.querySelector("#result").innerHTML = "";
+                document.querySelector("#eingabe").innerHTML =
+                    "&#x23F1; 5 sec<br>" + data.data;
+
+                console.log("data:", data.data);
+
+                setTimeout(() => location.reload(), 5000);
+            }
+        })
+        .catch(err => {
+            document.querySelector("#result").innerHTML =
+                "Fetch-Fehler: " + err;
+        });
+}
+
+function abbrechen() {
+    location.reload();
+}
+</script>
 EOT;
       $html.=$my_script_txt;              
 
@@ -1240,57 +1245,64 @@ EOT;
 
       $html="";      // gerenderte
       $debug="";     //  debuginfo
-      $my_script_txt = <<< EOT
-        <script language="javascript" type="text/javascript">
-        function uebernehmen() {     /* neuer Teilnehmer */        
-          var _par = jQuery("#inputForm :input").serialize();   // ich habe den Eindruck nur so bekomme ich die Werte
-console.log('Teilnehmer uebernehmen: '+_par);
-          var _inputArr = _par.split("&");
-          let myA=[];
-          for (var x = 0; x < _inputArr.length; x++) {
-            var _kv = _inputArr[x].split("=");
-            myA[_kv[0]] = _kv[1];
-            console.log(_kv);
-          }
+$my_script_txt = <<< EOT
+<script>
+function uebernehmen() {
 
-        var url = '/fussball/bearbeiteteilnehmer/'
-            + (myA['aktion']    || 'n') + '/'
-            + (myA['ID']        || -1) + '/'
-            + (myA['Art']       || 'T') + '/'
-            + (myA['Kurzname']  || 'KN') + '/'
-            + (myA['Name']      || '-') + '/'
-            + (myA['Email']     || '-') + '/'
-            + (myA['Bezahlt']   || '0') + '/'
-            + (myA['Erst']      || '0') + '/'
-            + (myA['Sechzehn']  || '0') + '/'
-            + (myA['Achtel']    || '0') + '/'
-            + (myA['Viertel']   || '0') + '/'
-            + (myA['Halb']      || '0') + '/'
-            + (myA['Finale']    || '0');
+    // Form einlesen (ersetzt jQuery serialize)
+    const form = document.querySelector("#inputForm");
+    const fd   = new FormData(form);
+    const myA  = Object.fromEntries(fd.entries());
 
-console.log('url: '+url);
+    console.log("Teilnehmer uebernehmen:", myA);
 
-          jQuery.get(url, function(data, status){
-console.log('res da ');
-             errortxt=data['error'];
-             if (errortxt != '') {
-console.log('error: '+errortxt);
-               jQuery("#result").html(errortxt);
-             } else {
-               jQuery("#result").html("");
-                jQuery("#eingabe").html("&#x23F1; 8 sec<br>" + data['data']);
+    // URL zusammenbauen
+    const url = "/fussball/bearbeiteteilnehmer/"
+        + (myA['aktion']   || 'n') + "/"
+        + (myA['ID']       || -1)  + "/"
+        + (myA['Art']      || 'T') + "/"
+        + encodeURIComponent(myA['Kurzname'] || "KN") + "/"
+        + encodeURIComponent(myA['Name']     || "-")  + "/"
+        + encodeURIComponent(myA['Email']    || "-")  + "/"
+        + (myA['Bezahlt']  || "0") + "/"
+        + (myA['Erst']     || "0") + "/"
+        + (myA['Sechzehn'] || "0") + "/"
+        + (myA['Achtel']   || "0") + "/"
+        + (myA['Viertel']  || "0") + "/"
+        + (myA['Halb']     || "0") + "/"
+        + (myA['Finale']   || "0");
 
-                setTimeout(function() {
+    console.log("url:", url);
+
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+
+            const errortxt = data.error || "";
+
+            if (errortxt !== "") {
+                console.log("error:", errortxt);
+                document.querySelector("#result").innerHTML = errortxt;
+            } else {
+                document.querySelector("#result").innerHTML = "";
+                document.querySelector("#eingabe").innerHTML =
+                    "&#x23F1; 5 sec<br>" + data.data;
+
+                setTimeout(() => {
                     location.reload();
-                }, 8000);  // 8000 ms = 8 Sekunden
-             }
-          });
+                }, 5000);
+            }
+        })
+        .catch(err => {
+            document.querySelector("#result").innerHTML =
+                "Fetch-Fehler: " + err;
+        });
+}
 
-        }
-        function abbrechen() {
-          location.reload();
-        }
-        </script>
+function abbrechen() {
+    location.reload();
+}
+</script>
 EOT;
       $html.=$my_script_txt;              
 
@@ -1389,52 +1401,59 @@ EOT;
 
       $html="";      // gerenderte
       $debug="";     //  debuginfo
-      $my_script_txt = <<< EOT
-        <script language="javascript" type="text/javascript">
-        function uebernehmen() {     /* neuer Nation */
-          var _par = jQuery("#inputForm :input").serialize();   // ich habe den Eindruck nur so bekomme ich die Werte
-console.log('Nation uebernehmen: '+_par);
-          var _inputArr = _par.split("&");
-          let myA=[];
-          for (var x = 0; x < _inputArr.length; x++) {
-            var _kv = _inputArr[x].split("=");
-            myA[_kv[0]] = _kv[1];
-            console.log(_kv);
-          }
-          //var url =  '/fussball/bearbeitenation/'+myA['aktion']+'/'+myA['ID']+'/'+myA['Nation']+'/'+myA['Type']+'/'+myA['Alfa2']+'/'+myA['Alfa3']+'/'+myA['Domain']+'/'+myA['Image'];
-        var url = '/fussball/bearbeitenation/'
-            + (myA['aktion']    || 'n') + '/'
-            + (myA['ID']        || -1) + '/'
-            + (myA['Nation']    || '-1') + '/'
-            + (myA['Type']      || '-') + '/'
-            + (myA['Alfa2']     || '-') + '/'
-            + (myA['Alfa3']     || '-') + '/'
-            + (myA['Domain']   || '0') + '/'
-            + (myA['Image']    || '0');
-console.log('url: '+url);
-          jQuery.get(url, function(data, status){
-console.log('res da ');
-             errortxt=data['error'];
-             if (errortxt != '') {
-console.log('error: '+errortxt);
-               jQuery("#result").html(errortxt);
-             } else {
-               //location.reload();
-               jQuery("#result").html("");
-                jQuery("#eingabe").html("&#x23F1; 8 sec<br>" + data['data']);
+$my_script_txt = <<< EOT
+<script>
+function uebernehmen() {
 
-                setTimeout(function() {
+    // Form einlesen (ersetzt jQuery serialize)
+    const form = document.querySelector("#inputForm");
+    const fd   = new FormData(form);
+    const myA  = Object.fromEntries(fd.entries());
+
+    console.log("Nation uebernehmen:", myA);
+
+    // URL zusammenbauen
+    const url = "/fussball/bearbeitenation/"
+        + (myA['aktion'] || 'n') + "/"
+        + (myA['ID']     || -1)  + "/"
+        + encodeURIComponent(myA['Nation'] || "-1") + "/"
+        + encodeURIComponent(myA['Type']   || "-")  + "/"
+        + encodeURIComponent(myA['Alfa2']  || "-")  + "/"
+        + encodeURIComponent(myA['Alfa3']  || "-")  + "/"
+        + encodeURIComponent(myA['Domain'] || "0")  + "/"
+        + encodeURIComponent(myA['Image']  || "0");
+
+    console.log("url:", url);
+
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+
+            const errortxt = data.error || "";
+
+            if (errortxt !== "") {
+                console.log("error:", errortxt);
+                document.querySelector("#result").innerHTML = errortxt;
+            } else {
+                document.querySelector("#result").innerHTML = "";
+                document.querySelector("#eingabe").innerHTML =
+                    "&#x23F1; 5 sec<br>" + data.data;
+
+                setTimeout(() => {
                     location.reload();
-                }, 8000);  // 8000 ms = 8 Sekunden
-               
-             }
-          });
+                }, 5000);
+            }
+        })
+        .catch(err => {
+            document.querySelector("#result").innerHTML =
+                "Fetch-Fehler: " + err;
+        });
+}
 
-        }
-        function abbrechen() {
-          location.reload();
-        }
-        </script>
+function abbrechen() {
+    location.reload();
+}
+</script>
 EOT;
       $html.=$my_script_txt;              
 
@@ -1640,172 +1659,147 @@ EOT;
      * @throws DoctrineDBALException
      */
 
-  public function bearbeitemannschaft(string $aktion,int $ID=-1,string $name="",string $nation='',string $Gruppe='')
-  {
-    if (!isset($aktion)) {
-      $html.="fehlerhafte Aktion empty<br>";
-      $errortxt.="fehlerhafte Aktion empty<br>";
-      $errortxt = utf8_encode($errortxt);
-      return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
-    }
-    $c=$this->cgiUtil;
-    $id = $ID;
-    $html="";
-    $debug="aktion: $aktion";
-    $errortxt="";
-    $Wettbewerb = $this->aktWettbewerb['aktWettbewerb'];
-    $name = trim($name);
-    $nation = trim($nation);
-    $Gruppe = trim($Gruppe);
-    $debug.=" id: $id, Wettbewerb: $Wettbewerb, name: $name, nation $nation, nation $Gruppe";
-    if ($aktion == "u" || $aktion == "n") { 
-      // flagge lesen
-      $sql = "select * from tl_hy_nation where Nation='$nation'";
-      $stmt = $this->connection->executeQuery($sql);
-      $debug.="sql: $sql<br>";	
-      $anz = $stmt->rowCount();
-      $flagge="";
-//      $flid="";
-      if ($anz > 0) {
-        $rownati = $stmt->fetchAssociative();
-	    $flagge =   $rownati['Image'];
-//	    $flid = $rownati['ID'];
-      } else {         // default Deutschland
-        $sql = "select * from tl_hy_nation where Nation='Deutschland'";
-        $stmt = $this->connection->executeQuery($sql);
-        $rownati = $stmt->fetchAssociative();
-	    $flagge =   $rownati['Image'];
-//	    $flid = $rownati['ID'];
-      }
-      if ($aktion == "n" ) {   // neueintrag
-        $sql="SELECT name FROM tl_hy_mannschaft WHERE name='$name' AND Wettbewerb ='$Wettbewerb'"; 
-        $stmt = $this->connection->executeQuery($sql);
-        $debug.="sql: $sql<br>";	
-        $anz = $stmt->rowCount();
-        if ($anz > 0) {
-          $errortxt.="Mannschaft $name existiert bereits";
-          $errortxt = utf8_encode($errortxt);
-          return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+    public function bearbeitemannschaft(string $aktion, int $ID = -1, string $name = "", string $nation = "", string $Gruppe = '')
+    {
+        $c = $this->cgiUtil;
+        $id = $ID;
+        $html = "";
+        $debug = "aktion: $aktion\n";
+        $errortxt = "";
+        $Wettbewerb = $this->aktWettbewerb['aktWettbewerb'];
+
+        // Strings normal trimmen
+        $name   = trim($name);
+        $nation = trim($nation);
+        $Gruppe = trim($Gruppe);
+        $debug .= " id: $id, Wettbewerb: $Wettbewerb, name: $name, nation $nation, Gruppe $Gruppe\n";
+        if ($aktion == "u" || $aktion == "n") {
+            // Flagge lesen
+            $sql = "select * from tl_hy_nation where Nation = ?";
+            $stmt = $this->connection->executeQuery($sql, [$nation]);
+            $debug .= "sql: $sql ($nation)\n";
+            if ($stmt->rowCount() > 0) {
+                $rownati = $stmt->fetchAssociative();
+                $flagge = $rownati['Image'];
+            } else {
+                $sql = "select * from tl_hy_nation where Nation = 'Deutschland'";
+                $stmt = $this->connection->executeQuery($sql);
+                $rownati = $stmt->fetchAssociative();
+                $flagge = $rownati['Image'];
+                $debug .= " Deutschland als Default Flagge";
+            }
+            // Neue Mannschaft
+            if ($aktion == "n") {
+                $sql = "SELECT name FROM tl_hy_mannschaft WHERE name = ? AND Wettbewerb = ?";
+                $stmt = $this->connection->executeQuery($sql, [$name, $Wettbewerb]);
+                $debug .= "sql: $sql\n";
+                if ($stmt->rowCount() > 0) {
+                    return new JsonResponse([
+                        'data' => "",
+                        'error' => "Mannschaft $name existiert bereits",
+                        'debug' => $debug
+                   ]);
+                }
+                $sql = "INSERT INTO tl_hy_mannschaft (Wettbewerb, Name, Nation, Flagge, Gruppe) VALUES (?, ?, ?, ?, ?)";         
+                $this->connection->executeStatement($sql, [$Wettbewerb, $name, $nation, $flagge, $Gruppe]);
+                $html = "Wettbewerb $Wettbewerb Mannschaft $name Nation $nation Flagge $flagge neu gesetzt";
+                return new JsonResponse(['data' => $html, 'error' => '', 'debug' => $debug]);
+            }
+
+            // Update Mannschaft
+            if ($aktion == "u") {
+                $sql = "UPDATE tl_hy_mannschaft SET Name = ?, Nation = ?, Flagge = ?, Gruppe = ? WHERE ID = ?";
+                $this->connection->executeStatement($sql, [$name, $nation, $flagge, $Gruppe, $id]);
+                $html = "Wettbewerb $Wettbewerb Mannschaft $name Nation $nation Flagge $flagge bearbeitet";
+                return new JsonResponse(['data' => $html, 'error' => '', 'debug' => $debug]);
+            }
         }
-        $sql="INSERT INTO tl_hy_mannschaft(Wettbewerb,Name,Nation,Flagge,Gruppe) VALUES ('$Wettbewerb','$name','$nation','$flagge','$Gruppe');";
-        $debug.="sql: $sql<br>";	
-        $cnt = $this->connection->executeStatement($sql);
-	    $html.="Wettbewerb $Wettbewerb  Mannschaft $name Nation $nation Flagge $flagge  $flid neu gesetzt";
-        $html = utf8_encode($html);
-        return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
-      }
-      if ($aktion == "u" ) {   // Mannschaft uebernehmen
-
-        $value = "SET ";
-        $value .= "Name='" . $name ."' ," ; 
-        $value .= "Nation='" . $nation ."' ," ;
-        $value .= "Flagge='" . $flagge ."' ," ;
-        $value .= "Gruppe='" . $Gruppe ."' " ;
-
-	    $sql = "update tl_hy_mannschaft $value where ID='$id'";
-//echo "sql: $sql<br>";	
-        $cnt = $this->connection->executeStatement($sql);
-	    $html.="Wettbewerb $Wettbewerb  Mannschaft $name Nation $nation Flagge $flagge bearbeitet";
-        $html = utf8_encode($html);
-
-        return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
-      }
+        // Löschen
+        if ($aktion == "d") {
+            $sql = "DELETE FROM tl_hy_mannschaft WHERE ID = ? LIMIT 1";
+            $this->connection->executeStatement($sql, [$id]);
+            return new JsonResponse(['data' => "Mannschaft gelöscht", 'error' => '', 'debug' => $debug]);
+        }
+        return new JsonResponse([ 'data' => '', 'error' => "fehlerhafte Aktion $aktion",'debug' => $debug]);
     }
-    if ($aktion == "d" ) {   // Mannschaft loeschen
-	  $sql = "Delete from tl_hy_mannschaft WHERE ID='$id' LIMIT 1";
-      $cnt = $this->connection->executeStatement($sql);
-      //$html.="in Tabelle tl_hy_mannschaft betroffene Saetze $cnt<br>";
-	  $html.="Mannschaft gel&ouml;scht";
-      $html = utf8_encode($html);
-      return new JsonResponse(['data' => $html,'error'=>$errortxt,'debug'=>$debug]); 
-    }
-    $html.="fehlerhafte Aktion $aktion<br>";
-    $errortxt.="fehlerhafte Aktion $aktion<br>";
-    $errortxt = utf8_encode($errortxt);
-    return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
-  } 
     #[Route( '/fussball/bearbeitenation/{aktion}/{ID}/{Nation}/{Type}/{Alfa2}/{Alfa3}/{Domain}/{Image}', name: 'FussballRequestClass_bearbeitenation', defaults: ['_scope' => 'frontend'] ) ]
     /**
      * @throws \Exception
      * @throws DoctrineDBALException
      */
 
-  public function bearbeitenation(string $aktion,int $ID=-1,string $Nation='',string $Type='',string $Alfa2='',string $Alfa3='',string $Domain='',string $Image='')
-  {
-    if (!isset($aktion)) {
-      $html.="fehlerhafte Aktion empty<br>";
-      $errortxt.="fehlerhafte Aktion empty<br>";
-      $errortxt = utf8_encode($errortxt);
-      return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
-    }
-    $c=$this->cgiUtil;
-    $id = $ID;
-    $html="";
-    $debug="aktion: $aktion";
-    $errortxt="";
-    $Wettbewerb = $this->aktWettbewerb['aktWettbewerb'];
-    $Nation = trim($Nation);
-    $Type = trim($Type);
-    $Alfa2 = trim($Alfa2);
-    $Alfa3 = trim($Alfa3);
-    $Domain = trim($Domain);
-    $Image = trim($Image);
-    $debug.=" id: $id, Wettbewerb: $Wettbewerb, Nation $Nation, Type $Type, Alfa2 $Alfa2, Alfa3 $Alfa3, Domain $Domain, Image $Image";
-    if ($aktion == "u" || $aktion == "n") { 
-      if ($aktion == "n" ) {   // neueintrag
-        if (empty($Nation)||empty($Type)||empty($Image)) {
-          $errortxt.="Nation/ Type/ Image Eingabe notwendig";
-          $errortxt = utf8_encode($errortxt);
-          return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+    public function bearbeitenation(string $aktion,int $ID=-1,string $Nation='',string $Type='',string $Alfa2='',string $Alfa3='',string $Domain='',string $Image='')
+    {
+        if (!isset($aktion)) {
+            $html.="fehlerhafte Aktion empty<br>";
+            $errortxt.="fehlerhafte Aktion empty<br>";
+            $errortxt = utf8_encode($errortxt);
+            return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
         }
-        $sql="SELECT Nation FROM tl_hy_nation WHERE Nation='$Nation'"; 
-        $stmt = $this->connection->executeQuery($sql);
-        $debug.="sql: $sql<br>";	
-        $anz = $stmt->rowCount();
-        if ($anz > 0) {
-          $errortxt.="Nation $Nation existiert bereits";
-          $errortxt = utf8_encode($errortxt);
-          return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+        $c=$this->cgiUtil;
+        $id = $ID;
+        $html="";
+        $debug="aktion: $aktion";
+        $errortxt="";
+        $Wettbewerb = $this->aktWettbewerb['aktWettbewerb'];
+        $Nation = trim($Nation);
+        $Type = trim($Type);
+        $Alfa2 = trim($Alfa2);
+        $Alfa3 = trim($Alfa3);
+        $Domain = trim($Domain);
+        $Image = trim($Image);
+        $debug.=" id: $id, Wettbewerb: $Wettbewerb, Nation $Nation, Type $Type, Alfa2 $Alfa2, Alfa3 $Alfa3, Domain $Domain, Image $Image";
+        if ($aktion == "u" || $aktion == "n") { 
+            if ($aktion == "n" ) {   // neueintrag
+                if (empty($Nation)||empty($Type)||empty($Image)) {
+                    $errortxt.="Nation/ Type/ Image Eingabe notwendig";
+                    $errortxt = utf8_encode($errortxt);
+                    return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+                }
+                $sql="SELECT Nation FROM tl_hy_nation WHERE Nation='$Nation'"; 
+                $stmt = $this->connection->executeQuery($sql);
+                $debug.="sql: $sql<br>";	
+                $anz = $stmt->rowCount();
+                if ($anz > 0) {
+                    $errortxt.="Nation $Nation existiert bereits";
+                    $errortxt = utf8_encode($errortxt);
+                    return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+                }
+                $sql="INSERT INTO tl_hy_nation(Nation,Type,Alfa2,Alfa3,Domain,Image) VALUES ('$Nation','$Type','$Alfa2','$Alfa3','$Domain','$Image');";
+                $debug.="sql: $sql<br>";	
+                $cnt = $this->connection->executeStatement($sql);
+                $html.=" Nation: $Nation, Type: $Type, Alfa2: $Alfa2, Alfa3: $Alfa3, Domain: $Domain, Image: $Image";
+                $html = utf8_encode($html);
+                return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+            }
+            if ($aktion == "u" ) {   // Nation uebernehmen
+                $value = "SET ";
+                $value .= "Nation='" . $Nation ."' ," ;
+                $value .= "Type='" . $Type ."' ," ;
+                $value .= "Alfa2='" . $Alfa2 ."' ," ;
+                $value .= "Alfa3='" . $Alfa3 ."' ," ;
+                $value .= "Domain='" . $Domain ."' ," ;
+                $value .= "Image='" . $Image ."' " ;
+        	    $sql = "update tl_hy_nation $value where ID='$id'";
+                $cnt = $this->connection->executeStatement($sql);
+                $html.=" Nation: $Nation, Type: $Type, Alfa2: $Alfa2, Alfa3: $Alfa3, Domain: $Domain, Image: $Image";
+                $html = utf8_encode($html);            
+                return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+            }
         }
-        $sql="INSERT INTO tl_hy_nation(Nation,Type,Alfa2,Alfa3,Domain,Image) VALUES ('$Nation','$Type','$Alfa2','$Alfa3','$Domain','$Image');";
-        $debug.="sql: $sql<br>";	
-        $cnt = $this->connection->executeStatement($sql);
-        $html.=" Nation: $Nation, Type: $Type, Alfa2: $Alfa2, Alfa3: $Alfa3, Domain: $Domain, Image: $Image";
-        $html = utf8_encode($html);
+        if ($aktion == "d" ) {   // Nation loeschen
+            $sql = "Delete from tl_hy_nation WHERE ID='$id' LIMIT 1";
+            $cnt = $this->connection->executeStatement($sql);
+            //$html.="in Tabelle tl_hy_nation betroffene Saetze $cnt<br>";
+            $html.="Nation gel&ouml;scht";
+            $html = utf8_encode($html);
+            return new JsonResponse(['data' => $html,'error'=>$errortxt,'debug'=>$debug]); 
+        }
+        $html.="fehlerhafte Aktion $aktion<br>";
+        $errortxt.="fehlerhafte Aktion $aktion<br>";
+        $errortxt = utf8_encode($errortxt);
         return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
-      }
-      if ($aktion == "u" ) {   // Nation uebernehmen
-
-        $value = "SET ";
-        $value .= "Nation='" . $Nation ."' ," ;
-        $value .= "Type='" . $Type ."' ," ;
-        $value .= "Alfa2='" . $Alfa2 ."' ," ;
-        $value .= "Alfa3='" . $Alfa3 ."' ," ;
-        $value .= "Domain='" . $Domain ."' ," ;
-        $value .= "Image='" . $Image ."' " ;
-
-	    $sql = "update tl_hy_nation $value where ID='$id'";
-//echo "sql: $sql<br>";	
-        $cnt = $this->connection->executeStatement($sql);
-        $html.=" Nation: $Nation, Type: $Type, Alfa2: $Alfa2, Alfa3: $Alfa3, Domain: $Domain, Image: $Image";
-        $html = utf8_encode($html);
-
-        return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
-      }
-    }
-    if ($aktion == "d" ) {   // Mannschaft loeschen
-	  $sql = "Delete from tl_hy_nation WHERE ID='$id' LIMIT 1";
-      $cnt = $this->connection->executeStatement($sql);
-      //$html.="in Tabelle tl_hy_nation betroffene Saetze $cnt<br>";
-	  $html.="Nation gel&ouml;scht";
-      $html = utf8_encode($html);
-      return new JsonResponse(['data' => $html,'error'=>$errortxt,'debug'=>$debug]); 
-    }
-    $html.="fehlerhafte Aktion $aktion<br>";
-    $errortxt.="fehlerhafte Aktion $aktion<br>";
-    $errortxt = utf8_encode($errortxt);
-    return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
-  } 
+    } 
     
     #[Route( '/fussball/bearbeiteort/{aktion}/{ID}/{ort}/{beschreibung}', name: 'FussballRequestClass_bearbeiteort', defaults: ['_scope' => 'frontend'] ) ]
     /**
@@ -2147,7 +2141,7 @@ EOT;
     // check kein leerer Parameter
     $debug.= '      aaaa';
       if ($Nr== -1 || $Gruppe=='' || $M1==-1 || $M2==-1 || $Ort==-1 || $Datum=='' || $Uhrzeit=='' || $T1==-2 || $T2==-2) {
-	      $errortxt.="ID $ID Wettbewerb $Wettbewerb Spielnummer $Nr Gruppe $Gruppe M1 $M1 M2 $M2  Ort $Ort Datum $Datum Uhrzeit $Uhrzeit T1 $T1 T2 $T2 neu";
+	      $errortxt.="aktion $aktion ID $ID Wettbewerb $Wettbewerb Spielnummer $Nr Gruppe $Gruppe M1 $M1 M2 $M2  Ort $Ort Datum $Datum Uhrzeit $Uhrzeit T1 $T1 T2 $T2 Fehlerhafte daten";
           //$errortxt = utf8_encode($errortxt);
           return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
       }

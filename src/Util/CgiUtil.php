@@ -227,7 +227,7 @@ class CgiUtil
     $clickName=""; 
     if (is_array($atts)) {
         foreach ($atts as $key => $val) {
-            if (strtolower($key) == "checked") { // Sonderbehandlung f�r checked
+            if (strtolower($key) == "checked") { // Sonderbehandlung für checked
                 if ($val != "" && $val != "0") {
                     $str .= "checked ";
                 }
@@ -275,23 +275,37 @@ class CgiUtil
 }
 
 // input is not a hashed array
-  public function select($name, $options=null,$sel=null){
-        $str = "<select name=\"" . $name . "\" id=\"" . $name . "\" >\n";
-        if(is_array($options)) {
-                $cnt = count($options);
-                $ss="";
-                if (!empty($sel)) $ss=(string) $sel;
-                $ss=strtolower($ss);
-                foreach ($options as  $key=>$val) {
-                        $str .= "<option value='" . $val . "'";
-                        if (strtolower((string)$val) == $ss) $str .= " selected";
-                        if (is_numeric($key)) { $str .= " > " . $val . "</option>\n";
-                        } else { $str .= " > " . $key . "</option>\n"; }
-                }
+public function select($name, $options = null, $sel = null)
+{
+    $str="";
+    $nameEsc = htmlspecialchars((string)$name, ENT_QUOTES, 'UTF-8');
+    $str .= "<select name=\"{$nameEsc}\" id=\"{$nameEsc}\">\n";
+
+    if (is_array($options)) {
+        $selLower = strtolower((string) $sel);
+
+        foreach ($options as $key => $val) {
+            // Schlüssel und Wert IMMER vorher in String casten
+            $key = (string) $key;
+            $val = (string) $val;
+
+            // UTF-8 sicher escapen
+            $keyEsc = htmlspecialchars($key, ENT_QUOTES, 'UTF-8');
+            $valEsc = htmlspecialchars($val, ENT_QUOTES, 'UTF-8');
+
+            $str .= "<option value=\"{$valEsc}\"";
+
+            if (strtolower($val) === $selLower) {
+                $str .= " selected";
+            }
+            $str .= ">{$keyEsc}</option>\n";
         }
-        $str .= "</select>\n";
-        return($str);
-  }
+    }
+
+    $str .= "</select>\n";
+    return $str;
+}
+
 
 
 
