@@ -67,6 +67,20 @@ class FussballRequestClass extends AbstractController
         }
         
     }
+    
+    private function jsonUtf8Response(array $payload, int $status = 200): JsonResponse
+    {
+        array_walk_recursive($payload, function (&$value) {
+            if (is_string($value)) {
+                $value = mb_convert_encoding($value, 'UTF-8', 'UTF-8'); // 1) Ungültige UTF-8-Bytes entfernen
+                $value = preg_replace( '/[\x00-\x08\x0B\x0C\x0E-\x1F]/u', '',$value); // 2) Steuerzeichen entfernen (JSON-kritisch)
+            }
+        });
+    
+        $json = json_encode($payload,JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR );    // 3) JSON selbst erzeugen
+        return new JsonResponse($json, $status, [], true);   // 4) Raw JSON zurückgeben (true!)
+    }
+        
     #[Route( '/fussball/anzeigewettbewerb/{aktion}/{ID}', name: 'FussballRequestClass_anzeigewettbewerb', defaults: ['_scope' => 'frontend'] ) ]
     /**
      * @throws \Exception
@@ -192,8 +206,8 @@ EOT;
         $html.= $c->end_table() . "\n";
         $html.= $c->end_form();
   
-        $html = utf8_encode($html);
-        return new JsonResponse(['dir'=>__DIR__,'data' => $html,'debug'=>$debug]); 
+        //$html = utf8_encode($html);
+        return $this->jsonUtf8Response(['dir'=>__DIR__,'data' => $html,'debug'=>$debug]); 
     }
   
 
@@ -351,13 +365,7 @@ EOT;
                 $html.= $c->end_tr()."\n";
             $html.= $c->end_table() . "\n";
         $html.= $c->end_form();
-        // 1) Entfernt ungültige UTF-8-Bytes
-        $html = mb_convert_encoding($html, 'UTF-8', 'UTF-8');
-        // 2) Entfernt Steuerzeichen (0x00–0x1F), die JSON zerstören
-        $html = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F]/u', '', $html);
-        $json = json_encode(['data' => $html, 'debug' => $debug],JSON_UNESCAPED_UNICODE);
-        $response = new JsonResponse($json,200,[],true);
-        return $response;
+        return $this->jsonUtf8Response(['data'  => $html,'debug' => $debug,]);
     }
   
 
@@ -482,8 +490,8 @@ EOT;
       $html.= $c->end_table() . "\n";
       $html.= $c->end_form();
   
-      $html = utf8_encode($html);
-	  return new JsonResponse(['data' => $html,'debug'=>$debug]); 
+      //$html = utf8_encode($html);
+	  return $this->jsonUtf8Response(['data' => $html,'debug'=>$debug]); 
   }
 
 /* erzeugt das Formular und Buttons zur Eingabe/Veraenderung einer Gruppe
@@ -593,8 +601,8 @@ EOT;
         $html.="Gruppe &auml;ndern<br>\n";
       } else {
         $html.="Gruppe neu, Bitte alle Gruppen löschen und neu aufsetzen<br>\n";
-        $html = utf8_encode($html);
-	    return new JsonResponse(['data' => $html,'debug'=>$debug]); 
+        //$html = utf8_encode($html);
+	    return $this->jsonUtf8Response(['data' => $html,'debug'=>$debug]); 
       }
       $debug.='id: '.$id.' Ort: '.$ort.' Beschreibung: '.$beschreibung;
 
@@ -626,8 +634,8 @@ EOT;
       $html.=$c->end_table()."\n";
       $html.= $c->end_form();
   
-      $html = utf8_encode($html);
-	  return new JsonResponse(['data' => $html,'debug'=>$debug]); 
+      //$html = utf8_encode($html);
+	  return $this->jsonUtf8Response(['data' => $html,'debug'=>$debug]); 
   }
   
 /* erzeugt das Formular und Buttons zur Eingabe eines Spiels
@@ -842,8 +850,8 @@ EOT;
       $html.= $c->end_table() . "\n";
       $html.= $c->end_form();
   
-      $html = utf8_encode($html);
-	  return new JsonResponse(['data' => $html,'debug'=>$debug]); 
+      //$html = utf8_encode($html);
+	  return $this->jsonUtf8Response(['data' => $html,'debug'=>$debug]); 
   }
 
     #[Route( '/fussball/anzeigewette/{aktion}/{ID}/{Type}', name: 'FussballRequestClass_anzeigewette', defaults: ['_scope' => 'frontend']  ) ]
@@ -882,9 +890,9 @@ EOT;
         $optarray[$str] = $row['ID'];
       }
       $res=$cgi->select($name, $optarray,$selected);
-      $search  = array("\xC3\xA4", "\xC3\xB6", "\xC3\xBC", "\xC3\x84", "\xC3\x96","\xC3\x9f");
-      $replace = array("ä", 'ö', 'ü', 'Ä', 'Ö','Ü','ß');
-      $res= str_replace($search, $replace, $res);          
+//      $search  = array("\xC3\xA4", "\xC3\xB6", "\xC3\xBC", "\xC3\x84", "\xC3\x96","\xC3\x9f");
+//      $replace = array("ä", 'ö', 'ü', 'Ä', 'Ö','Ü','ß');
+//      $res= str_replace($search, $replace, $res);          
       return $res;
     }
 
@@ -912,17 +920,17 @@ EOT;
         $optarray[$str] = $row['M1ind'];
       }
       $res=$cgi->select($name, $optarray,$selected);
-      $search  = array("\xC3\xA4", "\xC3\xB6", "\xC3\xBC", "\xC3\x84", "\xC3\x96","\xC3\x9f");
-      $replace = array("ä", 'ö', 'ü', 'Ä', 'Ö','Ü','ß');
-      $res= str_replace($search, $replace, $res);          
+//      $search  = array("\xC3\xA4", "\xC3\xB6", "\xC3\xBC", "\xC3\x84", "\xC3\x96","\xC3\x9f");
+//      $replace = array("ä", 'ö', 'ü', 'Ä', 'Ö','Ü','ß');
+//      $res= str_replace($search, $replace, $res);          
       return $res;
     }
 
     function createGruppenOption ($cgi,$name,$GruppenArray,$selected) {
       $res=$cgi->select($name,$GruppenArray,$selected);
-      $search  = array("\xC3\xA4", "\xC3\xB6", "\xC3\xBC", "\xC3\x84", "\xC3\x96","\xC3\x9f");
-      $replace = array('ä', 'ö', 'ü', 'Ä', 'Ö','Ü','ß');
-      $res= str_replace($search, $replace, $res);          
+//      $search  = array("\xC3\xA4", "\xC3\xB6", "\xC3\xBC", "\xC3\x84", "\xC3\x96","\xC3\x9f");
+//      $replace = array('ä', 'ö', 'ü', 'Ä', 'Ö','Ü','ß');
+//      $res= str_replace($search, $replace, $res);          
       return $res;
     }
     function createWettheader($Row,$cgi) {
@@ -1173,8 +1181,8 @@ EOT;
     }
     $html.= $c->end_table() . "\n";
     $html.= $c->end_form();
-    $html = utf8_encode($html);
-	return new JsonResponse(['data' => $html,'debug'=>$debug]); 
+    //$html = utf8_encode($html);
+	return $this->jsonUtf8Response(['data' => $html,'debug'=>$debug]); 
   }
 
     #[Route( '/fussball/anzeigeteilnehmer/{aktion}/{ID}', name: 'FussballRequestClass_anzeigeteilnehmer', defaults: ['_scope' => 'frontend'] ) ]
@@ -1332,8 +1340,8 @@ EOT;
 	    $Row['Art'] = "T";                // Teilnehmerdaten
         $html.=displayTeilnehmer($c,$aktion,$Row);
       }
-      $html = utf8_encode($html);
-	  return new JsonResponse(['data' => $html,'debug'=>$debug]); 
+      //$html = utf8_encode($html);
+	  return $this->jsonUtf8Response(['data' => $html,'debug'=>$debug]); 
   }
 
     #[Route( '/fussball/anzeigenation/{aktion}/{ID}', name: 'FussballRequestClass_anzeigenation',  defaults: ['_scope' => 'frontend'] ) ]
@@ -1478,8 +1486,8 @@ EOT;
         $Row = $stmt->fetchAssociative();
         $html.=displayNation($c,$aktion,$Row);
       }
-      $html = utf8_encode($html);
-	  return new JsonResponse(['data' => $html,'debug'=>$debug]); 
+      //$html = utf8_encode($html);
+	  return $this->jsonUtf8Response(['data' => $html,'debug'=>$debug]); 
   }
   
     #[Route( '/fussball/bearbeitewettbewerb/{aktion}/{ID}/{Wettbewerb}/{anzahlGruppen}/{deutschlandGruppe}/{startDatum}/{endeDatum}', name: 'FussballRequestClass_bearbeitewettbewerb', defaults: ['_scope' => 'frontend'] ) ]
@@ -1532,13 +1540,13 @@ EOT;
       if (false === checkDatum($startDatum)) {
           $errortxt.="startDatum $startDatum fehlerhaft (yyyy-mm-tt)<br>";
           $errortxt = utf8_encode($errortxt);
-          return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+          return $this->jsonUtf8Response(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
         }
         if (false === checkDatum($endeDatum)) {
           //throw $this->createNotFoundException("endeDatum $endeDatum fehlerhaft (yyyy-mm-tt)<br>");
           $errortxt.="endeDatum $endeDatum fehlerhaft (yyyy-mm-tt)<br>";
           $errortxt = utf8_encode($errortxt);
-          return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+          return $this->jsonUtf8Response(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
         }
       }
       $debug.=' Datum checked';
@@ -1552,8 +1560,8 @@ EOT;
 //echo "sql: $sql<br>";	
         $cnt = $this->connection->executeStatement($sql);
 	    $html.="Wettbewerb $Wettbewerb  Anzahl Gruppen $anzahlGruppen Deutschlandgruppe $deutschlandGruppe start $startDatum ende $endeDatum neu gesetzt";
-        $html = utf8_encode($html);
-        return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+        //$html = utf8_encode($html);
+        return $this->jsonUtf8Response(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
       } elseif ($aktion == "n" ) {   // Neuer Wettbewerb
     // zuerst Prüfen ob schon vorhanden
         $sql = "select ID,Name,Value1 From tl_hy_config where Name='Wettbewerb' AND value1='$Wettbewerb'";
@@ -1564,16 +1572,16 @@ EOT;
         if ($anz > 0) {
           $errortxt.="Wettbewerb $Wettbewerb existiert bereits";
           $errortxt = utf8_encode($errortxt);
-          return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+          return $this->jsonUtf8Response(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
         }
         if ($Wettbewerb == "" || $anzahlGruppen == "" || $deutschlandGruppe == "" || $startDatum == "" || $endeDatum == "") {
           $errortxt.="Kein Feld darf leer sein";
           $errortxt = utf8_encode($errortxt);
-          return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+          return $this->jsonUtf8Response(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
         } elseif (!is_numeric($anzahlGruppen)) {
           $errortxt.="Fehlerhafte Gruppenzahl";
           $errortxt = utf8_encode($errortxt);
-          return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+          return $this->jsonUtf8Response(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
         } else {
         // als aktuellen Wettbewerb entfernen
           $value = "SET ";
@@ -1595,8 +1603,8 @@ EOT;
 	      //$conn->printerror=true;
           $cnt = $this->connection->executeQuery($sql);
 	      $html.="Wettbewerb neu eingetragen $Wettbewerb &uuml;bernommen";
-          $html = utf8_encode($html);
-          return new JsonResponse(['dir'=>__DIR__,'data' => $html,'debug'=>$debug]); 
+          //$html = utf8_encode($html);
+          return $this->jsonUtf8Response(['dir'=>__DIR__,'data' => $html,'debug'=>$debug]); 
         }
       } elseif ($aktion == "d" ) {   // Wettbewerb loeschen
         $sql = "select * From tl_hy_config where Name='Wettbewerb' AND ID='$id'";
@@ -1619,8 +1627,8 @@ EOT;
         //$cnt=$conn->affected();
         $html.="in Tabelle tl_hy_config betroffene Saetze $cnt<br>";
         $html.="<br><strong>!! Achtung evtl neuen aktuellen Wettbewerb wählen !! </strong><br><br>";
-        $html = utf8_encode($html);
-        return new JsonResponse(['dir'=>__DIR__,'data' => $html,'debug'=>$debug]); 
+        //$html = utf8_encode($html);
+        return $this->jsonUtf8Response(['dir'=>__DIR__,'data' => $html,'debug'=>$debug]); 
       } elseif ($aktion == "a" ) {   // setze akt Wettbewerb
       // selektierter Wettbewerb
         $sql = "select * From tl_hy_config where Name='Wettbewerb' AND ID='$id'";
@@ -1630,8 +1638,8 @@ EOT;
         //echo "neu anzahl eintr&auml;ge $anz<br>";
         if ($anz < 1) {
           $html.="Wettbewerb existiert nicht";
-        $html = utf8_encode($html);
-        return new JsonResponse(['dir'=>__DIR__,'data' => $html,'debug'=>$debug]); 
+        //$html = utf8_encode($html);
+        return $this->jsonUtf8Response(['dir'=>__DIR__,'data' => $html,'debug'=>$debug]); 
         }
         $value = "SET ";
         $value .= "aktuell=0" ; 
@@ -1646,11 +1654,11 @@ EOT;
         $html.="neuer aktueller Wettbewerb bitte F5 dr&uuml;cken<br>";
       } else {
         $html.="fehlerhafte Aktion $aktion<br>";
-        $html = utf8_encode($html);
-        return new JsonResponse(['dir'=>__DIR__,'data' => $html,'debug'=>$debug]); 
+        //$html = utf8_encode($html);
+        return $this->jsonUtf8Response(['dir'=>__DIR__,'data' => $html,'debug'=>$debug]); 
       }
-      $html = utf8_encode($html);
-      return new JsonResponse(['dir'=>__DIR__,'data' => $html,'debug'=>$debug]); 
+      //$html = utf8_encode($html);
+      return $this->jsonUtf8Response(['dir'=>__DIR__,'data' => $html,'debug'=>$debug]); 
   }
   
     #[Route( '/fussball/bearbeitemannschaft/{aktion}/{ID}/{name}/{nation}/{Gruppe}', name: 'FussballRequestClass_bearbeitemannschaft', defaults: ['_scope' => 'frontend'] ) ]
@@ -1694,7 +1702,7 @@ EOT;
                 $stmt = $this->connection->executeQuery($sql, [$name, $Wettbewerb]);
                 $debug .= "sql: $sql\n";
                 if ($stmt->rowCount() > 0) {
-                    return new JsonResponse([
+                    return $this->jsonUtf8Response([
                         'data' => "",
                         'error' => "Mannschaft $name existiert bereits",
                         'debug' => $debug
@@ -1703,7 +1711,7 @@ EOT;
                 $sql = "INSERT INTO tl_hy_mannschaft (Wettbewerb, Name, Nation, Flagge, Gruppe) VALUES (?, ?, ?, ?, ?)";         
                 $this->connection->executeStatement($sql, [$Wettbewerb, $name, $nation, $flagge, $Gruppe]);
                 $html = "Wettbewerb $Wettbewerb Mannschaft $name Nation $nation Flagge $flagge neu gesetzt";
-                return new JsonResponse(['data' => $html, 'error' => '', 'debug' => $debug]);
+                return $this->jsonUtf8Response(['data' => $html, 'error' => '', 'debug' => $debug]);
             }
 
             // Update Mannschaft
@@ -1711,16 +1719,16 @@ EOT;
                 $sql = "UPDATE tl_hy_mannschaft SET Name = ?, Nation = ?, Flagge = ?, Gruppe = ? WHERE ID = ?";
                 $this->connection->executeStatement($sql, [$name, $nation, $flagge, $Gruppe, $id]);
                 $html = "Wettbewerb $Wettbewerb Mannschaft $name Nation $nation Flagge $flagge bearbeitet";
-                return new JsonResponse(['data' => $html, 'error' => '', 'debug' => $debug]);
+                return $this->jsonUtf8Response(['data' => $html, 'error' => '', 'debug' => $debug]);
             }
         }
         // Löschen
         if ($aktion == "d") {
             $sql = "DELETE FROM tl_hy_mannschaft WHERE ID = ? LIMIT 1";
             $this->connection->executeStatement($sql, [$id]);
-            return new JsonResponse(['data' => "Mannschaft gelöscht", 'error' => '', 'debug' => $debug]);
+            return $this->jsonUtf8Response(['data' => "Mannschaft gelöscht", 'error' => '', 'debug' => $debug]);
         }
-        return new JsonResponse([ 'data' => '', 'error' => "fehlerhafte Aktion $aktion",'debug' => $debug]);
+        return $this->jsonUtf8Response([ 'data' => '', 'error' => "fehlerhafte Aktion $aktion",'debug' => $debug]);
     }
     #[Route( '/fussball/bearbeitenation/{aktion}/{ID}/{Nation}/{Type}/{Alfa2}/{Alfa3}/{Domain}/{Image}', name: 'FussballRequestClass_bearbeitenation', defaults: ['_scope' => 'frontend'] ) ]
     /**
@@ -1734,7 +1742,7 @@ EOT;
             $html.="fehlerhafte Aktion empty<br>";
             $errortxt.="fehlerhafte Aktion empty<br>";
             $errortxt = utf8_encode($errortxt);
-            return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+            return $this->jsonUtf8Response(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
         }
         $c=$this->cgiUtil;
         $id = $ID;
@@ -1754,7 +1762,7 @@ EOT;
                 if (empty($Nation)||empty($Type)||empty($Image)) {
                     $errortxt.="Nation/ Type/ Image Eingabe notwendig";
                     $errortxt = utf8_encode($errortxt);
-                    return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+                    return $this->jsonUtf8Response(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
                 }
                 $sql="SELECT Nation FROM tl_hy_nation WHERE Nation='$Nation'"; 
                 $stmt = $this->connection->executeQuery($sql);
@@ -1763,14 +1771,14 @@ EOT;
                 if ($anz > 0) {
                     $errortxt.="Nation $Nation existiert bereits";
                     $errortxt = utf8_encode($errortxt);
-                    return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+                    return $this->jsonUtf8Response(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
                 }
                 $sql="INSERT INTO tl_hy_nation(Nation,Type,Alfa2,Alfa3,Domain,Image) VALUES ('$Nation','$Type','$Alfa2','$Alfa3','$Domain','$Image');";
                 $debug.="sql: $sql<br>";	
                 $cnt = $this->connection->executeStatement($sql);
                 $html.=" Nation: $Nation, Type: $Type, Alfa2: $Alfa2, Alfa3: $Alfa3, Domain: $Domain, Image: $Image";
-                $html = utf8_encode($html);
-                return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+                //$html = utf8_encode($html);
+                return $this->jsonUtf8Response(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
             }
             if ($aktion == "u" ) {   // Nation uebernehmen
                 $value = "SET ";
@@ -1783,8 +1791,8 @@ EOT;
         	    $sql = "update tl_hy_nation $value where ID='$id'";
                 $cnt = $this->connection->executeStatement($sql);
                 $html.=" Nation: $Nation, Type: $Type, Alfa2: $Alfa2, Alfa3: $Alfa3, Domain: $Domain, Image: $Image";
-                $html = utf8_encode($html);            
-                return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+                //$html = utf8_encode($html);            
+                return $this->jsonUtf8Response(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
             }
         }
         if ($aktion == "d" ) {   // Nation loeschen
@@ -1792,13 +1800,13 @@ EOT;
             $cnt = $this->connection->executeStatement($sql);
             //$html.="in Tabelle tl_hy_nation betroffene Saetze $cnt<br>";
             $html.="Nation gel&ouml;scht";
-            $html = utf8_encode($html);
-            return new JsonResponse(['data' => $html,'error'=>$errortxt,'debug'=>$debug]); 
+            //$html = utf8_encode($html);
+            return $this->jsonUtf8Response(['data' => $html,'error'=>$errortxt,'debug'=>$debug]); 
         }
         $html.="fehlerhafte Aktion $aktion<br>";
         $errortxt.="fehlerhafte Aktion $aktion<br>";
         $errortxt = utf8_encode($errortxt);
-        return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+        return $this->jsonUtf8Response(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
     } 
     
     #[Route( '/fussball/bearbeiteort/{aktion}/{ID}/{ort}/{beschreibung}', name: 'FussballRequestClass_bearbeiteort', defaults: ['_scope' => 'frontend'] ) ]
@@ -1813,7 +1821,7 @@ EOT;
       $html.="fehlerhafte Aktion empty<br>";
       $errortxt.="fehlerhafte Aktion empty<br>";
       $errortxt = utf8_encode($errortxt);
-      return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+      return $this->jsonUtf8Response(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
     }
     $c=$this->cgiUtil;
     $id = $ID;
@@ -1833,8 +1841,8 @@ EOT;
 	    $sql="INSERT INTO tl_hy_orte(Wettbewerb,Ort,Beschreibung) VALUES $value";
         $cnt = $this->connection->executeStatement($sql);
 	    $html.="Wettbewerb $Wettbewerb Ort $ort Beschreibung $beschreibung neu gesetzt";
-        $html = utf8_encode($html);
-        return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+        //$html = utf8_encode($html);
+        return $this->jsonUtf8Response(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
       }
       if ($aktion == "u" ) {   // Mannschaft uebernehmen
         $value = "SET ";
@@ -1846,8 +1854,8 @@ EOT;
 //echo "sql: $sql<br>";	
         $cnt = $this->connection->executeStatement($sql);
 	    $html.="Wettbewerb $Wettbewerb Ort $ort Beschreibung $beschreibung bearbeitet";
-        $html = utf8_encode($html);
-        return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+        //$html = utf8_encode($html);
+        return $this->jsonUtf8Response(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
       }
     }
     if ($aktion == "d" ) {   // Ort loeschen
@@ -1855,13 +1863,13 @@ EOT;
       $cnt = $this->connection->executeStatement($sql);
       //$html.="in Tabelle tl_hy_orte betroffene Saetze $cnt<br>";
 	  $html.="Ort gel&ouml;scht";
-      $html = utf8_encode($html);
-      return new JsonResponse(['data' => $html,'error'=>$errortxt,'debug'=>$debug]); 
+      //$html = utf8_encode($html);
+      return $this->jsonUtf8Response(['data' => $html,'error'=>$errortxt,'debug'=>$debug]); 
     }
     $html.="fehlerhafte Aktion $aktion<br>";
     $errortxt.="fehlerhafte Aktion $aktion<br>";
     $errortxt = utf8_encode($errortxt);
-    return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+    return $this->jsonUtf8Response(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
   } 
   
   /* Bei bearbeite Gruppe 
@@ -1886,7 +1894,7 @@ EOT;
       $html.="fehlerhafte Aktion empty<br>";
       $errortxt.="fehlerhafte Aktion empty<br>";
       $errortxt = utf8_encode($errortxt);
-      return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+      return $this->jsonUtf8Response(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
     }
     $c=$this->cgiUtil;
     $id = $ID;
@@ -1897,10 +1905,10 @@ EOT;
     if ($aktion == "u") {
       if ($ID<0) {
         $html.="unzulässige ID $ID<br>";
-        $html = utf8_encode($html);
+        //$html = utf8_encode($html);
         $errortxt.="unzulässige ID $ID<br><br>";
         $errortxt = utf8_encode($errortxt);
-        return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+        return $this->jsonUtf8Response(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
       }
       $value = "SET Platz=$Platz" ;
   	  $sql = "update tl_hy_gruppen $value where ID='$id'";
@@ -1908,8 +1916,8 @@ EOT;
       $cnt = $this->connection->executeStatement($sql);
 	  $html.="Wettbewerb $Wettbewerb GrupenId $id Platz $Platz";
       $html=replace16Bit($html);
-      $html = utf8_encode($html);
-      return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+      //$html = utf8_encode($html);
+      return $this->jsonUtf8Response(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
     } 
     if ($aktion == "a") {              // alle Gruppeneintraege löschen und aus den Spielen neu aufbauen
        $sql="SELECT * FROM tl_hy_gruppen WHERE Wettbewerb='$Wettbewerb'";
@@ -1994,7 +2002,7 @@ EOT;
          }
        }
        $debug.="!!!!!!!!!!!!!Platz bestimmen !!!!!!!!!!!!!!!!!!!!!\n";
-       //return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]);  
+       //return $this->jsonUtf8Response(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]);  
        // Versuch der Platzbestimmung
        // lies alle Gruppen nochmals ein
        $sql="SELECT * FROM tl_hy_gruppen WHERE Wettbewerb='$Wettbewerb' ORDER BY Gruppe";
@@ -2009,7 +2017,7 @@ EOT;
          }
        } else {
          $errortxt.="Fehler bei Platzbestimmung Anz gruppen $num_rows";
-         return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]);  
+         return $this->jsonUtf8Response(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]);  
        } 
        $grpNameSelect="";
        //$debug="";
@@ -2086,8 +2094,8 @@ EOT;
          }
        }
        $html=replace16Bit($html);
-       $html = utf8_encode($html); 
-       return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]);           
+       //$html = utf8_encode($html); 
+       return $this->jsonUtf8Response(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]);           
     }
   }  
 
@@ -2129,7 +2137,7 @@ EOT;
       $html.="fehlerhafte Aktion empty<br>";
       $errortxt.="fehlerhafte Aktion empty<br>";
       $errortxt = utf8_encode($errortxt);
-      return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+      return $this->jsonUtf8Response(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
     }
     $c=$this->cgiUtil;
     $id = $ID;
@@ -2143,12 +2151,12 @@ EOT;
       if ($Nr== -1 || $Gruppe=='' || $M1==-1 || $M2==-1 || $Ort==-1 || $Datum=='' || $Uhrzeit=='' || $T1==-2 || $T2==-2) {
 	      $errortxt.="aktion $aktion ID $ID Wettbewerb $Wettbewerb Spielnummer $Nr Gruppe $Gruppe M1 $M1 M2 $M2  Ort $Ort Datum $Datum Uhrzeit $Uhrzeit T1 $T1 T2 $T2 Fehlerhafte daten";
           //$errortxt = utf8_encode($errortxt);
-          return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+          return $this->jsonUtf8Response(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
       }
       if (false === checkDatum($Datum)) {
           $errortxt.="startDatum $Datum fehlerhaft (yyyy-mm-tt)<br>";
           $errortxt = utf8_encode($errortxt);
-          return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+          return $this->jsonUtf8Response(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
       }
 
       if ($aktion == "n" ) {   // neueintrag
@@ -2163,7 +2171,7 @@ EOT;
           $errortxt.=" Spiel $Nr existiert bereits";
           //$errortxt = utf8_encode($errortxt);
           $debug = utf8_encode($debug);
-          return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+          return $this->jsonUtf8Response(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
         }
         
         $value = "( ";
@@ -2181,8 +2189,8 @@ EOT;
         $cnt = $this->connection->executeStatement($sql);
         $debug.="sql: $sql<br>";	
 	    $html.="Wettbewerb $Wettbewerb Spielnummer $Nr Gruppe $Gruppe M1 $M1 M2 $M2  Ort $Ort Datum $Datum Uhrzeit $Uhrzeit T1 $T1 T2 $T2 neu";
-        $html = utf8_encode($html); 
-        return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]);  
+        //$html = utf8_encode($html); 
+        return $this->jsonUtf8Response(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]);  
       }
       if ($aktion == "u" ) {   // Spiel uebernehmen
         $value = "SET ";
@@ -2198,12 +2206,12 @@ EOT;
         $value .= "T2=$T2 " ;
 	    $sql = "update tl_hy_spiele $value where ID=$id";
 $debug.=" sql: $sql\n";	
-    //return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+    //return $this->jsonUtf8Response(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
         $cnt = $this->connection->executeStatement($sql);
 
 	    $html.="Wettbewerb $Wettbewerb Spielnummer $Nr Gruppe $Gruppe M1 $M1 M2 $M2  Ort $Ort Datum $Datum Uhrzeit $Uhrzeit T1 $T1 T2 $T2 bearbeitet";
-        $html = utf8_encode($html);
-        return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+        //$html = utf8_encode($html);
+        return $this->jsonUtf8Response(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
       }
     }
     if ($aktion == "d" ) {   // Spiel loeschen
@@ -2211,13 +2219,13 @@ $debug.=" sql: $sql\n";
       $cnt = $this->connection->executeStatement($sql);
       //$html.="in Tabelle tl_hy_spiele betroffene Saetze $cnt<br>";
 	  $html.="Spiel $id Nr $Nr gel&ouml;scht";
-      $html = utf8_encode($html);
-      return new JsonResponse(['data' => $html,'error'=>$errortxt,'debug'=>$debug]); 
+      //$html = utf8_encode($html);
+      return $this->jsonUtf8Response(['data' => $html,'error'=>$errortxt,'debug'=>$debug]); 
     }
     $html.="fehlerhafte Aktion $aktion Spiel bearbeiten<br>";
     $errortxt.="fehlerhafte Aktion $aktion\n";
     $errortxt = utf8_encode($errortxt);
-    return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+    return $this->jsonUtf8Response(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
   } 
 
     #[Route(
@@ -2261,7 +2269,7 @@ $debug.=" sql: $sql\n";
       $html.="fehlerhafte Aktion empty<br>";
       $errortxt.="fehlerhafte Aktion empty<br>";
       $errortxt = utf8_encode($errortxt);
-      return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+      return $this->jsonUtf8Response(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
     }
     $c=$this->cgiUtil;
     $id = $ID;
@@ -2274,7 +2282,7 @@ $debug.=" sql: $sql\n";
 	  $errortxt.="Fehlerhafte Eingabe Kommentar oder Art dürfen nicht leer sein";
       $errortxt.="Kommentar: |$Kommentar| Art: |$Art|";
       //$errortxt = utf8_encode($errortxt);
-      return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+      return $this->jsonUtf8Response(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
     }
     if ($aktion == "n" ) {   // neueintrag
       $value = "( '$Wettbewerb','$Kommentar','$Art',$Pok,$Ptrend,'$Tipp1','$Tipp2','$Tipp3','$Tipp4')";
@@ -2282,7 +2290,7 @@ $debug.=" sql: $sql\n";
       $cnt = $this->connection->executeStatement($sql);
       $debug.="sql: $sql<br>";	
       $html.="Kommentar: $Kommentar Art: $Art Pok: $Pok Ptrend: $Ptrend Tipp1: $Tipp1 Tipp2: $Tipp2 Tipp3: $Tipp3 Tipp4: $Tipp4 neu";
-      $html = utf8_encode($html); 
+      //$html = utf8_encode($html); 
       // Wettid Lesen
       $sql="SELECT * FROM  tl_hy_wetten WHERE ID = LAST_INSERT_ID();";
       $stmt = $this->connection->executeQuery($sql);
@@ -2317,7 +2325,7 @@ $debug.=" sql: $sql\n";
 //          $errortext.="wette fuer Tln $tid Name: ".$tln['Name'].' Wette '.$wettid.' geschrieben';       
           $html.="wette fuer Tln $tid Name: ".$tln['Name'].' Wette '.$wettid.' geschrieben';       
       }
-      return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]);  
+      return $this->jsonUtf8Response(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]);  
     }
     if ($aktion == "b" ) {   // Wette uebernehmen
       if ($Tipp2 == 'undefined') $Tipp2 = -1;
@@ -2337,7 +2345,7 @@ $debug.=" sql: $sql\n";
       $cnt = $this->connection->executeStatement($sql);
       $html.="Wettbewerb $Wettbewerb Kommentar: $Kommentar Art: $Art Pok: $Pok Ptrend: $Ptrend Tipp1: $Tipp1 Tipp2: $Tipp2 Tipp3: $Tipp3 Tipp4: $Tipp4 neu";
       //$html = utf8_encode($html);
-      return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+      return $this->jsonUtf8Response(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
     }
     if ($aktion == "u" ) {   // alle Wetten updaten, d.h. die Werte tipp1 Tipp2 Tipp3 abhängig vom aktuellen Stand neu eintragen
       // zuerst alle Wetten zum Wettbewerb einlesen
@@ -2396,7 +2404,7 @@ $debug.=" sql: $sql\n";
             $html.="Wettbewerb $Wettbewerb Spielwette $wettindex Tipp2: $T1 Tipp3: $T2 neu<br>";           
         }
       }
-      return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+      return $this->jsonUtf8Response(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
     }
     if ($aktion == "d" ) {   // Wette loeschen
 	  $sql = "Delete from  tl_hy_wetten WHERE ID='$id' LIMIT 1";
@@ -2406,13 +2414,13 @@ $debug.=" sql: $sql\n";
 	  $sql = "Delete from  tl_hy_wetteaktuell WHERE Wette='$id'";
       $cnt = $this->connection->executeStatement($sql);
 	  $html.="Wette $id in $cnt Teilnehmern gel&ouml;scht";
-      $html = utf8_encode($html);
-      return new JsonResponse(['data' => $html,'error'=>$errortxt,'debug'=>$debug]); 
+      //$html = utf8_encode($html);
+      return $this->jsonUtf8Response(['data' => $html,'error'=>$errortxt,'debug'=>$debug]); 
     }
     $html.="fehlerhafte Aktion $aktion Wette bearbeiten<br>";
     $errortxt.="fehlerhafte Aktion $aktion\n";
     $errortxt = utf8_encode($errortxt);
-    return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+    return $this->jsonUtf8Response(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
   } 
     
     
@@ -2429,7 +2437,7 @@ $debug.=" sql: $sql\n";
       $html.="fehlerhafte Aktion empty<br>";
       $errortxt.="fehlerhafte Aktion empty<br>";
       $errortxt = utf8_encode($errortxt);
-      return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+      return $this->jsonUtf8Response(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
     }
     if (!isset($Bezahlt) || $Bezahlt == 'undefined') $Bezahlt = 0;
     if (!isset($Erst)) $Erst = 0;
@@ -2449,7 +2457,7 @@ $debug.=" sql: $sql\n";
       $html.="fehlerhafte Werte bei Bezahlt $Bezahlt, Erst $Erst, Sechzehn $Sechzehn, Achtel $Achtel, Viertel $Viertel, Halb $Halb, Finale $Finale nur 0 oder 1 zugelassen<br>";
       $errortxt.="fehlerhafte Werte bei Bezahlt $Bezahlt, Erst $Erst, Sechzehn $Sechzehn, Achtel $Achtel, Viertel $Viertel, Halb $Halb, Finale $Finale nur 0 odeer 1 zugelassen<br><br>";
       $errortxt = utf8_encode($errortxt);
-      return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+      return $this->jsonUtf8Response(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
     } 
     $c=$this->cgiUtil;
     $id = $ID;
@@ -2464,7 +2472,7 @@ $debug.=" sql: $sql\n";
           $html.="Kurzname fehlerhafter Wert ($Kurzname)<br>";
           $errortxt.="Kurzname fehlerhafter Wert ($Kurzname)<br>";
           $errortxt = utf8_encode($errortxt);
-          return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+          return $this->jsonUtf8Response(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
         }
       if ($aktion == "n" ) {   // neueintrag
         $value = "( '$Wettbewerb' ,'$Kurzname' , '$Name' , '$Email', '$Bezahlt', '$Erst', $Sechzehn, '$Achtel', '$Viertel', '$Halb', '$Finale' )" ; 
@@ -2508,7 +2516,7 @@ $debug.=" sql: $sql\n";
           $html.="Teilnehmer bearbeiten ID nicht vorhanden ($ID)<br>";
           $errortxt.="Teilnehmer bearbeiten ID nicht vorhanden ($ID)<br>";
           $errortxt = utf8_encode($errortxt);
-          return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+          return $this->jsonUtf8Response(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
         }
         $value = "SET Wettbewerb='$Wettbewerb' ,Kurzname='$Kurzname', Name='$Name', Email='$Email'" ; 
         $value .= " ,Bezahlt='$Bezahlt' ,Erst='$Erst', Sechzehn = '$Sechzehn', Achtel='$Achtel', Viertel='$Viertel', Halb='$Halb', Finale='$Finale'" ; 
@@ -2517,8 +2525,8 @@ $debug.=" sql: $sql\n";
         $cnt = $this->connection->executeStatement($sql);
 	    $html.="Teilnehmer " . $Kurzname . " ge&auml;ndert $value ";
       }
-      $html = utf8_encode($html);
-      return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+      //$html = utf8_encode($html);
+      return $this->jsonUtf8Response(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
     }
     if ($aktion == "d" ) {   
         // TeilnehmerId besorgen/pruefen
@@ -2533,7 +2541,7 @@ $debug.=" sql: $sql\n";
           $html.="Teilnehmer bearbeiten ID nicht vorhanden ($ID)<br>";
           $errortxt.="Teilnehmer bearbeiten ID nicht vorhanden ($ID)<br>";
           $errortxt = utf8_encode($errortxt);
-          return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+          return $this->jsonUtf8Response(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
         }
         $Kurzname=$row['Kurzname'];
 	  $sql = "Delete from tl_hy_teilnehmer WHERE ID=$tid LIMIT 1";
@@ -2545,13 +2553,13 @@ $debug.=" sql: $sql\n";
       $cnt = $this->connection->executeStatement($sql);
       $debug.="Teilnehmer $Kurzname($id) und in Tabelle  tl_hy_wetteaktuell betroffene Saetze $cnt<br>";
       $html.="Teilnehmer $Kurzname($id) und in Tabelle  tl_hy_wetteaktuell betroffene Saetze $cnt<br>";
-      $html = utf8_encode($html);
-      return new JsonResponse(['data' => $html,'error'=>$errortxt,'debug'=>$debug]); 
+      //$html = utf8_encode($html);
+      return $this->jsonUtf8Response(['data' => $html,'error'=>$errortxt,'debug'=>$debug]); 
     }
     $html.="fehlerhafte Aktion $aktion<br>";
     $errortxt.="fehlerhafte Aktion $aktion<br>";
     $errortxt = utf8_encode($errortxt);
-    return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+    return $this->jsonUtf8Response(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
   } 
 
     #[Route( '/fussball/storeteilnehmerwette/{aktion}/{Idwettaktuell}/{W1}/{W2}/{W3}', name: 'FussballRequestClass_storeteilnehmerwette', defaults: ['_scope' => 'frontend'] ) ]
@@ -2566,7 +2574,7 @@ $debug.=" sql: $sql\n";
       $html.="fehlerhafte Aktion oder ID <br>";
       $errortxt.="fehlerhafte Aktion ID: $Idwettaktuell <br>";
       $errortxt = utf8_encode($errortxt);
-      return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+      return $this->jsonUtf8Response(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
     }
     $c=$this->cgiUtil;
     $id = $Idwettaktuell;
@@ -2581,13 +2589,13 @@ $debug.=" sql: $sql\n";
 	    $sql = "update  tl_hy_wetteaktuell $value where Wettbewerb='$Wettbewerb' AND ID=$Idwettaktuell;";
         $cnt = $this->connection->executeStatement($sql);
 	    $html.="Wetteaktuell $Wettbewerb  tl_hy_wetteaktuell $Idwettaktuell SET W1='$W1' ,W2='$W2', W3='$W3' gesetzt";
-      $html = utf8_encode($html);
-      return new JsonResponse(['data' => $html,'error'=>$errortxt,'debug'=>$debug]); 
+      //$html = utf8_encode($html);
+      return $this->jsonUtf8Response(['data' => $html,'error'=>$errortxt,'debug'=>$debug]); 
     }
     $html.="fehlerhafte Aktion $aktion<br>";
     $errortxt.="fehlerhafte Aktion $aktion<br>";
     $errortxt = utf8_encode($errortxt);
-    return new JsonResponse(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
+    return $this->jsonUtf8Response(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
   } 
   
     #[Route( '/fussball/testAjax/{article}', name: 'FussballRequestClass_testAjax', defaults: ['_scope' => 'frontend']  )]
@@ -2606,7 +2614,7 @@ $debug.=" sql: $sql\n";
       // erzeugt einen 404
       //throw $this->createNotFoundException("endeDatum fehlerhaft (yyyy-mm-tt)<br>");
 
-	  return new JsonResponse(['article' => $article,'data'=>'123','dir'=>__DIR__,'realpath'=>$path,'res'=>$res], Response::HTTP_BAD_REQUEST); 
+	  return $this->jsonUtf8Response(['article' => $article,'data'=>'123','dir'=>__DIR__,'realpath'=>$path,'res'=>$res], Response::HTTP_BAD_REQUEST); 
     } 
    
 }

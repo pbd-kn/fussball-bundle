@@ -11,7 +11,6 @@
       <p>
 	    <br />Tippen kann jeder für den es eine eindeutige E-Mail Adresse gibt. Eine E-Mail Adresse kann nur einmal verwendet werden.
       <br />
-      <br />Derzeit werden noch keine Wetten angenommen.
       <br />Als einmaliger Wetteinsatz (pauschal für die gesamte EM) sind <b>8 Euro pro Teilnehmer</b> vorgesehen.  
       <br />
       <strong>Anmelden könnt Ihr Euch über die Webseite www.hoyzer-wetten.de</strong>
@@ -50,12 +49,12 @@
         <tr><td>Ergebnis Finale</td><td>2 oder 5</td><td>5</td></tr>
       </table>
       <br />
-      <p>Für den richtigen Tipp eines Spieles bekommt man entweder 2 Punkt (Tendenz richtig getippt) oder 5 Punkte (Ergebnis richtig getippt).
+      <p>Für den richtigen Tipp eines Spieles bekommt man entweder 2 Punkte (Tendenz richtig getippt) oder 5 Punkte (Ergebnis richtig getippt).
       </p>
 	  <p>
       <br />Für den richtigen Tipp der Gruppenplazierung bekommt man entweder 1 Punkt oder 3 Punkte.
       <br /> 1 Punkt erhält man, wenn sich die getippte Mannschaft sich qualifiziert, aber die Platzierung falsch ist.
-      <br /> 3 Punkte erhält man, wenn die getippte Platzierung korrekt ist. Somit kann man pro Gruppe max. 9 Punkte bekommen.
+      <br /> 3 Punkte erhält man, wenn die getippte Platzierung korrekt ist. Somit kann man pro Gruppe max. 6 Punkte bekommen.
       <br />
       <br />Für den richtigen Tipp der jeweiligen Finale bekommt man entweder 2 Punkt oder 5 Punkte.
       <br /> 2 Punkt erhält man, wenn sich die getippte Mannschaft gewinnt.
@@ -63,7 +62,7 @@
       <br />
       <br />Das war es schon an Spielregeln ?
       <br />
-      <br />Nun kann es losgehen. Unter Onlinewette könnt Ihr alle zu tippenden Wetten einsehen.
+      <br />Nun kann es losgehen. Unter Wettenübersicht könnt Ihr alle zu tippenden Wetten einsehen.
       <br />
       <br />Derzeit werden keine Wetten angenommen. 
       <br />

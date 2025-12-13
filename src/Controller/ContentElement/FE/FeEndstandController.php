@@ -693,7 +693,7 @@ class FeEndstandController extends AbstractFussballController
              $res.=$c->td(array("align"=>"left","valign"=>"top"),$str);	   
            } else {
              $str.=$wette['Tipp1'];
-             $infotext="1: Europameister
+             $infotext="1: Meister
 2: Ausscheiden in Finale
 4: Ausscheiden in Halbfinale
 8: Ausscheiden in Viertelfinale
