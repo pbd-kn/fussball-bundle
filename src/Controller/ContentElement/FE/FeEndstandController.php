@@ -698,7 +698,8 @@ class FeEndstandController extends AbstractFussballController
 4: Ausscheiden in Halbfinale
 8: Ausscheiden in Viertelfinale
 16: Ausscheiden in Achtelfinale
-32: Ausscheiden in Gruppenspielen
+32: Ausscheiden in Sechzentelfinale (wenn vorhanden)
+64: Ausscheiden in Gruppenspielen
 ";
              $res.=$c->td(array("align"=>"left","valign"=>"top","title"=>$infotext),$str);	   
            }
