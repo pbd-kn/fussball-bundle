@@ -134,27 +134,16 @@ protected function getResponse(Template $template, ContentModel $model, Request 
     /* ============================================================
        GRUPPENTABELLE LADEN
     ============================================================ */
-    $sql  = "SELECT
-        tl_hy_gruppen.ID as ID,
-        tl_hy_gruppen.Gruppe as Gruppe,
-        tl_hy_gruppen.M1 as M1Ind,
-        mannschaft1.Nation as M1,
-        mannschaft1.Name as M1Name,
-        mannschaft1.Flagge as Flagge1,
-        tl_hy_gruppen.Spiele as Spiele,
-        tl_hy_gruppen.Sieg as Sieg,
-        tl_hy_gruppen.Unentschieden as Unentschieden,
-        tl_hy_gruppen.Niederlage as Niederlage,
-        tl_hy_gruppen.Tore as Tore,
-        tl_hy_gruppen.Gegentore as Gegentore,
-        tl_hy_gruppen.Differenz as Differenz,
-        tl_hy_gruppen.Platz as Platz,
-        tl_hy_gruppen.Punkte as Punkte
-        FROM tl_hy_gruppen
-        LEFT JOIN tl_hy_mannschaft AS mannschaft1 ON tl_hy_gruppen.M1 = mannschaft1.ID
-        WHERE tl_hy_gruppen.Wettbewerb = ?
-        ORDER BY tl_hy_gruppen.Gruppe ASC, tl_hy_gruppen.Platz ASC
-    ";
+
+    $sql = "
+        SELECT s.ID, s.Nr, s.Gruppe, s.Datum, s.Uhrzeit, s.M1, s.M2, m1.Name  AS M1Name, m1.Flagge AS Flagge1, m2.Name  AS M2Name, m2.Flagge AS Flagge2
+        FROM tl_hy_spiele s
+        LEFT JOIN tl_hy_mannschaft m1 ON s.M1 = m1.ID
+        LEFT JOIN tl_hy_mannschaft m2 ON s.M2 = m2.ID
+        WHERE s.Wettbewerb = ?
+        ORDER BY s.Datum ASC, s.Uhrzeit ASC, s.Nr ASC
+        ";
+
 
     try {
         $rows = $this->connection
