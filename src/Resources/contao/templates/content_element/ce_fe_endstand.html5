@@ -1,0 +1,273 @@
+<?php
+/**
+ * Frontend-Template: Endstand
+ * FINAL – stabil, mit korrekt integriertem PUV-Block
+ */
+
+if (!isset($this->data)) {
+    echo '<p><b>DEBUG:</b> $this->data ist nicht gesetzt</p>';
+    return;
+}
+?>
+
+<style>
+.endstand-section {
+  margin: 2rem 0;
+  padding: 1rem;
+  background: rgba(255,255,255,0.18);
+  border: 1px solid #666;
+}
+
+.endstand-section h2 {
+  margin: 0;
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+  padding-right: 1.8rem;
+}
+
+.endstand-section h2::after {
+  content: "▼";
+  position: absolute;
+  right: 0;
+}
+
+.endstand-section h2.closed::after {
+  content: "▶";
+}
+
+.toggle-body.hidden { display:none; }
+
+/* ===== Rangliste ===== */
+
+.rangliste-wrapper {
+  position: sticky;
+  top: 0;
+  z-index: 999;
+  background: #cfdfe2;
+  border-bottom: 3px solid #333;
+}
+
+.rangliste-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.rangliste-table th,
+.rangliste-table td {
+  border: 1px solid #444;
+  padding: 0.4rem;
+}
+
+.rangliste-table th:nth-child(1),
+.rangliste-table td:nth-child(1) {
+  width: 80px;
+  text-align: center;
+}
+
+.rangliste-table th:nth-child(3),
+.rangliste-table td:nth-child(3) {
+  width: 100px;
+  text-align: right;
+}
+
+/* ===== Teilnehmer-Zeilen ===== */
+
+.player-row {
+  display: grid;
+  grid-template-columns: 160px 1fr 140px;
+  gap: 1rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #777;
+}
+
+.player-name { font-weight:bold; }
+.player-sum {
+  text-align:right;
+  font-weight:bold;
+  white-space:nowrap;
+}
+
+/* ===== Karten ===== */
+
+.cards-scroll {
+  display: flex;
+  gap: 0.75rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.card {
+  min-width: 200px;
+  max-width: 200px;
+  border: 1px solid #555;
+  padding: 0.5rem;
+  background: rgba(255,255,255,0.28);
+  font-size: 0.85rem;
+  box-sizing: border-box;
+}
+
+.card div {
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  line-height: 1.25;
+}
+
+.card img.flag {
+  height: 12px;
+  vertical-align: middle;
+  margin-right: 4px;
+}
+
+/* ===== Debug ===== */
+
+.debug-box {
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  background: rgba(0,0,0,0.06);
+  border: 1px dashed #666;
+  font-size: 0.8rem;
+  max-height: 200px;
+  overflow: auto;
+  display:none;
+}
+</style>
+
+<script>
+function toggleSection(h){
+  h.classList.toggle('closed');
+  h.nextElementSibling.classList.toggle('hidden');
+}
+function toggleDebug(el){
+  const d = el.nextElementSibling;
+  d.style.display = d.style.display==='block'?'none':'block';
+}
+</script>
+
+<?php /* ================= RANGLISTE ================= */ ?>
+<?php if (!empty($this->data['rangliste'])): ?>
+<div class="rangliste-wrapper">
+<section class="endstand-section">
+<h2 onclick="toggleSection(this)">🏆 Rangliste</h2>
+<div class="toggle-body">
+
+<table class="rangliste-table">
+<thead>
+<tr>
+  <th>Reihenfolge</th>
+  <th>Name</th>
+  <th>Punkte</th>
+</tr>
+</thead>
+<tbody>
+<?php $i=1; foreach ($this->data['rangliste'] as $r): ?>
+<tr>
+  <td><?= $i++ ?></td>
+  <td><?= htmlspecialchars($r['Name']) ?></td>
+  <td><?= (int)$r['Punkte'] ?></td>
+</tr>
+<?php endforeach; ?>
+</tbody>
+</table>
+
+<div onclick="toggleDebug(this)" style="cursor:pointer;">▶ DEBUG Rangliste</div>
+<div class="debug-box"><pre><?php print_r($this->data['rangliste']); ?></pre></div>
+
+</div>
+</section>
+</div>
+<?php endif; ?>
+
+<?php /* ================= SECTIONS ================= */ ?>
+<?php foreach (($this->data['sections'] ?? []) as $section): ?>
+
+<section class="endstand-section">
+<h2 onclick="toggleSection(this)"><?= htmlspecialchars($section['title']) ?></h2>
+<div class="toggle-body">
+
+<?php /* ===== SPIELE ===== */ ?>
+<?php if ($section['type']==='spiele'): ?>
+<?php foreach ($section['rows'] as $row): ?>
+<div class="player-row">
+<div class="player-name"><?= htmlspecialchars($row['name']) ?></div>
+
+<div class="cards-scroll">
+<?php foreach ($row['cards'] as $card): ?>
+<div class="card">
+<div><b><?= htmlspecialchars($card['datum']) ?></b></div>
+<div>
+<img class="flag" src="<?= $this->fussballUtil->getImagePath($card['flag1']) ?>">
+<?= htmlspecialchars($card['m1']) ?>
+<?= $card['t1'] ?> : <?= $card['t2'] ?>
+<?= htmlspecialchars($card['m2']) ?>
+<img class="flag" src="<?= $this->fussballUtil->getImagePath($card['flag2']) ?>">
+</div>
+<div>gewettet: <?= htmlspecialchars($card['wette']) ?></div>
+<div>Punkte: <?= (int)$card['punkte'] ?></div>
+</div>
+<?php endforeach; ?>
+</div>
+
+<div class="player-sum"><?= $row['sum'] ?></div>
+</div>
+<?php endforeach; ?>
+
+<?php /* ===== GRUPPEN ===== */ ?>
+<?php elseif ($section['type']==='gruppen'): ?>
+<?php foreach ($section['rows'] as $row): ?>
+<div class="player-row">
+<div class="player-name"><?= htmlspecialchars($row['name']) ?></div>
+
+<div class="cards-scroll">
+<?php foreach ($row['cards'] as $card): ?>
+<div class="card">
+<div><b>Gruppe <?= htmlspecialchars($card['gruppe']) ?></b></div>
+<div>1: <?= htmlspecialchars($card['ist1'] ?? '—') ?></div>
+<div>2: <?= htmlspecialchars($card['ist2'] ?? '—') ?></div>
+<div>Punkte: <?= (int)$card['punkte'] ?></div>
+</div>
+<?php endforeach; ?>
+</div>
+
+<div class="player-sum"><?= $row['sum'] ?></div>
+</div>
+<?php endforeach; ?>
+
+<?php /* ===== PLATZ & VERGLEICH (PUV) ===== */ ?>
+<?php elseif ($section['type']==='puv'): ?>
+
+<?php if (!empty($section['rows'])): ?>
+<?php foreach ($section['rows'] as $row): ?>
+<div class="player-row">
+<div class="player-name"><?= htmlspecialchars($row['name']) ?></div>
+
+<div class="cards-scroll">
+<?php foreach ($row['cells'] as $cell): ?>
+<div class="card">
+<?= $cell['text'] ?>
+</div>
+<?php endforeach; ?>
+</div>
+
+<div class="player-sum"><?= $row['sumText'] ?></div>
+</div>
+<?php endforeach; ?>
+<?php else: ?>
+<p style="font-style:italic;">Keine Platz-/Vergleich-Wetten vorhanden</p>
+<?php endif; ?>
+
+<?php if (!empty($section['infotext'])): ?>
+<div style="margin-top:0.5rem;font-size:0.85rem;white-space:pre-line;">
+<?= htmlspecialchars($section['infotext']) ?>
+</div>
+<?php endif; ?>
+
+<?php endif; ?>
+
+<div onclick="toggleDebug(this)" style="cursor:pointer;">▶ DEBUG Section</div>
+<div class="debug-box"><pre><?php print_r($section); ?></pre></div>
+
+</div>
+</section>
+<?php endforeach; ?>
