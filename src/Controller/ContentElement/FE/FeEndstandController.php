@@ -129,49 +129,21 @@ class FeEndstandController extends AbstractFussballController
 
         // Deutschlandspiele (Gruppe aus Config + Nation-Filter Deutschland)
         $deutschlandgruppe = (string) ($this->aktWettbewerb['aktDGruppe'] ?? '');
-        $sections[] = $this->createSpieleSection(
-            $conn,
-            $Wettbewerb,
-            $deutschlandgruppe,
-            $allTeilnehmer,
-            $punkteSumme,
-            'Deutschland Gruppenspiele',
-            'Deutschland'
-        );
-
+        $sections[] = $this->createSpieleSection( $conn, $Wettbewerb, $deutschlandgruppe, $allTeilnehmer, $punkteSumme, 'Deutschland Gruppenspiele', 'Deutschland' );
         // Gruppen A–L (Gruppenstände + Gruppenwetten)
-        $sections[] = $this->createGruppenSection(
-            $conn,
-            $Wettbewerb,
-            $allTeilnehmer,
-            $punkteSumme,
-            'Gruppen A–L'
-        );
-
+        $sections[] = $this->createGruppenSection( $conn, $Wettbewerb, $allTeilnehmer, $punkteSumme, 'Gruppen A–L');
         // KO-Phasen
         $sections[] = $this->createSpieleSection($conn, $Wettbewerb, 'sechz%',  $allTeilnehmer, $punkteSumme, 'Sechzehntelfinale', '');
         $sections[] = $this->createSpieleSection($conn, $Wettbewerb, 'achtel%', $allTeilnehmer, $punkteSumme, 'Achtelfinale', '');
         $sections[] = $this->createSpieleSection($conn, $Wettbewerb, 'viertel%',$allTeilnehmer, $punkteSumme, 'Viertelfinale', '');
         $sections[] = $this->createSpieleSection($conn, $Wettbewerb, 'halb%',   $allTeilnehmer, $punkteSumme, 'Halbfinale', '');
         $sections[] = $this->createSpieleSection($conn, $Wettbewerb, 'finale',  $allTeilnehmer, $punkteSumme, 'Finale', '');
-
         // Platz & Vergleich (P/V)
-        $sections[] = $this->createPuVSection(
-            $conn,
-            $Wettbewerb,
-            $wetten,
-            $teilnehmerAktWetten,
-            $punkteSumme,
-            ['p', 'v'],
-            'Platz und Vergleich'
-        );
-
+        $sections[] = $this->createPuVSection( $conn, $Wettbewerb, $wetten, $teilnehmerAktWetten, $punkteSumme, ['p', 'v'], 'Platz und Vergleich');
         // Final: Punkte in DB schreiben (einmal pro Teilnehmer => keine Mehrfachwertung möglich)
         $this->writeFinalPoints($conn, $Wettbewerb, $punkteSumme);
-
         // Rangliste laden
         $rangliste = $this->loadRangliste($conn, $Wettbewerb);
-
         $data = [
             'debug' => $debug,
             'wettbewerb' => $Wettbewerb,
@@ -559,10 +531,11 @@ class FeEndstandController extends AbstractFussballController
             $stand[$grp][(int)$r['Platz']] = $r;
         }
 
+        /* sortiert die gruppen */
         $gruppenKeys = array_keys($stand);
         sort($gruppenKeys);
 
-        // Pok/Ptrend (Art g)
+        // Pok/Ptrend (Art g) liefert einen satz aus den wetten um POK und Ptrend zu ermitteln */
         $rowp = $conn->executeQuery(
             "SELECT Pok, Ptrend FROM tl_hy_wetten WHERE LOWER(Art)='g' AND Wettbewerb=? LIMIT 1",
             [$Wettbewerb]
@@ -571,7 +544,7 @@ class FeEndstandController extends AbstractFussballController
         $Pok = (int)$rowp['Pok'];
         $Ptrend = (int)$rowp['Ptrend'];
 
-        if (count($gruppenKeys) === 0) {
+        if (count($gruppenKeys) === 0) {   /* keine gruppen fefunden */
             return [
                 'type' => 'gruppen',
                 'title' => $title,
@@ -582,9 +555,9 @@ class FeEndstandController extends AbstractFussballController
         }
 
         // Prefetch Gruppen-Tipps: tl_hy_wetteaktuell join tl_hy_wetten (Art g, Tipp1=Gruppenbuchstabe)
-        $in = implode(',', array_fill(0, count($gruppenKeys), '?'));
+        $in = implode(',', array_fill(0, count($gruppenKeys), '?'));   /* Diese Zeile baut einen kommagetrennten Platzhalter-String mit ? auf – typisch für SQL IN (...) Also 'A','B','C'*/
         $params = array_merge([$Wettbewerb], $gruppenKeys);
-
+/*
         $sqlw =
             "SELECT wa.Teilnehmer, w.Art, w.Tipp1,
                     wa.W1, wa.W2,
@@ -598,13 +571,35 @@ class FeEndstandController extends AbstractFussballController
              WHERE wa.Wettbewerb = ?
                AND LOWER(w.Art)='g'
                AND w.Tipp1 IN ($in)";
+*/
+
+        $sqlw =
+        "SELECT wa.Teilnehmer, w.Art, w.Tipp1 AS Gruppe,
+        w.Tipp2              AS TippM1_ID, 
+        tm1.Nation           AS TippM1,
+        tm1.Flagge           AS TippFlag1,
+        w.Tipp3              AS TippM2_ID,
+        tm2.Nation           AS TippM2,
+        tm2.Flagge           AS TippFlag2,
+        w.Pok,
+        w.Ptrend
+        FROM tl_hy_wetteaktuell wa
+        JOIN tl_hy_wetten w
+            ON w.ID = wa.Wette
+        LEFT JOIN tl_hy_mannschaft tm1
+            ON w.Tipp2 = tm1.ID
+        LEFT JOIN tl_hy_mannschaft tm2
+            ON w.Tipp3 = tm2.ID
+        WHERE wa.Wettbewerb = ?
+            AND LOWER(w.Art) = 'g'
+            AND w.Tipp1 IN ($in)";
 
         $stmtw = $conn->executeQuery($sqlw, $params);
 
         $tipps = []; // [TeilnehmerId][Gruppe] => row
         while (($r = $stmtw->fetchAssociative()) !== false) {
             $tid = (string)$r['Teilnehmer'];
-            $grp = (string)$r['Tipp1'];
+            $grp = (string)$r['Gruppe'];
             $tipps[$tid][$grp] = $r;
         }
 
@@ -622,23 +617,12 @@ class FeEndstandController extends AbstractFussballController
 
                 $tipp = $tipps[$tid][$grp] ?? null;
 
-                $w1 = (int)($tipp['W1'] ?? -1);
-                $w2 = (int)($tipp['W2'] ?? -1);
+                $w1 = (int)($tipp['TippM1_ID'] ?? -1);
+                $w2 = (int)($tipp['TippM2_ID'] ?? -1);
 
                 $points = 0;
                 if ($erster && $zweiter) {
-                    $points = $this->berechneGruppenPunkte(
-                        'g',
-                        $w1,
-                        $w2,
-                        0,
-                        $grp,
-                        (int)($erster['MID'] ?? -1),
-                        (int)($zweiter['MID'] ?? -1),
-                        0,
-                        (int)($tipp['Pok'] ?? $Pok),
-                        (int)($tipp['Ptrend'] ?? $Ptrend)
-                    );
+                    $points = $this->berechneGruppenPunkte( 'g', $w1, $w2, 0, $grp, (int)($erster['MID'] ?? -1), (int)($zweiter['MID'] ?? -1), 0, (int)($tipp['Pok'] ?? $Pok), (int)($tipp['Ptrend'] ?? $Ptrend) );
                 }
 
                 $sum += $points;
@@ -648,10 +632,10 @@ class FeEndstandController extends AbstractFussballController
                     'gruppe' => $grp,
 
                     // Tipp (mit Flaggen) – das wolltest du sichtbar
-                    'tipp1' => (string)($tipp['TipM1'] ?? '—'),
-                    'tipp2' => (string)($tipp['TipM2'] ?? '—'),
-                    'tippFlag1' => (string)($tipp['TipFlag1'] ?? ''),
-                    'tippFlag2' => (string)($tipp['TipFlag2'] ?? ''),
+                    'tipp1' => (string)($tipp['TippM1'] ?? 'X'),
+                    'tipp2' => (string)($tipp['TippM2'] ?? '—'),
+                    'tippFlag1' => (string)($tipp['TippFlag1'] ?? ''),
+                    'tippFlag2' => (string)($tipp['TippFlag2'] ?? ''),
 
                     // Ist (Gruppenstand) – optional, aber hilfreich
                     'ist1' => (string)($erster['M1'] ?? '—'),
@@ -686,21 +670,16 @@ class FeEndstandController extends AbstractFussballController
             ],
             'rows' => $rows,
             'debug' => [
-                'stand' => $stand,
-                'groups' => $gruppenKeys,
+                'tipps' => $tipps,
+//                'stand' => $stand,
+//                'groups' => $gruppenKeys,
+//                'cards' => $cards,
             ],
         ];
     }
 
-    private function createPuVSection(
-        Connection $conn,
-        string $Wettbewerb,
-        array $wetten,
-        array $teilnehmeraktWetten,
-        array &$punkteSumme,
-        array $selectArray,
-        string $title
-    ): array {
+    private function createPuVSection( Connection $conn, string $Wettbewerb, array $wetten, array $teilnehmeraktWetten, array &$punkteSumme, array $selectArray, string $title): array 
+    {
         // relevante Wetten
         $tippwetten = [];
         foreach ($wetten as $Windex => $row) {
@@ -708,7 +687,6 @@ class FeEndstandController extends AbstractFussballController
                 $tippwetten[$Windex] = $row;
             }
         }
-
         $rows = [];
 
         foreach ($teilnehmeraktWetten as $akttlnname => $tlwetten) {
@@ -736,15 +714,9 @@ class FeEndstandController extends AbstractFussballController
             foreach ($tippwetten as $Windex => $wette) {
                 $tln = $akttippwetten[$Windex];
 
-                $points = $this->berechnePunkte(
-                    (string)($tln['Art'] ?? ''),
-                    (int)($tln['W1'] ?? -1),
-                    (int)($tln['W2'] ?? -1),
-                    (int)($wette['Tipp1'] ?? -1),
-                    (int)($wette['Tipp2'] ?? -1),
-                    (int)($wette['Tipp3'] ?? -1),
-                    (int)($wette['Pok'] ?? 0),
-                    (int)($wette['Ptrend'] ?? 0)
+                $points = $this->berechnePunkte( (string)($tln['Art'] ?? ''), (int)($tln['W1'] ?? -1), 
+                    (int)($tln['W2'] ?? -1), (int)($wette['Tipp1'] ?? -1), (int)($wette['Tipp2'] ?? -1), (int)($wette['Tipp3'] ?? -1), 
+                    (int)($wette['Pok'] ?? 0), (int)($wette['Ptrend'] ?? 0)
                 );
 
                 $sum += $points;

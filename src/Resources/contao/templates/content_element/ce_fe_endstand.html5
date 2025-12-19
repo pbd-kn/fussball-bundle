@@ -12,8 +12,8 @@ if (!isset($this->data)) {
 
 <style>
 .endstand-section {
-  margin: 2rem 0;
-  padding: 1rem;
+  margin: 0.6rem 0;   /* vorher 2rem */
+  padding: 0.6rem;    /* optional auch kleiner */
   background: rgba(255,255,255,0.18);
   border: 1px solid #666;
 }
@@ -23,6 +23,7 @@ if (!isset($this->data)) {
   cursor: pointer;
   user-select: none;
   position: relative;
+  font-size: 1.1rem;   /* ← HIER */
   padding-right: 1.8rem;
 }
 
@@ -30,6 +31,9 @@ if (!isset($this->data)) {
   content: "▼";
   position: absolute;
   right: 0;
+  font-size: 0.8rem;      /* ← PFEILGRÖSSE */
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 .endstand-section h2.closed::after {
@@ -183,8 +187,10 @@ function toggleDebug(el){
 <?php foreach (($this->data['sections'] ?? []) as $section): ?>
 
 <section class="endstand-section">
-<h2 onclick="toggleSection(this)"><?= htmlspecialchars($section['title']) ?></h2>
-<div class="toggle-body">
+<h2 class="closed" onclick="toggleSection(this)">
+    <?= htmlspecialchars($section['title']) ?>
+</h2>
+<div class="toggle-body hidden">
 
 <?php /* ===== SPIELE ===== */ ?>
 <?php if ($section['type']==='spiele'): ?>
@@ -193,20 +199,21 @@ function toggleDebug(el){
 <div class="player-name"><?= htmlspecialchars($row['name']) ?></div>
 
 <div class="cards-scroll">
-<?php foreach ($row['cards'] as $card): ?>
-<div class="card">
-<div><b><?= htmlspecialchars($card['datum']) ?></b></div>
-<div>
-<img class="flag" src="<?= $this->fussballUtil->getImagePath($card['flag1']) ?>">
-<?= htmlspecialchars($card['m1']) ?>
-<?= $card['t1'] ?> : <?= $card['t2'] ?>
-<?= htmlspecialchars($card['m2']) ?>
-<img class="flag" src="<?= $this->fussballUtil->getImagePath($card['flag2']) ?>">
-</div>
-<div>gewettet: <?= htmlspecialchars($card['wette']) ?></div>
-<div>Punkte: <?= (int)$card['punkte'] ?></div>
-</div>
-<?php endforeach; ?>
+    <?php foreach ($row['cards'] as $card): ?>
+        <div class="card">
+            <div><b><?= htmlspecialchars($card['datum']) ?></b></div>
+            <div>
+                <img class="flag" src="<?= $this->fussballUtil->getImagePath($card['flag1']) ?>">
+                <?= htmlspecialchars($card['m1']) ?>
+                <?= $card['t1'] ?> : <?= $card['t2'] ?>
+                <?= htmlspecialchars($card['m2']) ?>
+                <img class="flag" src="<?= $this->fussballUtil->getImagePath($card['flag2']) ?>">
+            </div>
+            <hr>
+            <div>gewettet: <?= htmlspecialchars($card['wette']) ?></div>
+            <div>Punkte: <?= (int)$card['punkte'] ?></div>
+        </div>
+    <?php endforeach; ?>
 </div>
 
 <div class="player-sum"><?= $row['sum'] ?></div>
@@ -215,50 +222,64 @@ function toggleDebug(el){
 
 <?php /* ===== GRUPPEN ===== */ ?>
 <?php elseif ($section['type']==='gruppen'): ?>
-<?php foreach ($section['rows'] as $row): ?>
-<div class="player-row">
-<div class="player-name"><?= htmlspecialchars($row['name']) ?></div>
+    <?php foreach ($section['rows'] as $row): ?>
+        <div class="player-row">
+            <div class="player-name"><?= htmlspecialchars($row['name']) ?>
 
-<div class="cards-scroll">
-<?php foreach ($row['cards'] as $card): ?>
-<div class="card">
-<div><b>Gruppe <?= htmlspecialchars($card['gruppe']) ?></b></div>
-<div>1: <?= htmlspecialchars($card['ist1'] ?? '—') ?></div>
-<div>2: <?= htmlspecialchars($card['ist2'] ?? '—') ?></div>
-<div>Punkte: <?= (int)$card['punkte'] ?></div>
-</div>
-<?php endforeach; ?>
-</div>
+            </div>
 
-<div class="player-sum"><?= $row['sum'] ?></div>
-</div>
-<?php endforeach; ?>
+            <div class="cards-scroll">
+                <?php foreach ($row['cards'] as $card): ?>
+                    <div class="card">
+                        <div><b>Gruppe <?= htmlspecialchars($card['gruppe']) ?></b></div>
+                        <div>1: <?= htmlspecialchars($card['tipp1'] ?? '-') ?>  
+                        <img class="flag" src="<?= $this->fussballUtil->getImagePath($card['tippFlag1']) ?>"> 
+                        </div>
+                        <div>2: <?= htmlspecialchars($card['tipp2'] ?? ' — ') ?>  <img class="flag" src="<?= $this->fussballUtil->getImagePath($card['tippFlag2']) ?>"> </div>
+                        <div><hr>gewettet:</div>
+                        <div>1: <?= htmlspecialchars($card['ist1'] ?? '&nbsp;—&nbsp;') ?>  <img class="flag" src="<?= $this->fussballUtil->getImagePath($card['istFlag1']) ?>"> </div>
+                        <div>2: <?= htmlspecialchars($card['ist2'] ?? ' — ') ?>  <img class="flag" src="<?= $this->fussballUtil->getImagePath($card['istFlag2']) ?>"> </div>
+                        <div>Punkte: <?= (int)$card['punkte'] ?></div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+
+            <div class="player-sum"><?= $row['sum'] ?></div>
+        </div>
+    <?php endforeach; ?>
 
 <?php /* ===== PLATZ & VERGLEICH (PUV) ===== */ ?>
 <?php elseif ($section['type']==='puv'): ?>
 
-<?php if (!empty($section['rows'])): ?>
-<?php foreach ($section['rows'] as $row): ?>
-<div class="player-row">
-<div class="player-name"><?= htmlspecialchars($row['name']) ?></div>
+    <?php if (!empty($section['rows'])): ?>
+        <?php foreach ($section['rows'] as $row): ?>
+            <div class="player-row">
+                <div class="player-name"><?= htmlspecialchars($row['name']) ?></div>
 
-<div class="cards-scroll">
-<?php foreach ($row['cells'] as $cell): ?>
-<div class="card">
-<?= $cell['text'] ?>
-</div>
-<?php endforeach; ?>
-</div>
+                <div class="cards-scroll">
+                    <?php foreach ($row['cards'] as $card): ?>
+                        <div class="card">
+                        <?php
+                            //echo "Windex: " . $card['wetteId'] . "<br>";
+                            echo $card['kommentar'] . "<br>";
+                            echo "<hr>";
+                            echo "gewettet: " . $card['gewettet'] . "<br>";
+                            echo "Punkte: "  . $card['punkte'] . "<br>";
+                        ?>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
 
-<div class="player-sum"><?= $row['sumText'] ?></div>
-</div>
-<?php endforeach; ?>
+            <div class="player-sum"><?= $row['sum'] ?></div>
+        </div>
+    <?php endforeach; ?>
 <?php else: ?>
 <p style="font-style:italic;">Keine Platz-/Vergleich-Wetten vorhanden</p>
 <?php endif; ?>
 
 <?php if (!empty($section['infotext'])): ?>
 <div style="margin-top:0.5rem;font-size:0.85rem;white-space:pre-line;">
+INFO Deutschland wird<br>
 <?= htmlspecialchars($section['infotext']) ?>
 </div>
 <?php endif; ?>

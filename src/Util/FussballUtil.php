@@ -118,6 +118,9 @@ class FussballUtil
         return $optarray;
       }
       public function getImagePath($image) {
+        if (empty($image)) {
+            return '';
+        }
         return 'bundles/fussball/assets/flaggen/'.$image;
         //return 'files/hoyzer-wetten/content/flaggen/'.$image;
         
