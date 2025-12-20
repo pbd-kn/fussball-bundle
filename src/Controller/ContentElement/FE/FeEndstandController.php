@@ -688,7 +688,6 @@ class FeEndstandController extends AbstractFussballController
             }
         }
         $rows = [];
-
         foreach ($teilnehmeraktWetten as $akttlnname => $tlwetten) {
             // Teilnehmer-ID herausfinden (aus erster Zeile)
             $tid = null;
@@ -705,6 +704,7 @@ class FeEndstandController extends AbstractFussballController
                     $akttippwetten[$Windex] = $rowaktwett;
                 }
             }
+//die(var_dump($akttippwetten));
             if (count($akttippwetten) === 0) continue;
 
             $cards = [];
@@ -720,10 +720,35 @@ class FeEndstandController extends AbstractFussballController
                 );
 
                 $sum += $points;
+                
                 $sumParts[] = (string)$points;
+                /*
+                if (stripos((string)($wette['Kommentar'], 'deutschland') !== false)) {   // deutschland wird
+                    //echo "Text enthält 'deutschland'";
+                }
+                $cards[] = [
+                    'id' => (int)$m['ID'],
+                    'datum' => (string)$m['Datum'],
+                    'uhrzeit' => (string)$m['Uhrzeit'],
+                    'ort' => (string)($m['Ort'] ?? ''),
+                    'm1' => (string)$m['M1'],
+                    'm2' => (string)$m['M2'],
+                    'flag1' => (string)($m['Flagge1'] ?? ''),
+                    'flag2' => (string)($m['Flagge2'] ?? ''),
+                    't1' => (string)($m['T1'] ?? ''),
+                    't2' => (string)($m['T2'] ?? ''),
+                    'wette' => ($w1 === -1 || $w2 === -1) ? '—' : ($w1 . ':' . $w2),
+                    'punkte' => $points,
+                ];
+                
+*/
 
                 $cards[] = [
                     'wetteId' => (string)$Windex,
+                    'art' => $wette['Art'],
+                    'tipp1' => $wette['Tipp1'],
+                    'mpnation' => $wette['MPNation'],
+                    'mpflagge' => $wette['MPFlagge'],
                     'kommentar' => (string)($wette['Kommentar'] ?? ''),
                     'gewettet' => (string)(($tln['W1'] ?? -1) . ' : ' . ($tln['M1'] ?? '')),
                     'punkte' => $points,

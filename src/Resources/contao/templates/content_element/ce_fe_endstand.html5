@@ -261,7 +261,12 @@ function toggleDebug(el){
                         <div class="card">
                         <?php
                             //echo "Windex: " . $card['wetteId'] . "<br>";
-                            echo $card['kommentar'] . "<br>";
+                            echo $card['kommentar'] . "(".$card['tipp1'].")<br>";
+                            if (!empty($card['mpnation'])) {
+                                echo "<div>" . htmlspecialchars($card['mpnation']) . " <img class='flag' src='" . $this->fussballUtil->getImagePath($card['mpflagge']) ."'<br></div>";
+                            } else {
+                                echo $card['tipp1']."<br>";
+                            }
                             echo "<hr>";
                             echo "gewettet: " . $card['gewettet'] . "<br>";
                             echo "Punkte: "  . $card['punkte'] . "<br>";
