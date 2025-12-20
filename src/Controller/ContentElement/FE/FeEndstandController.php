@@ -750,7 +750,7 @@ class FeEndstandController extends AbstractFussballController
                     'mpnation' => $wette['MPNation'],
                     'mpflagge' => $wette['MPFlagge'],
                     'kommentar' => (string)($wette['Kommentar'] ?? ''),
-                    'gewettet' => (string)(($tln['W1'] ?? -1) . ' : ' . ($tln['M1'] ?? '')),
+                    'gewettet' => (string)(($tln['W1'] ?? -1) . ' ' . ($tln['M1'] ?? '')),
                     'punkte' => $points,
                 ];
             }
