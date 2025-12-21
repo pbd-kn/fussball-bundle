@@ -121,8 +121,7 @@ class FePunkteController extends AbstractFussballController
             WHERE akt.Wettbewerb = ?
             ORDER BY tln.Name, wetten.Art, wetten.Kommentar
         ", [$Wettbewerb]);
-
-
+//die (var_dump($wettenRoh));
         //----------------------------------------------------------------------
         // 4. Gruppieren + Punkte berechnen
         //----------------------------------------------------------------------
@@ -170,20 +169,18 @@ class FePunkteController extends AbstractFussballController
     private function berechnePkt(array $row, string $Wettbewerb): int
     {
         $Art = strtolower($row['Art']);
-
         if ($Art === 's') {
             $sp = $this->connection->fetchAssociative("
                 SELECT T1, T2 
                 FROM tl_hy_spiele 
                 WHERE Wettbewerb = ? AND ID = ?
-            ", [$Wettbewerb, $row['Tipp1']]);
-
+            ", [$Wettbewerb, $row['Tipp2']]);
             if ($sp) {
                 $row['Tipp2'] = $sp['T1'];
                 $row['Tipp3'] = $sp['T2'];
             }
         }
-
+//die(var_dump($row));
         return $this->calculatePoints($row);
     }
 
@@ -206,13 +203,21 @@ class FePunkteController extends AbstractFussballController
         }
 
         if ($Art === 'p' || $Art === 'v') {
+            if ((int)$r['W1'] == -1 ||  (int)$r['Tipp1'] == -1) {
+//die(var_dump($r));
+                return 0;
+            }           
             return ($r['W1'] == $r['Tipp1']) ? $Pok : 0;
         }
 
         if ($Art === 'g') {
+            if ((int)$r['W1'] == -1 ||  (int)$r['W2'] == -1 ||  (int)$r['Tipp2'] == -1 ||  (int)$r['Tipp3'] == -1 ) {           
+//die(var_dump($r));        
+                return 0;
+            }
             $sum = 0;
-            if ($r['W1'] == $r['Tipp1']) $sum += $Pok;
-            if ($r['W2'] == $r['Tipp2']) $sum += $Pok;
+            if ($r['W1'] == $r['Tipp2']) $sum += $Pok;
+            if ($r['W2'] == $r['Tipp3']) $sum += $Pok;
             return $sum;
         }
 
