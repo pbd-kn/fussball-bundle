@@ -94,16 +94,27 @@ class FePunkteController extends AbstractFussballController
         foreach ($mannschaftRows as $m) {
             $mannschaften[$m['ID']] = $m;
         }
+        //----------------------------------------------------------------------
+        // 2. Spiele laden
+        //----------------------------------------------------------------------
 
+        $spieleRows = $this->connection->fetchAllAssociative("
+            SELECT *
+            FROM tl_hy_spiele
+            WHERE Wettbewerb = ?
+        ", [$Wettbewerb]);
+
+        $spiele = [];
+        foreach ($spieleRows as $m) {
+            $spiele[$m['ID']] = $m;
+        }
 
         //----------------------------------------------------------------------
         // 3. Wetten laden
         //----------------------------------------------------------------------
         $wettenRoh = $this->connection->fetchAllAssociative("
             SELECT 
-                tln.ID            AS TlnID,
-                tln.Name          AS TeilnehmerName,
-                wetten.Art        AS Art,
+                t.ID            AS ID, t.Name AS TeilnehmerName, wetten.Art AS Art,
                 wetten.Kommentar  AS Kommentar,
                 wetten.Tipp1,
                 wetten.Tipp2,
@@ -116,10 +127,10 @@ class FePunkteController extends AbstractFussballController
                 akt.W3,
                 akt.Wette
             FROM tl_hy_wetteaktuell akt
-            LEFT JOIN tl_hy_teilnehmer tln ON akt.Teilnehmer = tln.ID
+            LEFT JOIN tl_hy_teilnehmer t ON akt.Teilnehmer = t.ID
             LEFT JOIN tl_hy_wetten wetten ON akt.Wette = wetten.ID
             WHERE akt.Wettbewerb = ?
-            ORDER BY tln.Name, wetten.Art, wetten.Kommentar
+            ORDER BY t.Name, wetten.Art, wetten.Kommentar
         ", [$Wettbewerb]);
 //die (var_dump($wettenRoh));
         //----------------------------------------------------------------------
@@ -130,7 +141,7 @@ class FePunkteController extends AbstractFussballController
 
         foreach ($wettenRoh as $w) {
 
-            $tid = $w['TlnID'];
+            $tid = $w['ID'];
 
             if (!isset($wettenProTeilnehmer[$tid])) {
                 $wettenProTeilnehmer[$tid] = [];
@@ -157,6 +168,8 @@ class FePunkteController extends AbstractFussballController
         $tpl->wetten       = $wettenProTeilnehmer;
         $tpl->summe        = $punkteProTeilnehmer;
         $tpl->mannschaften = $mannschaften;
+        $tpl->spiele = $spiele;
+        
 
         // Helper für Bilder / Formatierung etc.
         $tpl->fussballUtil = $this->fussballUtil;
@@ -174,13 +187,15 @@ class FePunkteController extends AbstractFussballController
                 SELECT T1, T2 
                 FROM tl_hy_spiele 
                 WHERE Wettbewerb = ? AND ID = ?
-            ", [$Wettbewerb, $row['Tipp2']]);
+            ", [$Wettbewerb, $row['Tipp1']]);
+//if ($row['Tipp1'] == 511 ) die(var_dump($row).var_dump($sp));           
             if ($sp) {
                 $row['Tipp2'] = $sp['T1'];
                 $row['Tipp3'] = $sp['T2'];
             }
+//if ($row['Tipp1'] == 511 ) die(var_dump($row));           
         }
-//die(var_dump($row));
+
         return $this->calculatePoints($row);
     }
 
@@ -189,16 +204,23 @@ class FePunkteController extends AbstractFussballController
     {
         $Art = strtolower($r['Art']);
         $Pok = $r['Pok'];
-        $Ptr = $r['Ptrend'];
+        $Ptrend = $r['Ptrend'];
 
         if ($Art === 's') {
-            if ($r['W1'] == -1 || $r['W2'] == -1 || $r['Tipp2'] == -1 || $r['Tipp3'] == -1) return 0;
+            $pkt=0;
+            if ($r['W1'] == -1 || $r['W2'] == -1 || $r['Tipp2'] == -1 || $r['Tipp3'] == -1) return $pkt;
 
             if ($r['W1'] == $r['Tipp2'] && $r['W2'] == $r['Tipp3']) return $Pok;
-
-            $trendW = $r['W1'] <=> $r['W2'];
-            $trendT = $r['Tipp2'] <=> $r['Tipp3'];
-
+            $T1 = $r['Tipp2'];   // werte aus wette holen
+            $T2 = $r['Tipp3'];
+            $W1 = $r['W1'];   // gewettete Werte
+            $W2 = $r['W1'];
+            if ($T1 == $W1 && $T2 == $W2)  $pkt = $Pok;
+            else if (($T1 >= $W1 && $T2 >= $W2) || ($T1 <= $W1 && $T2 <= $W2)) $pkt = $Ptrend;
+//            $trendW = $r['W1'] <=> $r['W2'];
+//            $trendT = $r['Tipp2'] <=> $r['W1'];
+//if ($r['Tipp1'] == 511) die(var_dump($r));
+            return $pkt;
             return ($trendW === $trendT) ? $Ptr : 0;
         }
 
@@ -207,6 +229,7 @@ class FePunkteController extends AbstractFussballController
 //die(var_dump($r));
                 return 0;
             }           
+//if ($Art === 'v') die(var_dump($r));
             return ($r['W1'] == $r['Tipp1']) ? $Pok : 0;
         }
 

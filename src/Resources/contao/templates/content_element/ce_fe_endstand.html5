@@ -263,7 +263,7 @@ function toggleDebug(el){
                             //echo "Windex: " . $card['wetteId'] . "<br>";
                             echo $card['kommentar'] . "(".$card['tipp1'].")<br>";
                             if (!empty($card['mpnation'])) {
-                                echo "<div>" . htmlspecialchars($card['mpnation']) . " <img class='flag' src='" . $this->fussballUtil->getImagePath($card['mpflagge']) ."'<br></div>";
+                                echo "<div>" . htmlspecialchars($card['mpnation']) . " <img class='flag' src='" . $this->fussballUtil->getImagePath($card['mpflagge']) . "'><br></div>";
                             } else {
                                 echo $card['tipp1']."<br>";
                             }
