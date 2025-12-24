@@ -310,3 +310,83 @@
 .verwtablecss th {
   border: 1px solid #000;
 }
+
+/* ---------------------------------------------------------
+   Wettabgabe formular
+   --------------------------------------------------------- */
+
+/* =========================================================
+   WETTABGABE – kompakte, tabellenartige Darstellung
+   ========================================================= */
+
+/* =========================================================
+   WETTABGABE – Tippspiel-Layout
+   ========================================================= */
+
+/* Fieldset normal lassen (wichtig für legend!) */
+form fieldset {
+  display: block;
+  padding-left: 1rem;
+}
+
+/* Widgets in eine gemeinsame Zeile zwingen */
+form fieldset legend {
+    font-size: 14px;
+    font-weight: 600;
+}
+form fieldset .widget.wettformular_half {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;              /* Abstand Label ↔ Select */
+  margin-right: 25px;    /* Abstand DSP1 ↔ DSP2 */
+  vertical-align: middle;
+}
+
+/* letztes Widget kein Abstand rechts */
+form fieldset .widget.wettformular_half:last-of-type {
+  margin-right: 0;
+}
+
+/* Label flexibel, aber ausreichend breit */
+form .widget.wettformular_half label {
+  min-width: 110px;      /* HIER steuerst du die Breite */
+  margin: 0;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+/* Select: JETZT breiter (nur das geändert) */
+form .widget.wettformular_half select {
+  width: 150px;           /* ← vorher 70px */
+  min-width: 150px;       /* ← vorher 70px */
+  max-width: 150px;       /* ← vorher 70px */
+  text-align: center;
+  padding-right: 22px;
+  box-sizing: border-box;
+}
+
+/* nativen Dropdown-Pfeil erzwingen */
+form select,
+form select.custom-select {
+  appearance: menulist !important;
+  -webkit-appearance: menulist !important;
+  -moz-appearance: menulist !important;
+}
+
+/* =========================================================
+   MOBIL: Widgets untereinander
+   ========================================================= */
+@media (max-width: 600px) {
+  form fieldset .widget.wettformular_half {
+    display: flex;
+    margin-right: 0;
+    margin-bottom: 8px;
+  }
+
+  /* mobil ggf. etwas breiter, damit es angenehmer ist */
+  form .widget.wettformular_half select {
+    width: 110px;
+    min-width: 110px;
+    max-width: 110px;
+  }
+}

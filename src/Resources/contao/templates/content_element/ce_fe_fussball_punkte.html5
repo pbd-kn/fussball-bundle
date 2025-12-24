@@ -27,7 +27,10 @@
                         Details
                     </button>
                 </div>
-
+<?php
+//die (var_dump($this->spiele));
+//die (var_dump($wetten));
+?>
                 <div id="detail-<?= $tid ?>" class="punkte-details">
 
                     <?php foreach ($wetten as $w): ?>
