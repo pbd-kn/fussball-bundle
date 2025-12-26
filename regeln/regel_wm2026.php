@@ -50,6 +50,7 @@
       </table>
       <br />
       <p>Für den richtigen Tipp eines Spieles bekommt man entweder 2 Punkte (Tendenz richtig getippt) oder 5 Punkte (Ergebnis richtig getippt).
+      <br> es wird der Endstand, also incl. Verlängerung gewertet.
       </p>
 	  <p>
       <br />Für den richtigen Tipp der Gruppenplazierung bekommt man entweder 1 Punkt oder 3 Punkte.
