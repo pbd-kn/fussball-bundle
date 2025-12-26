@@ -146,7 +146,7 @@ class FeWettenController extends AbstractFussballController
                 'details' => $details
             ];
         }
-di(var_dump($wetten));
+
         // --- Ausgabe über HTML5-Template
         $tpl = new \Contao\FrontendTemplate('ce_fe_fussball_wetten');
         $tpl->wettbewerb = $Wettbewerb;
