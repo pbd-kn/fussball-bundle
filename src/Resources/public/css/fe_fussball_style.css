@@ -333,6 +333,7 @@ form fieldset {
 form fieldset legend {
     font-size: 14px;
     font-weight: 600;
+    margin-top: 1em;
 }
 form fieldset .widget.wettformular_half {
   display: inline-flex;
@@ -353,6 +354,7 @@ form .widget.wettformular_half label {
   margin: 0;
   white-space: nowrap;
   font-weight: 600;
+  font-size: 14px;
 }
 
 /* Select: JETZT breiter (nur das geändert) */
