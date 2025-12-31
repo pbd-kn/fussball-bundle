@@ -55,7 +55,7 @@
 
 
 /* ---------------------------------------------------------
-   KATEGORIEN / HORIZONTALES SCROLLEN
+   Spiele Uebersicht KATEGORIEN / HORIZONTALES SCROLLEN
    (Gruppen-Übersichten mit Spielboxen)
    --------------------------------------------------------- */
 
@@ -94,7 +94,7 @@
 }
 
 .kategorie-scroll::-webkit-scrollbar-thumb {
-  border-radius: 10px;
+  border-radius: var(--pb-border-radius);
 }
 
 .kategorie-scroll::-webkit-scrollbar-track {
@@ -113,7 +113,7 @@
   padding: 5px;
   font-size: 18px;
   font-weight: bold;
-  border-radius: 10px 10px 0 0;
+  border-radius: var(--pb-border-radius) var(--pb-border-radius) 0 0;
 }
 
 /* Tabelle innerhalb einer Gruppe */
@@ -123,7 +123,7 @@
   border-collapse: collapse;
   margin-bottom: 4px;
   font-size: 12px;
-  border-radius: 10px;
+  border-radius: var(--pb-border-radius);
 }
 
 .gruppen-tabelle th,
@@ -153,7 +153,7 @@
   border: 1px solid var(--pb-text-color);
   padding: 5px;
   margin-bottom: 6px;
-  border-radius: 10px;
+  border-radius: var(--pb-border-radius);
   font-size: 13px;
 }
 
@@ -161,7 +161,7 @@
   text-align: center;
   font-weight: bold;
   margin-bottom: 4px;
-  color: #333;
+  color: var(--pb-text-color);
   font-size: 12px;
 }
 
@@ -188,7 +188,7 @@
   text-align: left;
   margin-top: 4px;
   font-size: 11px;
-  color: #777;
+  color: var(--pb-text-color);
 }
 
 
@@ -392,3 +392,240 @@ form select.custom-select {
     max-width: 110px;
   }
 }
+
+/* =========================================================
+   Konfiguration Endstand
+   ========================================================= */
+.endstand-section {
+  margin: 0.6rem 0;   /* vorher 2rem */
+  /* padding: 0.6rem;     optional auch kleiner */
+  background: var(--pb-container-bg);
+  border: 1px solid var(--pb-text-color);
+  border-radius: var(--pb-border-radius);
+}
+
+.endstand-section h2 {
+  margin: 0;
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+  font-size: 1.1rem;   /* ← HIER */
+  padding-right: 1.8rem;
+}
+
+.endstand-section h2::after {
+  content: "▼";
+  position: absolute;
+  right: 0;
+  font-size: 0.8rem;      /* ← PFEILGRÖSSE */
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.endstand-section h2.closed::after {
+  content: "▶";
+}
+
+.toggle-body.hidden { display:none; }
+
+/* ===== Rangliste ===== */
+
+.rangliste-wrapper {
+  position: sticky;
+  top: 0;
+  z-index: 999;
+  background: var(--pb-container-bg);
+
+}
+
+.rangliste-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.rangliste-table th,
+.rangliste-table td {
+  border: 1px solid #444;
+  padding: 0.4rem;
+}
+
+.rangliste-table th:nth-child(1),
+.rangliste-table td:nth-child(1) {
+  width: 80px;
+  text-align: center;
+}
+
+.rangliste-table th:nth-child(3),
+.rangliste-table td:nth-child(3) {
+  width: 100px;
+  text-align: right;
+}
+
+/* ===== Teilnehmer-Zeilen ===== */
+
+.player-row {
+  display: grid;
+  grid-template-columns: 160px 1fr 140px;
+  gap: 1rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #777;
+}
+
+.player-name { font-weight:bold; }
+.player-sum {
+  text-align:right;
+  font-weight:bold;
+  white-space:nowrap;
+}
+
+/* ===== Karten ===== */
+
+.cards-scroll {
+  display: flex;
+  gap: 0.75rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.card {
+  min-width: 200px;
+  max-width: 200px;
+  border: 1px solid var(--pb-text-color);
+  padding: 0.5rem;
+  background-color: var(--pb-container-bg) !important;
+  font-size: 0.85rem;
+  box-sizing: border-box;
+}
+
+.card div {
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  line-height: 1.25;
+}
+
+.card img.flag {
+  height: 12px;
+  vertical-align: middle;
+  margin-right: 4px;
+}
+
+/* ===== Debug ===== */
+
+.debug-box {
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  background: rgba(0,0,0,0.06);
+  border: 1px dashed #666;
+  font-size: 0.8rem;
+  max-height: 200px;
+  overflow: auto;
+  display:none;
+}
+
+/* =========================================================
+   Konfiguration Punkestand
+   ========================================================= */
+.punkte-wrapper {
+    padding: 1rem;
+}
+
+.punkte-title {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.punkte-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0rem;
+}
+
+.punkte-card {
+    background: var(--pb-container-bg);
+    border-radius: var(--pb-border-radius);
+    padding-left: 1rem;
+    border: 1px solid var(--pb-text-color);
+}
+
+.punkte-head {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 1rem;
+    align-items: center;
+}
+
+.punkte-name {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.punkte-score {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--pb-text-color);
+}
+
+.punkte-toggle {
+    padding: .4rem .8rem;
+    background: var(--pb-link-navigation-bg);
+    color: var(--pb-link-navigation-color);
+    border: 0;
+    border-radius: var(--pb-border-radius);
+    cursor: pointer;
+}
+
+.punkte-details {
+    display: none;
+    margin-top: 1rem;
+}
+
+.punkte-details.open {
+    display: block;
+}
+
+.wette-item {
+    margin-bottom: 0rem;
+    padding: .2rem;
+    border-radius: var(--pb-border-radius);
+    border: 1px solid var(--pb-text-color);
+    background: var(--pb-container-bg);
+}
+
+.wette-header {
+    display: grid;
+    grid-template-columns: 70px 1fr 80px;
+    gap: .5rem;
+}
+
+.wette-art {
+    font-weight: bold;
+}
+
+.wette-punkte {
+    text-align: right;
+    font-weight: bold;
+    color: var(--pb-text-color);
+}
+
+.wette-row {
+    margin-bottom: .3rem;
+}
+
+@media (max-width: 540px) {
+
+    .punkte-head {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .wette-header {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .wette-punkte {
+        text-align: left;
+    }
+}
+
+
+   
