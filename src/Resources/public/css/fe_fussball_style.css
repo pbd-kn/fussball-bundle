@@ -405,7 +405,7 @@ form select.custom-select {
 }
 
 .endstand-section h2 {
-  margin: 0;
+  margin-left: 1rem;
   cursor: pointer;
   user-select: none;
   position: relative;
