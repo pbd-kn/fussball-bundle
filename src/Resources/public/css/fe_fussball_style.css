@@ -397,8 +397,9 @@ form select.custom-select {
    Konfiguration Endstand
    ========================================================= */
 .endstand-section {
-  margin: 0.6rem 0;   /* vorher 2rem */
-  /* padding: 0.6rem;     optional auch kleiner */
+   /* margin: 0.6rem 0;  vorher 2rem */
+  padding-left: 0.6rem;    /* optional auch kleiner */
+  padding-top: 0.6rem;
   background: var(--pb-container-bg);
   border: 1px solid var(--pb-text-color);
   border-radius: var(--pb-border-radius);
