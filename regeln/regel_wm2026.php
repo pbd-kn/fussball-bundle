@@ -11,7 +11,9 @@
       <p>
 	    <br />Tippen kann jeder für den es eine eindeutige E-Mail Adresse gibt. Eine E-Mail Adresse kann nur einmal verwendet werden.
       <br />
-      <br />Als einmaliger Wetteinsatz (pauschal für die gesamte EM) sind <b>8 Euro pro Teilnehmer</b> vorgesehen.  
+      <br />Als einmaliger Wetteinsatz (pauschal für die gesamte WM) sind <b>8 Euro pro Teilnehmer</b> vorgesehen.  
+      <br />
+      <strong>Registrieren könnt Ihr Euch über die Webseite www.hoyzer-wetten.de Kontakt/Registrieren</strong>
       <br />
       <strong>Anmelden könnt Ihr Euch über die Webseite www.hoyzer-wetten.de</strong>
       </p> 
@@ -65,9 +67,9 @@
       <br />
       <br />Nun kann es losgehen. Unter Wettenübersicht könnt Ihr alle zu tippenden Wetten einsehen.
       <br />
-      <br />Derzeit werden keine Wetten angenommen. 
-      <br />
-      <br />
+        <br /> Um zu wetten musst Du Dich mit Deinen Anmeldedaten anmelden.
+        <br /> Diese Daten bekommst Du von mir nach dem registrieren.
+     <br />
       <br />Bis dann und schon mal besten Dank für Eure Tipps !
       <br />
       <br />Falls Ihr noch Fragen oder Anregungen habt, meldet Euch bitte.

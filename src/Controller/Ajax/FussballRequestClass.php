@@ -133,7 +133,17 @@ function uebernehmen() {
     console.log("url:", url);
     // fetch statt jQuery.get
     fetch(url)
-        .then(response => response.json())
+        .then(response => response.text())
+        .then(text => {
+            let data;
+            try {
+                data = JSON.parse(text);
+            } catch (e) {
+                throw new Error(text.substring(0, 1000));
+            }
+
+            return data;
+        })
         .then(data => {
             if (data.error) {
                 document.querySelector("#result").innerHTML = data.error;
@@ -282,7 +292,17 @@ function uebernehmen() {
 
     // AJAX ersetzt durch fetch()
     fetch(url)
-        .then(response => response.json())
+        .then(response => response.text())
+        .then(text => {
+            let data;
+            try {
+                data = JSON.parse(text);
+            } catch (e) {
+                throw new Error(text.substring(0, 1000));
+            }
+
+            return data;
+        })
         .then(data => {
 
             if (data.error) {
@@ -1076,7 +1096,17 @@ function uebernehmen() {
     console.log("url:", url);
 
     fetch(url)
-        .then(response => response.json())
+        .then(response => response.text())
+        .then(text => {
+            let data;
+            try {
+                data = JSON.parse(text);
+            } catch (e) {
+                throw new Error(text.substring(0, 1000));
+            }
+
+            return data;
+        })
         .then(data => {
 
             const errortxt = data.error || "";
@@ -1205,6 +1235,7 @@ EOT;
         $Viertel   = $row['Viertel'] ?? 0;
         $Halb      = $row['Halb'] ?? 0;
         $Finale    = $row['Finale'] ?? 0;
+        $pwd = $row['pwd'] ?? '';
       $str="";
 	  if ($ID == -1) {
         $str.="<center><h3>Neuer Teilnehmer eintragen</h3></center><br>\n";
@@ -1227,6 +1258,8 @@ EOT;
       $str.=$cgi->td(array("valign"=>"top"),$cgi->textfield(array("name"=>"Name","id"=>"Name","value"=>"$Name"))) . "\n";
       $str.=$cgi->td(array("valign"=>"top"),"Email");
       $str.=$cgi->td(array("valign"=>"top"),$cgi->textfield(array("name"=>"Email","id"=>"Email","value"=>"$Email"))) . "\n";
+      $str.=$cgi->td(array("valign"=>"top"),"Passwort");
+      $str.=$cgi->td(array("valign"=>"top"),$cgi->textfield(array("name"=>"pwd","id"=>"pwd","value"=>"$pwd"))) . "\n";
       $str.=$cgi->end_tr() . $cgi->tr()."\n";
       $str.=$cgi->td(array("valign"=>"top"),"Bezahlt");
       $str.=$cgi->td(array("valign"=>"top"),$cgi->textfield(array("name"=>"Bezahlt","id"=>"Bezahlt","value"=>"$Bezahlt"))) . "\n";
@@ -1278,12 +1311,23 @@ function uebernehmen() {
         + (myA['Achtel']   || "0") + "/"
         + (myA['Viertel']  || "0") + "/"
         + (myA['Halb']     || "0") + "/"
-        + (myA['Finale']   || "0");
+        + (myA['Finale']   || "0")
+        + "?pwd=" + encodeURIComponent(myA['pwd'] || "");
 
     console.log("url:", url);
 
     fetch(url)
-        .then(response => response.json())
+        .then(response => response.text())
+        .then(text => {
+            let data;
+            try {
+                data = JSON.parse(text);
+            } catch (e) {
+                throw new Error(text.substring(0, 1000));
+            }
+
+            return data;
+        })
         .then(data => {
 
             const errortxt = data.error || "";
@@ -1321,6 +1365,7 @@ EOT;
 	    $Row['Name'] = -1;
 	    $Row['Kurzname'] = -1;
 	    $Row['Email'] = -1;
+	    $Row['pwd'] = '';
 	    $Row['Art'] = "T";                // Teilnehmerdaten
 	    $Row['Bezahlt'] = false;   
 	    $Row['Erst'] = false;   
@@ -2424,13 +2469,15 @@ $debug.=" sql: $sql\n";
   } 
     
     
+    #[Route( '/fussball/bearbeiteteilnehmer/{aktion}/{ID}', name: 'FussballRequestClass_bearbeiteteilnehmer_kurz', defaults: ['_scope' => 'frontend'] ) ]
+    #[Route( '/fussball/bearbeiteteilnehmer/{aktion}/{ID}/{Art}/{Kurzname}/{Name}/{Email}/{pwd}/{Bezahlt}/{Erst}/{Sechzehn}/{Achtel}/{Viertel}/{Halb}/{Finale}', name: 'FussballRequestClass_bearbeiteteilnehmer_mit_pwd', defaults: ['_scope' => 'frontend'] ) ]
     #[Route( '/fussball/bearbeiteteilnehmer/{aktion}/{ID}/{Art}/{Kurzname}/{Name}/{Email}/{Bezahlt}/{Erst}/{Sechzehn}/{Achtel}/{Viertel}/{Halb}/{Finale}', name: 'FussballRequestClass_bearbeiteteilnehmer', defaults: ['_scope' => 'frontend'] ) ]
     /**
      * @throws \Exception
      * @throws DoctrineDBALException
      */
 
-  public function bearbeiteteilnehmer(string $aktion,int $ID=-1,string $Art="",string $Kurzname='',string $Name='',string $Email='',
+  public function bearbeiteteilnehmer(string $aktion,int $ID=-1,string $Art="",string $Kurzname='',string $Name='',string $Email='',string $pwd='',
     string $Bezahlt="0", string $Erst="0", string $Sechzehn="0", string $Achtel="0", string $Viertel="0", string $Halb="0", string $Finale="0")
   {
     if (!isset($aktion)) {
@@ -2446,6 +2493,7 @@ $debug.=" sql: $sql\n";
     if (!isset($Viertel)) $Viertel = 0;
     if (!isset($Halb)) $Halb = 0;
     if (!isset($Finale)) $Finale = 0;
+    if (isset($_GET['pwd'])) $pwd = (string) $_GET['pwd'];
     // checkboxwerte prüfen
     if ( ($Erst != "0" && $Erst != 1) ||
          ($Sechzehn != "0" && $Sechzehn != 1) ||
@@ -2467,6 +2515,7 @@ $debug.=" sql: $sql\n";
     $errortxt="";
     $Wettbewerb = $this->aktWettbewerb['aktWettbewerb'];
     $debug.=" id: $id, Wettbewerb: $Wettbewerb";
+    try {
     if ($aktion == "u" || $aktion == "n") { 
       if ($Kurzname=='' || $Kurzname == '-1') {
           $html.="Kurzname fehlerhafter Wert ($Kurzname)<br>";
@@ -2475,14 +2524,13 @@ $debug.=" sql: $sql\n";
           return $this->jsonUtf8Response(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
         }
       if ($aktion == "n" ) {   // neueintrag
-        $value = "( '$Wettbewerb' ,'$Kurzname' , '$Name' , '$Email', '$Bezahlt', '$Erst', $Sechzehn, '$Achtel', '$Viertel', '$Halb', '$Finale' )" ; 
-        $sql="INSERT INTO tl_hy_teilnehmer(Wettbewerb,Kurzname,Name,Email,Bezahlt,Erst,Sechzehn,Achtel,Viertel,Halb,Finale) VALUES $value";
-        $cnt = $this->connection->executeStatement($sql);
+        $sql = "INSERT INTO tl_hy_teilnehmer(Wettbewerb,Kurzname,Name,Email,pwd,Bezahlt,Erst,Sechzehn,Achtel,Viertel,Halb,Finale) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
+        $cnt = $this->connection->executeStatement($sql, [$Wettbewerb, $Kurzname, $Name, $Email, $pwd, $Bezahlt, $Erst, $Sechzehn, $Achtel, $Viertel, $Halb, $Finale]);
 	    $html.="Wettbewerb $Wettbewerb Teilnehmer $Kurzname Name $Name Email $Email neu gesetzt";
       // TeilnehmerId besorgen
-	    $sql = "Select ID from tl_hy_teilnehmer where Wettbewerb = '$Wettbewerb'  and Kurzname='" . $Kurzname."';";
-        $stmt = $this->connection->executeQuery($sql);
-        $debug.="sql: $sql<br>";	
+	    $sql = "Select ID from tl_hy_teilnehmer where Wettbewerb = ? and Kurzname = ?";
+        $stmt = $this->connection->executeQuery($sql, [$Wettbewerb, $Kurzname]);
+        $debug.="sql: $sql<br>";
         $anz = $stmt->rowCount();
         $row = $stmt->fetchAssociative();
         $tid=$row['ID'];
@@ -2498,16 +2546,15 @@ $debug.=" sql: $sql\n";
         }
 	    foreach ($wetten as $data) {
           $wettid=$data['ID'];
-	      $value = "( '$Wettbewerb' , $tid , $wettid,-1 ,-1,-1 )" ; 
-	      $sql="INSERT INTO  tl_hy_wetteaktuell(Wettbewerb,Teilnehmer,Wette,W1,W2,W3) VALUES $value";
+	      $sql="INSERT INTO tl_hy_wetteaktuell(Wettbewerb,Teilnehmer,Wette,W1,W2,W3) VALUES (?,?,?,?,?,?)";
           $debug.="Teilnehmerwetten: $sql<br>";
-          $cnt = $this->connection->executeStatement($sql);
-	    }      
+          $cnt = $this->connection->executeStatement($sql, [$Wettbewerb, $tid, $wettid, -1, -1, -1]);
+	    }
       } elseif ($aktion == 'u') {
         // TeilnehmerId besorgen/pruefen
-	    $sql = "Select ID from tl_hy_teilnehmer where Wettbewerb = '$Wettbewerb'  and ID='$id.';";
-        $debug.="sql: $sql<br>";	
-        $stmt = $this->connection->executeQuery($sql);
+	    $sql = "Select ID from tl_hy_teilnehmer where Wettbewerb = ? and ID = ?";
+        $debug.="sql: $sql<br>";
+        $stmt = $this->connection->executeQuery($sql, [$Wettbewerb, $id]);
         $anz = $stmt->rowCount();
         if ($anz > 0) {
           $row = $stmt->fetchAssociative();
@@ -2518,21 +2565,20 @@ $debug.=" sql: $sql\n";
           $errortxt = utf8_encode($errortxt);
           return $this->jsonUtf8Response(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
         }
-        $value = "SET Wettbewerb='$Wettbewerb' ,Kurzname='$Kurzname', Name='$Name', Email='$Email'" ; 
-        $value .= " ,Bezahlt='$Bezahlt' ,Erst='$Erst', Sechzehn = '$Sechzehn', Achtel='$Achtel', Viertel='$Viertel', Halb='$Halb', Finale='$Finale'" ; 
-	    $sql = "UPDATE tl_hy_teilnehmer $value where ID='$id'";
-        $debug.="UPDATE Teilnehmer sql: $sql<br>";	
-        $cnt = $this->connection->executeStatement($sql);
+        $value = "SET Wettbewerb=?, Kurzname=?, Name=?, Email=?, pwd=?, Bezahlt=?, Erst=?, Sechzehn=?, Achtel=?, Viertel=?, Halb=?, Finale=?" ;
+	    $sql = "UPDATE tl_hy_teilnehmer $value where ID=?";
+        $debug.="UPDATE Teilnehmer sql: $sql<br>";
+        $cnt = $this->connection->executeStatement($sql, [$Wettbewerb, $Kurzname, $Name, $Email, $pwd, $Bezahlt, $Erst, $Sechzehn, $Achtel, $Viertel, $Halb, $Finale, $id]);
 	    $html.="Teilnehmer " . $Kurzname . " ge&auml;ndert $value ";
       }
       //$html = utf8_encode($html);
       return $this->jsonUtf8Response(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
     }
-    if ($aktion == "d" ) {   
+    if ($aktion == "d" ) {
         // TeilnehmerId besorgen/pruefen
-	    $sql = "Select ID,Kurzname from tl_hy_teilnehmer where Wettbewerb = '$Wettbewerb'  and ID='$id.';";
-        $debug.="sql: $sql<br>";	
-        $stmt = $this->connection->executeQuery($sql);
+	    $sql = "Select ID,Kurzname from tl_hy_teilnehmer where Wettbewerb = ? and ID = ?";
+        $debug.="sql: $sql<br>";
+        $stmt = $this->connection->executeQuery($sql, [$Wettbewerb, $id]);
         $anz = $stmt->rowCount();
         if ($anz > 0) {
           $row = $stmt->fetchAssociative();
@@ -2544,17 +2590,21 @@ $debug.=" sql: $sql\n";
           return $this->jsonUtf8Response(['data' => $html,'error'=>$errortxt, 'debug'=>$debug]); 
         }
         $Kurzname=$row['Kurzname'];
-	  $sql = "Delete from tl_hy_teilnehmer WHERE ID=$tid LIMIT 1";
-      $cnt = $this->connection->executeStatement($sql);
+	  $sql = "Delete from tl_hy_teilnehmer WHERE ID=? LIMIT 1";
+      $cnt = $this->connection->executeStatement($sql, [$tid]);
       //$html.="in Tabelle tl_hy_teilnehmer betroffene Saetze $cnt<br>";
 	  $html.="Teilnehmer gel&ouml;scht";                     // eigentlich muessen auch noch die Teilnehmerwetten in  tl_hy_wetteaktuell
                                                              // geloescht werden
-	  $sql = "Delete from  tl_hy_wetteaktuell where Wettbewerb = '$Wettbewerb' AND Teilnehmer =$tid";
-      $cnt = $this->connection->executeStatement($sql);
+	  $sql = "Delete from tl_hy_wetteaktuell where Wettbewerb = ? AND Teilnehmer = ?";
+      $cnt = $this->connection->executeStatement($sql, [$Wettbewerb, $tid]);
       $debug.="Teilnehmer $Kurzname($id) und in Tabelle  tl_hy_wetteaktuell betroffene Saetze $cnt<br>";
       $html.="Teilnehmer $Kurzname($id) und in Tabelle  tl_hy_wetteaktuell betroffene Saetze $cnt<br>";
       //$html = utf8_encode($html);
       return $this->jsonUtf8Response(['data' => $html,'error'=>$errortxt,'debug'=>$debug]); 
+    }
+    } catch (\Throwable $e) {
+      $errortxt = 'Teilnehmer konnte nicht gespeichert werden: '.$e->getMessage();
+      return $this->jsonUtf8Response(['data' => $html,'error'=>$errortxt, 'debug'=>$debug], Response::HTTP_INTERNAL_SERVER_ERROR);
     }
     $html.="fehlerhafte Aktion $aktion<br>";
     $errortxt.="fehlerhafte Aktion $aktion<br>";

@@ -132,7 +132,6 @@ class FePunkteController extends AbstractFussballController
             WHERE akt.Wettbewerb = ?
             ORDER BY t.Name, wetten.Art, wetten.Kommentar
         ", [$Wettbewerb]);
-//die (var_dump($wettenRoh));
         //----------------------------------------------------------------------
         // 4. Gruppieren + Punkte berechnen
         //----------------------------------------------------------------------
@@ -207,21 +206,20 @@ class FePunkteController extends AbstractFussballController
         $Ptrend = $r['Ptrend'];
 
         if ($Art === 's') {
-            $pkt=0;
+            $pkt = 0;
             if ($r['W1'] == -1 || $r['W2'] == -1 || $r['Tipp2'] == -1 || $r['Tipp3'] == -1) return $pkt;
 
             if ($r['W1'] == $r['Tipp2'] && $r['W2'] == $r['Tipp3']) return $Pok;
-            $T1 = $r['Tipp2'];   // werte aus wette holen
-            $T2 = $r['Tipp3'];
-            $W1 = $r['W1'];   // gewettete Werte
-            $W2 = $r['W1'];
-            if ($T1 == $W1 && $T2 == $W2)  $pkt = $Pok;
-            else if (($T1 >= $W1 && $T2 >= $W2) || ($T1 <= $W1 && $T2 <= $W2)) $pkt = $Ptrend;
-//            $trendW = $r['W1'] <=> $r['W2'];
-//            $trendT = $r['Tipp2'] <=> $r['W1'];
+
+            $trendWette = (int)$r['W1'] <=> (int)$r['W2'];
+            $trendErgebnis = (int)$r['Tipp2'] <=> (int)$r['Tipp3'];
+
+            if ($trendWette === $trendErgebnis) {
+                return (int)$Ptrend;
+            }
+
 //if ($r['Tipp1'] == 511) die(var_dump($r));
             return $pkt;
-            return ($trendW === $trendT) ? $Ptr : 0;
         }
 
         if ($Art === 'p' || $Art === 'v') {

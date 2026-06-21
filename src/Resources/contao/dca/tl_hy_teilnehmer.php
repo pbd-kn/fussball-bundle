@@ -82,8 +82,8 @@ $GLOBALS['TL_DCA']['tl_hy_teilnehmer'] = [
 
 
     'palettes' => [
-        '__selector__' => array('Wettbewerb','Name','Kurzname','Email','Punkte'),
-		'default' => '{title_legend},Wettbewerb;Name;Kurzname;Email;Punkte;'
+        '__selector__' => array('Wettbewerb','Name','Kurzname','Email','pwd','Punkte'),
+		'default' => '{title_legend},Wettbewerb;Name;Kurzname;Email;pwd;Punkte;'
     ],
     // Fields
     'fields' => [
@@ -116,6 +116,13 @@ $GLOBALS['TL_DCA']['tl_hy_teilnehmer'] = [
         ],
         'Email' => [
             'label' => &$GLOBALS['TL_LANG']['tl_hy_teilnehmer']['Email'],
+            'exclude' => true,
+            'inputType' => 'text',
+            'eval' => ['mandatory' => true, 'maxlength' => 64],
+            'sql' => "varchar(255) NOT NULL default ''",
+        ],
+        'pwd' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_hy_teilnehmer']['pwd'],
             'exclude' => true,
             'inputType' => 'text',
             'eval' => ['mandatory' => true, 'maxlength' => 64],
