@@ -317,6 +317,8 @@ class FeEndstandController extends AbstractFussballController
             $punkte[(string)$tln['ID']] = 0;
         }
 
+        $abgeschlosseneGruppen = $this->loadAbgeschlosseneGruppen($conn, $Wettbewerb);
+
         $wetten = $conn->fetchAllAssociative("
             SELECT
                 t.ID AS ID,
@@ -358,6 +360,10 @@ class FeEndstandController extends AbstractFussballController
                 }
             }
 
+            if ($art === 'g' && !isset($abgeschlosseneGruppen[(string)$row['Tipp1']])) {
+                continue;
+            }
+
             $punkte[$tid] += $this->berechnePunkte(
                 $art,
                 $row['W1'] ?? -1,
@@ -371,6 +377,40 @@ class FeEndstandController extends AbstractFussballController
         }
 
         return $punkte;
+    }
+
+    private function loadAbgeschlosseneGruppen(Connection $conn, string $Wettbewerb): array
+    {
+        $rows = $conn->fetchAllAssociative(
+            "SELECT Gruppe
+             FROM tl_hy_gruppen
+             WHERE Wettbewerb = ? AND CHAR_LENGTH(Gruppe) = 1
+             GROUP BY Gruppe
+             HAVING COUNT(*) >= 4 AND MIN(Spiele + 0) >= 3",
+            [$Wettbewerb]
+        );
+
+        $gruppen = [];
+        foreach ($rows as $row) {
+            $gruppen[(string)$row['Gruppe']] = true;
+        }
+
+        return $gruppen;
+    }
+
+    private function istGruppeAbgeschlossen(array $stand, string $gruppe): bool
+    {
+        if (count($stand[$gruppe] ?? []) < 4) {
+            return false;
+        }
+
+        foreach ($stand[$gruppe] as $row) {
+            if ((int)($row['Spiele'] ?? 0) < 3) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private function uniqueTeilnehmerFromAny(array $teilnehmerByArt): array
@@ -585,6 +625,7 @@ class FeEndstandController extends AbstractFussballController
         $sql =
             "SELECT g.Gruppe as Gruppe, g.Platz as Platz,
                     g.M1 as M1Ind,
+                    g.Spiele as Spiele,
                     m.Nation as M1,
                     m.Flagge as Flagge1,
                     m.ID as MID
@@ -636,12 +677,20 @@ class FeEndstandController extends AbstractFussballController
                     wa.W2 AS TippM2_ID,
                     m2.Nation AS TippM2,
                     m2.Flagge AS TippFlag2,
+                    w.Tipp2 AS IstM1_ID,
+                    im1.Nation AS IstM1,
+                    im1.Flagge AS IstFlag1,
+                    w.Tipp3 AS IstM2_ID,
+                    im2.Nation AS IstM2,
+                    im2.Flagge AS IstFlag2,
                     w.Pok,
                     w.Ptrend
              FROM tl_hy_wetteaktuell wa
              JOIN tl_hy_wetten w ON w.ID = wa.Wette
              LEFT JOIN tl_hy_mannschaft m1 ON wa.W1 = m1.ID
              LEFT JOIN tl_hy_mannschaft m2 ON wa.W2 = m2.ID
+             LEFT JOIN tl_hy_mannschaft im1 ON w.Tipp2 = im1.ID
+             LEFT JOIN tl_hy_mannschaft im2 ON w.Tipp3 = im2.ID
              WHERE wa.Wettbewerb = ?
                AND LOWER(w.Art) = 'g'
                AND w.Tipp1 IN ($in)";
@@ -671,10 +720,20 @@ class FeEndstandController extends AbstractFussballController
 
                 $w1 = (int)($tipp['TippM1_ID'] ?? -1);
                 $w2 = (int)($tipp['TippM2_ID'] ?? -1);
+                $gruppeAbgeschlossen = $this->istGruppeAbgeschlossen($stand, $grp);
 
                 $points = 0;
-                if ($erster && $zweiter) {
-                    $points = $this->berechneGruppenPunkte( 'g', $w1, $w2, 0, $grp, (int)($erster['MID'] ?? -1), (int)($zweiter['MID'] ?? -1), 0, (int)($tipp['Pok'] ?? $Pok), (int)($tipp['Ptrend'] ?? $Ptrend) );
+                if ($gruppeAbgeschlossen) {
+                    $points = $this->berechnePunkte(
+                        'g',
+                        $w1,
+                        $w2,
+                        0,
+                        (int)($tipp['IstM1_ID'] ?? -1),
+                        (int)($tipp['IstM2_ID'] ?? -1),
+                        (int)($tipp['Pok'] ?? $Pok),
+                        (int)($tipp['Ptrend'] ?? $Ptrend)
+                    );
                 }
 
                 $sum += $points;
@@ -690,10 +749,10 @@ class FeEndstandController extends AbstractFussballController
                     'tippFlag2' => (string)($tipp['TippFlag2'] ?? ''),
 
                     // Ist (Gruppenstand) – optional, aber hilfreich
-                    'ist1' => (string)($erster['M1'] ?? '—'),
-                    'ist2' => (string)($zweiter['M1'] ?? '—'),
-                    'istFlag1' => (string)($erster['Flagge1'] ?? ''),
-                    'istFlag2' => (string)($zweiter['Flagge1'] ?? ''),
+                    'ist1' => $gruppeAbgeschlossen ? (string)($tipp['IstM1'] ?? '—') : 'offen',
+                    'ist2' => $gruppeAbgeschlossen ? (string)($tipp['IstM2'] ?? '—') : 'offen',
+                    'istFlag1' => $gruppeAbgeschlossen ? (string)($tipp['IstFlag1'] ?? '') : '',
+                    'istFlag2' => $gruppeAbgeschlossen ? (string)($tipp['IstFlag2'] ?? '') : '',
 
                     'punkte' => $points,
                 ];
