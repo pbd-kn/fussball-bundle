@@ -119,27 +119,29 @@ class FeEndstandController extends AbstractFussballController
             return new Response($tpl->parse(), Response::HTTP_OK, ['content-type' => 'text/html']);
         }
 
-        // In-memory Punkte je Teilnehmer
-        $punkteSumme = [];
+        // In-memory Punkte je Teilnehmer fuer die Detail-Sektionen
+        $sectionPunkteSumme = [];
         foreach ($allTeilnehmer as $tln) {
-            $punkteSumme[(string)$tln['ID']] = 0;
+            $sectionPunkteSumme[(string)$tln['ID']] = 0;
         }
 
         $sections = [];
 
         // Deutschlandspiele (Gruppe aus Config + Nation-Filter Deutschland)
         $deutschlandgruppe = (string) ($this->aktWettbewerb['aktDGruppe'] ?? '');
-        $sections[] = $this->createSpieleSection( $conn, $Wettbewerb, $deutschlandgruppe, $allTeilnehmer, $punkteSumme, 'Deutschland Gruppenspiele', 'Deutschland' );
+        $sections[] = $this->createSpieleSection( $conn, $Wettbewerb, $deutschlandgruppe, $allTeilnehmer, $sectionPunkteSumme, 'Deutschland Gruppenspiele', 'Deutschland' );
         // Gruppen A–L (Gruppenstände + Gruppenwetten)
-        $sections[] = $this->createGruppenSection( $conn, $Wettbewerb, $allTeilnehmer, $punkteSumme, 'Gruppen A–L');
+        $sections[] = $this->createGruppenSection( $conn, $Wettbewerb, $allTeilnehmer, $sectionPunkteSumme, 'Gruppen A–L');
         // KO-Phasen
-        $sections[] = $this->createSpieleSection($conn, $Wettbewerb, 'sechz%',  $allTeilnehmer, $punkteSumme, 'Sechzehntelfinale', '');
-        $sections[] = $this->createSpieleSection($conn, $Wettbewerb, 'achtel%', $allTeilnehmer, $punkteSumme, 'Achtelfinale', '');
-        $sections[] = $this->createSpieleSection($conn, $Wettbewerb, 'viertel%',$allTeilnehmer, $punkteSumme, 'Viertelfinale', '');
-        $sections[] = $this->createSpieleSection($conn, $Wettbewerb, 'halb%',   $allTeilnehmer, $punkteSumme, 'Halbfinale', '');
-        $sections[] = $this->createSpieleSection($conn, $Wettbewerb, 'finale',  $allTeilnehmer, $punkteSumme, 'Finale', '');
+        $sections[] = $this->createSpieleSection($conn, $Wettbewerb, 'sechz%',  $allTeilnehmer, $sectionPunkteSumme, 'Sechzehntelfinale', '');
+        $sections[] = $this->createSpieleSection($conn, $Wettbewerb, 'achtel%', $allTeilnehmer, $sectionPunkteSumme, 'Achtelfinale', '');
+        $sections[] = $this->createSpieleSection($conn, $Wettbewerb, 'viertel%',$allTeilnehmer, $sectionPunkteSumme, 'Viertelfinale', '');
+        $sections[] = $this->createSpieleSection($conn, $Wettbewerb, 'halb%',   $allTeilnehmer, $sectionPunkteSumme, 'Halbfinale', '');
+        $sections[] = $this->createSpieleSection($conn, $Wettbewerb, 'finale',  $allTeilnehmer, $sectionPunkteSumme, 'Finale', '');
         // Platz & Vergleich (P/V)
-        $sections[] = $this->createPuVSection( $conn, $Wettbewerb, $wetten, $teilnehmerAktWetten, $punkteSumme, ['p', 'v'], 'Platz und Vergleich');
+        $sections[] = $this->createPuVSection( $conn, $Wettbewerb, $wetten, $teilnehmerAktWetten, $sectionPunkteSumme, ['p', 'v'], 'Platz und Vergleich');
+        // Die offizielle Rangliste muss dieselbe Wetten-Berechnung nutzen wie die Punkteuebersicht.
+        $punkteSumme = $this->calculatePunkteUebersicht($conn, $Wettbewerb);
         // Final: Punkte in DB schreiben (einmal pro Teilnehmer => keine Mehrfachwertung möglich)
         $this->writeFinalPoints($conn, $Wettbewerb, $punkteSumme);
         // Rangliste laden
@@ -300,6 +302,75 @@ class FeEndstandController extends AbstractFussballController
             $out[] = $r;
         }
         return $out;
+    }
+
+    private function calculatePunkteUebersicht(Connection $conn, string $Wettbewerb): array
+    {
+        $punkte = [];
+
+        $teilnehmer = $conn->fetchAllAssociative(
+            "SELECT ID FROM tl_hy_teilnehmer WHERE Wettbewerb = ?",
+            [$Wettbewerb]
+        );
+
+        foreach ($teilnehmer as $tln) {
+            $punkte[(string)$tln['ID']] = 0;
+        }
+
+        $wetten = $conn->fetchAllAssociative("
+            SELECT
+                t.ID AS ID,
+                w.Art AS Art,
+                w.Tipp1,
+                w.Tipp2,
+                w.Tipp3,
+                w.Pok,
+                w.Ptrend,
+                akt.W1,
+                akt.W2
+            FROM tl_hy_wetteaktuell akt
+            LEFT JOIN tl_hy_teilnehmer t ON akt.Teilnehmer = t.ID
+            LEFT JOIN tl_hy_wetten w ON akt.Wette = w.ID
+            WHERE akt.Wettbewerb = ?
+        ", [$Wettbewerb]);
+
+        foreach ($wetten as $row) {
+            $tid = (string)($row['ID'] ?? '');
+            $art = strtolower((string)($row['Art'] ?? ''));
+
+            if ($tid === '' || $art === '') {
+                continue;
+            }
+
+            if (!isset($punkte[$tid])) {
+                $punkte[$tid] = 0;
+            }
+
+            if ($art === 's') {
+                $spiel = $conn->fetchAssociative(
+                    "SELECT T1, T2 FROM tl_hy_spiele WHERE Wettbewerb = ? AND ID = ?",
+                    [$Wettbewerb, $row['Tipp1']]
+                );
+
+                if ($spiel) {
+                    $row['Tipp2'] = $spiel['T1'];
+                    $row['Tipp3'] = $spiel['T2'];
+                }
+            }
+
+            $punkte[$tid] += $this->berechnePunkte(
+                $art,
+                $row['W1'] ?? -1,
+                $row['W2'] ?? -1,
+                $row['Tipp1'] ?? -1,
+                $row['Tipp2'] ?? -1,
+                $row['Tipp3'] ?? -1,
+                $row['Pok'] ?? 0,
+                $row['Ptrend'] ?? 0
+            );
+        }
+
+        return $punkte;
     }
 
     private function uniqueTeilnehmerFromAny(array $teilnehmerByArt): array
