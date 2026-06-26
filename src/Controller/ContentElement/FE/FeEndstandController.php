@@ -557,42 +557,23 @@ class FeEndstandController extends AbstractFussballController
         // Prefetch Gruppen-Tipps: tl_hy_wetteaktuell join tl_hy_wetten (Art g, Tipp1=Gruppenbuchstabe)
         $in = implode(',', array_fill(0, count($gruppenKeys), '?'));   /* Diese Zeile baut einen kommagetrennten Platzhalter-String mit ? auf – typisch für SQL IN (...) Also 'A','B','C'*/
         $params = array_merge([$Wettbewerb], $gruppenKeys);
-/*
         $sqlw =
-            "SELECT wa.Teilnehmer, w.Art, w.Tipp1,
-                    wa.W1, wa.W2,
-                    m1.Nation as TipM1, m1.Flagge as TipFlag1,
-                    m2.Nation as TipM2, m2.Flagge as TipFlag2,
-                    w.Pok, w.Ptrend
+            "SELECT wa.Teilnehmer, w.Art, w.Tipp1 AS Gruppe,
+                    wa.W1 AS TippM1_ID,
+                    m1.Nation AS TippM1,
+                    m1.Flagge AS TippFlag1,
+                    wa.W2 AS TippM2_ID,
+                    m2.Nation AS TippM2,
+                    m2.Flagge AS TippFlag2,
+                    w.Pok,
+                    w.Ptrend
              FROM tl_hy_wetteaktuell wa
              JOIN tl_hy_wetten w ON w.ID = wa.Wette
              LEFT JOIN tl_hy_mannschaft m1 ON wa.W1 = m1.ID
              LEFT JOIN tl_hy_mannschaft m2 ON wa.W2 = m2.ID
              WHERE wa.Wettbewerb = ?
-               AND LOWER(w.Art)='g'
+               AND LOWER(w.Art) = 'g'
                AND w.Tipp1 IN ($in)";
-*/
-
-        $sqlw =
-        "SELECT wa.Teilnehmer, w.Art, w.Tipp1 AS Gruppe,
-        w.Tipp2              AS TippM1_ID, 
-        tm1.Nation           AS TippM1,
-        tm1.Flagge           AS TippFlag1,
-        w.Tipp3              AS TippM2_ID,
-        tm2.Nation           AS TippM2,
-        tm2.Flagge           AS TippFlag2,
-        w.Pok,
-        w.Ptrend
-        FROM tl_hy_wetteaktuell wa
-        JOIN tl_hy_wetten w
-            ON w.ID = wa.Wette
-        LEFT JOIN tl_hy_mannschaft tm1
-            ON w.Tipp2 = tm1.ID
-        LEFT JOIN tl_hy_mannschaft tm2
-            ON w.Tipp3 = tm2.ID
-        WHERE wa.Wettbewerb = ?
-            AND LOWER(w.Art) = 'g'
-            AND w.Tipp1 IN ($in)";
 
         $stmtw = $conn->executeQuery($sqlw, $params);
 

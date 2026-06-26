@@ -105,11 +105,12 @@ function toggleDebug(el){
                 <?php foreach ($row['cards'] as $card): ?>
                     <div class="card">
                         <div><b>Gruppe <?= htmlspecialchars($card['gruppe']) ?></b></div>
+                        <div>gewettet:</div>
                         <div>1: <?= htmlspecialchars($card['tipp1'] ?? '-') ?>  
                         <img class="flag" src="<?= $this->fussballUtil->getImagePath($card['tippFlag1']) ?>"> 
                         </div>
                         <div>2: <?= htmlspecialchars($card['tipp2'] ?? ' — ') ?>  <img class="flag" src="<?= $this->fussballUtil->getImagePath($card['tippFlag2']) ?>"> </div>
-                        <div><hr>gewettet:</div>
+                        <div><hr>Ist:</div>
                         <div>1: <?= htmlspecialchars($card['ist1'] ?? '&nbsp;—&nbsp;') ?>  <img class="flag" src="<?= $this->fussballUtil->getImagePath($card['istFlag1']) ?>"> </div>
                         <div>2: <?= htmlspecialchars($card['ist2'] ?? ' — ') ?>  <img class="flag" src="<?= $this->fussballUtil->getImagePath($card['istFlag2']) ?>"> </div>
                         <div>Punkte: <?= (int)$card['punkte'] ?></div>
