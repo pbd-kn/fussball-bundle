@@ -239,6 +239,8 @@ class FePunkteController extends AbstractFussballController
             $sum = 0;
             if ($r['W1'] == $r['Tipp2']) $sum += $Pok;
             if ($r['W2'] == $r['Tipp3']) $sum += $Pok;
+            if ($r['W1'] == $r['Tipp3']) $sum += $Ptrend;
+            if ($r['W2'] == $r['Tipp2']) $sum += $Ptrend;
             return $sum;
         }
 
