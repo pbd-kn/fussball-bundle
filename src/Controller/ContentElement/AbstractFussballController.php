@@ -77,7 +77,7 @@ abstract class AbstractFussballController extends AbstractContentElementControll
 
     protected function berechneWettPunkte(string $Art, $W1, $W2, $Tipp1, $Tipp2, $Tipp3, $Pok, $Ptrend): int
     {
-        $art = strtolower($Art);
+        $art = strtolower(trim($Art));
         $pok = (int) $Pok;
         $ptrend = (int) $Ptrend;
 
