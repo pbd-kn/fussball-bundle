@@ -75,4 +75,71 @@ abstract class AbstractFussballController extends AbstractContentElementControll
         }
     }
 
+    protected function berechneWettPunkte(string $Art, $W1, $W2, $Tipp1, $Tipp2, $Tipp3, $Pok, $Ptrend): int
+    {
+        $art = strtolower($Art);
+        $pok = (int) $Pok;
+        $ptrend = (int) $Ptrend;
+
+        if ($art === 's') {
+            $w1 = $this->normalizeScore($W1);
+            $w2 = $this->normalizeScore($W2);
+            $tipp2 = $this->normalizeScore($Tipp2);
+            $tipp3 = $this->normalizeScore($Tipp3);
+
+            if ($w1 === null || $w2 === null || $tipp2 === null || $tipp3 === null) {
+                return 0;
+            }
+
+            if ($w1 === $tipp2 && $w2 === $tipp3) {
+                return $pok;
+            }
+
+            return (($w1 <=> $w2) === ($tipp2 <=> $tipp3)) ? $ptrend : 0;
+        }
+
+        if ($art === 'g') {
+            $w1 = (int) $W1;
+            $w2 = (int) $W2;
+            $tipp2 = (int) $Tipp2;
+            $tipp3 = (int) $Tipp3;
+
+            if ($w1 === -1 || $w2 === -1 || $tipp2 === -1 || $tipp3 === -1) {
+                return 0;
+            }
+
+            $punkte = 0;
+            if ($w1 === $tipp2) $punkte += $pok;
+            if ($w2 === $tipp3) $punkte += $pok;
+            if ($w1 === $tipp3) $punkte += $ptrend;
+            if ($w2 === $tipp2) $punkte += $ptrend;
+
+            return $punkte;
+        }
+
+        if ($art === 'p' || $art === 'v') {
+            $w1 = (int) $W1;
+            $tipp1 = (int) $Tipp1;
+
+            if ($w1 === -1 || $tipp1 === -1) {
+                return 0;
+            }
+
+            return ($w1 === $tipp1) ? $pok : 0;
+        }
+
+        return 0;
+    }
+
+    private function normalizeScore($value): ?int
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        $score = (int) $value;
+
+        return $score < 0 ? null : $score;
+    }
+
 }

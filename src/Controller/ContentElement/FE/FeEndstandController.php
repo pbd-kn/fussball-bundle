@@ -172,45 +172,7 @@ class FeEndstandController extends AbstractFussballController
 
     private function berechnePunkte(string $Art, $W1, $W2, $Tipp1, $Tipp2, $Tipp3, $Pok, $Ptrend): int
     {
-        if (strtolower($Art) === 's') {
-            if ($W1 == -1 || $W2 == -1) return 0;
-            if ($Tipp2 == -1 || $Tipp3 == -1) return 0;
-
-            if ($W1 == $Tipp2 && $W2 == $Tipp3) {
-                return (int) $Pok;
-            }
-
-            $erg = 0;
-            if ($Tipp2 == $Tipp3) $erg = 0;
-            else if ($Tipp2 > $Tipp3) $erg = -1;
-            else $erg = 1;
-
-            $werg = 0;
-            if ($W1 == $W2) $werg = 0;
-            else if ($W1 > $W2) $werg = -1;
-            else $werg = 1;
-
-            if ($erg == $werg) return (int) $Ptrend;
-            return 0;
-        } elseif (strtolower($Art) === 'g') {
-            $Punkte = 0;
-            if ($W1 == -1 || $W2 == -1) return $Punkte;
-            if ($W1 == $Tipp2) $Punkte += (int) $Pok;
-            if ($W2 == $Tipp3) $Punkte += (int) $Pok;
-            if ($W1 == $Tipp3) $Punkte += (int) $Ptrend;
-            if ($W2 == $Tipp2) $Punkte += (int) $Ptrend;
-            return $Punkte;
-        } elseif (strtolower($Art) === 'v') {
-            if ($W1 == -1) return 0;
-            if ($W1 == $Tipp1) return (int) $Pok;
-            return 0;
-        } elseif (strtolower($Art) === 'p') {
-            if ($W1 == -1) return 0;
-            if ($W1 == $Tipp1) return (int) $Pok;
-            return 0;
-        }
-
-        return 0;
+        return $this->berechneWettPunkte($Art, $W1, $W2, $Tipp1, $Tipp2, $Tipp3, $Pok, $Ptrend);
     }
 
     private function berechneGruppenPunkte(string $Art, $W1, $W2, $W3, $GRP, $Tipp1, $Tipp2, $Tipp3, $Pok, $Ptrend): int

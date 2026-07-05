@@ -201,49 +201,15 @@ class FePunkteController extends AbstractFussballController
 
     private function calculatePoints(array $r): int
     {
-        $Art = strtolower($r['Art']);
-        $Pok = $r['Pok'];
-        $Ptrend = $r['Ptrend'];
-
-        if ($Art === 's') {
-            $pkt = 0;
-            if ($r['W1'] == -1 || $r['W2'] == -1 || $r['Tipp2'] == -1 || $r['Tipp3'] == -1) return $pkt;
-
-            if ($r['W1'] == $r['Tipp2'] && $r['W2'] == $r['Tipp3']) return $Pok;
-
-            $trendWette = (int)$r['W1'] <=> (int)$r['W2'];
-            $trendErgebnis = (int)$r['Tipp2'] <=> (int)$r['Tipp3'];
-
-            if ($trendWette === $trendErgebnis) {
-                return (int)$Ptrend;
-            }
-
-//if ($r['Tipp1'] == 511) die(var_dump($r));
-            return $pkt;
-        }
-
-        if ($Art === 'p' || $Art === 'v') {
-            if ((int)$r['W1'] == -1 ||  (int)$r['Tipp1'] == -1) {
-//die(var_dump($r));
-                return 0;
-            }           
-//if ($Art === 'v') die(var_dump($r));
-            return ($r['W1'] == $r['Tipp1']) ? $Pok : 0;
-        }
-
-        if ($Art === 'g') {
-            if ((int)$r['W1'] == -1 ||  (int)$r['W2'] == -1 ||  (int)$r['Tipp2'] == -1 ||  (int)$r['Tipp3'] == -1 ) {           
-//die(var_dump($r));        
-                return 0;
-            }
-            $sum = 0;
-            if ($r['W1'] == $r['Tipp2']) $sum += $Pok;
-            if ($r['W2'] == $r['Tipp3']) $sum += $Pok;
-            if ($r['W1'] == $r['Tipp3']) $sum += $Ptrend;
-            if ($r['W2'] == $r['Tipp2']) $sum += $Ptrend;
-            return $sum;
-        }
-
-        return 0;
+        return $this->berechneWettPunkte(
+            (string)($r['Art'] ?? ''),
+            $r['W1'] ?? -1,
+            $r['W2'] ?? -1,
+            $r['Tipp1'] ?? -1,
+            $r['Tipp2'] ?? -1,
+            $r['Tipp3'] ?? -1,
+            $r['Pok'] ?? 0,
+            $r['Ptrend'] ?? 0
+        );
     }
 }
