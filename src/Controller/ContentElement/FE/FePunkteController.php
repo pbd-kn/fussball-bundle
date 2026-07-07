@@ -156,6 +156,17 @@ class FePunkteController extends AbstractFussballController
             $punkteProTeilnehmer[$tid] += $punkte;
         }
 
+        usort($teilnehmer, static function (array $a, array $b) use ($punkteProTeilnehmer): int {
+            $punkteA = (int)($punkteProTeilnehmer[$a['ID']] ?? 0);
+            $punkteB = (int)($punkteProTeilnehmer[$b['ID']] ?? 0);
+
+            if ($punkteA !== $punkteB) {
+                return $punkteB <=> $punkteA;
+            }
+
+            return strcasecmp((string)($a['Kurzname'] ?? $a['Name'] ?? ''), (string)($b['Kurzname'] ?? $b['Name'] ?? ''));
+        });
+
 
         //----------------------------------------------------------------------
         // 5. Ausgabe per HTML5-Template
