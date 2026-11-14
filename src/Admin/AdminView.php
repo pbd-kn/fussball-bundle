@@ -225,6 +225,8 @@ final class AdminView
     {
         $participant = $this->service->row('teilnehmer', $id);
         $html = '<h3>Tipps von '.self::escape($participant['Name']).'</h3>';
+        $close = '<p>'.$this->button('Tipps schließen', ['data-fussball-cancel' => '1']).'</p>';
+        $html .= $close;
         foreach ($this->service->participantBets($id) as $bet) {
             $type = strtolower((string) $bet['Art']);
             $html .= '<form method="post" action="'.self::escape($this->url('storeteilnehmerwette')).'" data-fussball-form data-keep-open="1"><fieldset><legend>'.self::escape($bet['Kommentar']).'</legend>';
@@ -240,6 +242,6 @@ final class AdminView
             }
             $html .= '<button type="submit" class="tl_submit">Tipp speichern</button></fieldset></form>';
         }
-        return $html;
+        return $html.$close;
     }
 }

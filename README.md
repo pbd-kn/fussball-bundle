@@ -77,3 +77,7 @@ Composer verlangt im Projekt PHP `^8.3` und löst Abhängigkeiten für die Platt
 Die lokale Datenbank wurde vor der gezielten Fußball-Passwortmigration mit Contao gesichert. Diese Migration ist abgeschlossen; eine ebenfalls ausstehende Cookiebar-Migration wurde nicht ausgeführt. Nach der Verlagerung der Verwaltung wurde der Produktionscache neu erstellt. HTTP-Prüfungen bestätigen die Weiterleitung der neuen Verwaltungsadressen zum Backend-Login, HTTP 404 für entfernte Frontend-AJAX-URLs und HTTP 200 für das Backend-Stylesheet. Schreibzugriffe sind ausschließlich per POST erlaubt.
 
 Der zuletzt durchgeführte Composer-Audit des bestehenden Projekts meldet darüber hinaus 51 Sicherheitsmeldungen in 16 produktiven Paketen, darunter Contao selbst und eine kritische Meldung im Comments-Bundle. Diese Paketlücken werden durch die AJAX-Anpassungen nicht behoben. Die Website ist damit noch nicht als insgesamt sicher für eine öffentliche Freigabe bewertet. Ein angemeldeter Bedienungstest im Browser steht ebenfalls noch aus.
+
+## Separate Portierung unter co5
+
+Die eigenständige Kopie unter C:/wampneu/www/co5/websites/Hoyzer verwendet Contao 5.7.17, PHP 8.3.36 und die Datenbank co5_hoyzer. Sie ist unter http://hoyzer5.local erreichbar und bindet dieses Repository unter C:/wampneu/www/co5/co5Bundles/fussball-bundle mit dev-portierung-nach-5.7 ein. Die ursprüngliche co4-Installation bleibt bestehen. Das ausführliche lokale Upgrade-Protokoll steht in der Datei UPGRADE-5.7.md im neuen Website-Verzeichnis.
