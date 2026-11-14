@@ -35,7 +35,7 @@ $GLOBALS['TL_DCA']['tl_hy_spiele'] = [
 //        'ctable' => ['tl_extcss_file'],
     // Config
     'config' => [
-        'dataContainer' => 'Table',
+        'dataContainer' => \Contao\DC_Table::class,
         'enableVersioning' => true,
         'sql' => [
             'keys' => [
@@ -48,11 +48,11 @@ $GLOBALS['TL_DCA']['tl_hy_spiele'] = [
     'list' => [
         'sorting' => [
             'mode' => 1,
-            'fields' => ['Name'],
+            'fields' => ['Nr'],
             'flag' => 1,
         ],
         'label' => [
-            'fields' => ['Name'],
+            'fields' => ['Nr'],
             'format' => '%s',
         ],
         'global_operations' => [

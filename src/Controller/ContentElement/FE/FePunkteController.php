@@ -19,11 +19,7 @@ use Twig\Environment as TwigEnvironment;
 use PBDKN\FussballBundle\Controller\ContentElement\AbstractFussballController;
 use PBDKN\FussballBundle\Controller\ContentElement\DependencyAggregate;
 
-use Contao\CoreBundle\ServiceAnnotation\ContentElement;
 
-/**
- * @ContentElement(FePunkteController::TYPE, category="fussball-FE")
- */
 class FePunkteController extends AbstractFussballController
 {
     public const TYPE = 'TeilnehmerPunkte';
@@ -52,8 +48,9 @@ class FePunkteController extends AbstractFussballController
     }
 
 
-    public function __invoke(Request $request, ContentModel $model, string $section, array $classes = null, PageModel $pageModel = null): Response
+    public function __invoke(Request $request, ContentModel $model, string $section, ?array $classes = null, ?PageModel $pageModel = null): Response
     {
+        $this->loadAktWettbewerb();
         if ($this->scopeMatcher->isBackendRequest($request)) {
             return new Response(
                 $this->twig->render('@Fussball/Backend/backend_element_view.html.twig', [
@@ -66,7 +63,7 @@ class FePunkteController extends AbstractFussballController
     }
 
 
-    protected function getResponse(\Contao\Template $template, ContentModel $model, Request $request): ?Response
+    protected function getResponse(\Contao\Template $template, ContentModel $model, Request $request): Response
     {
         $Wettbewerb = $this->aktWettbewerb['aktWettbewerb'];
 

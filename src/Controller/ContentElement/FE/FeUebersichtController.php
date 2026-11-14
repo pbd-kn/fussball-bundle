@@ -8,7 +8,6 @@ use Contao\Config;
 use Contao\ContentModel;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\CoreBundle\ServiceAnnotation\ContentElement;
 use Contao\Environment;
 use Contao\FrontendTemplate;
 use Contao\Input;
@@ -20,14 +19,12 @@ use PBDKN\FussballBundle\Controller\ContentElement\DependencyAggregate;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * @ContentElement(FeUebersichtController::TYPE, category="fussball-FE")
- */
 class FeUebersichtController extends AbstractFussballController
 {
     public const TYPE = 'AnzeigeUebersicht';
 
     protected ContaoFramework $framework;
+    protected \Twig\Environment $twig;
     protected Connection $connection;
     protected ?ContentModel $model = null;
     protected ?PageModel $pageModel = null;
@@ -43,16 +40,12 @@ class FeUebersichtController extends AbstractFussballController
     public function __construct(
         DependencyAggregate $dependencyAggregate,
         ContaoFramework $framework,
-        \Twig\Environment $twig,
-        \Contao\CoreBundle\String\HtmlDecoder $htmlDecoder,
-        ?\FOS\HttpCacheBundle\Http\SymfonyResponseTagger $responseTagger
+        \Twig\Environment $twig
     ) {
         parent::__construct($dependencyAggregate);
 
         $this->framework      = $framework;
         $this->twig           = $twig;
-        $this->htmlDecoder    = $htmlDecoder;
-        $this->responseTagger = $responseTagger;
         $this->connection     = $dependencyAggregate->connection;
 
         $this->config      = $framework->getAdapter(Config::class);
@@ -65,9 +58,10 @@ class FeUebersichtController extends AbstractFussballController
         Request $request,
         ContentModel $model,
         string $section,
-        array $classes = null,
-        PageModel $pageModel = null
+        ?array $classes = null,
+        ?PageModel $pageModel = null
     ): Response {
+        $this->loadAktWettbewerb();
         // Backend-Vorschau
         if ($this->scopeMatcher->isBackendRequest($request)) {
             return new Response(
@@ -88,7 +82,7 @@ class FeUebersichtController extends AbstractFussballController
         \Contao\Template $template,
         ContentModel $model,
         Request $request
-    ): ?Response {
+    ): Response {
         // Frontend-Template
         $template = new FrontendTemplate('ce_fe_uebersicht');
 

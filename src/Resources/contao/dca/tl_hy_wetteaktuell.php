@@ -35,7 +35,7 @@ $GLOBALS['TL_DCA']['tl_hy_wetteaktuell'] = [
 //        'ctable' => ['tl_extcss_file'],
     // Config
     'config' => [
-        'dataContainer' => 'Table',
+        'dataContainer' => \Contao\DC_Table::class,
         'enableVersioning' => true,
         'sql' => [
             'keys' => [
@@ -48,11 +48,11 @@ $GLOBALS['TL_DCA']['tl_hy_wetteaktuell'] = [
     'list' => [
         'sorting' => [
             'mode' => 1,
-            'fields' => ['Name'],
+            'fields' => ['Teilnehmer'],
             'flag' => 1,
         ],
         'label' => [
-            'fields' => ['Name'],
+            'fields' => ['Teilnehmer'],
             'format' => '%s',
         ],
         'global_operations' => [

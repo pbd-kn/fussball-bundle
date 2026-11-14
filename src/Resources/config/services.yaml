@@ -4,18 +4,75 @@ services:
         autoconfigure: true
         public: true
 
-    # Bundle laden
     PBDKN\FussballBundle\:
         resource: ../../*
-        exclude: ../../{DependencyInjection,Resources,Model,Entity}
+        exclude: ../../{DependencyInjection,Resources,Model,Entity,ContaoManager,FussballBundle.php}
 
-    # DependencyAggregate als Service
-    PBDKN\FussballBundle\Controller\ContentElement\DependencyAggregate: ~
-
-    # Dein CE-Controller
-    PBDKN\FussballBundle\Controller\ContentElement\FE\FeUebersichtController:
-        public: true
-        tags:
-            - { name: contao.content_element, category: "fussball-FE", type: "AnzeigeUebersicht" }
+    PBDKN\FussballBundle\Security\AjaxSecurity:
         arguments:
-            $dependencyAggregate: '@PBDKN\FussballBundle\Controller\ContentElement\DependencyAggregate'
+            $csrfTokenManager: '@contao.csrf.token_manager'
+            $tokenName: '%contao.csrf_token_name%'
+
+    PBDKN\FussballBundle\Migration\ParticipantPasswordMigration:
+        autoconfigure: false
+        tags: [contao.migration]
+
+    PBDKN\FussballBundle\Controller\ContentElement\FE\FeEndstandController:
+        tags:
+            - { name: contao.content_element, category: "fussball-FE", type: "AnzeigeEndstand", template: "ce_fe_endstand" }
+
+    PBDKN\FussballBundle\Controller\ContentElement\FE\FeGruppeController:
+        tags:
+            - { name: contao.content_element, category: "fussball-FE", type: "AnzeigeGruppen", template: "ce_fe_fussball_gruppen" }
+
+    PBDKN\FussballBundle\Controller\ContentElement\FE\FePunkteController:
+        tags:
+            - { name: contao.content_element, category: "fussball-FE", type: "TeilnehmerPunkte", template: "ce_fe_fussball_punkte" }
+
+    PBDKN\FussballBundle\Controller\ContentElement\FE\FeRegelController:
+        tags:
+            - { name: contao.content_element, category: "fussball-FE", type: "AnzeigeRegel" }
+
+    PBDKN\FussballBundle\Controller\ContentElement\FE\FeSpieleController:
+        tags:
+            - { name: contao.content_element, category: "fussball-FE", type: "AnzeigeSpiele" }
+
+    PBDKN\FussballBundle\Controller\ContentElement\FE\FeUebersichtController:
+        tags:
+            - { name: contao.content_element, category: "fussball-FE", type: "AnzeigeUebersicht", template: "ce_fe_uebersicht" }
+
+    PBDKN\FussballBundle\Controller\ContentElement\FE\FeWettenController:
+        tags:
+            - { name: contao.content_element, category: "fussball-FE", type: "AnzeigeWetten", template: "ce_fe_fussball_wetten" }
+
+    PBDKN\FussballBundle\Controller\ContentElement\OrteController:
+        tags:
+            - { name: contao.content_element, category: "fussball-Verwaltung", type: "Orte" }
+
+    PBDKN\FussballBundle\Controller\ContentElement\SpieleController:
+        tags:
+            - { name: contao.content_element, category: "fussball-Verwaltung", type: "Spiele" }
+
+    PBDKN\FussballBundle\Controller\ContentElement\VW\VWGruppeController:
+        tags:
+            - { name: contao.content_element, category: "fussball-Verwaltung", type: "Gruppen verwalten manuell" }
+
+    PBDKN\FussballBundle\Controller\ContentElement\VW\VWMannschaftController:
+        tags:
+            - { name: contao.content_element, category: "fussball-Verwaltung", type: "Mannschaften" }
+
+    PBDKN\FussballBundle\Controller\ContentElement\VW\VWNationController:
+        tags:
+            - { name: contao.content_element, category: "fussball-Verwaltung", type: "Nation" }
+
+    PBDKN\FussballBundle\Controller\ContentElement\VW\VWTeilnehmerController:
+        tags:
+            - { name: contao.content_element, category: "fussball-Verwaltung", type: "Teilnehmer" }
+
+    PBDKN\FussballBundle\Controller\ContentElement\VW\VWWettenController:
+        tags:
+            - { name: contao.content_element, category: "fussball-Verwaltung", type: "Wetten" }
+
+    PBDKN\FussballBundle\Controller\ContentElement\WettbewerbController:
+        tags:
+            - { name: contao.content_element, category: "fussball-Verwaltung", type: "Wettbewerbe" }

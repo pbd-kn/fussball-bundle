@@ -632,4 +632,40 @@ form select.custom-select {
 }
 
 
-   
+/* Management forms are scoped independently of the public result tables. */
+.fussball-admin-result { margin: .75rem 0; white-space: pre-wrap; }
+.fussball-admin-form { margin: 1rem 0; }
+.fussball-admin-form label { display: inline-block; margin-bottom: .5rem; }
+.fussball-admin-form input, .fussball-admin-form select { max-width: 100%; }
+.fussball-admin-scroll { overflow-x: auto; margin-top: 1rem; }
+.fussball-admin button { margin: .2rem; }
+
+.fussball-admin table.verwtablecss {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid #53677e;
+}
+.fussball-admin table.verwtablecss th,
+.fussball-admin table.verwtablecss td {
+    border: 1px solid #53677e;
+    padding: .45rem .6rem;
+    text-align: left;
+    vertical-align: top;
+}
+.fussball-admin table.verwtablecss th {
+    font-weight: bold;
+    white-space: nowrap;
+}
+.fussball-admin-login {
+    max-width: 48rem;
+    margin: 1rem 0;
+    padding: 1rem 1.25rem;
+    border: 1px solid #53677e;
+    border-left-width: 4px;
+    background: #f5f8fc;
+    color: #1b2b3a;
+}
+.fussball-admin-login a {
+    color: #174e80;
+    text-decoration: underline;
+}

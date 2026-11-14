@@ -1,7 +1,7 @@
 <div class="tabellenueberschrift">
-    Wetten der <?= $this->wettbewerb ?> 
-    vom <?= $this->datumStart ?> 
-    bis <?= $this->datumEnde ?>
+    Wetten der <?= htmlspecialchars((string) ($this->wettbewerb), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>
+    vom <?= htmlspecialchars((string) ($this->datumStart), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>
+    bis <?= htmlspecialchars((string) ($this->datumEnde), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>
 </div>
 
 <table class="tablecss" rules="all" border="1">
@@ -24,27 +24,27 @@
             <?php $d = $item['details']; ?>
 
             <tr>
-                <td><?= $w['Kommentar'] ?></td>
-                <td><?= $w['Pok'] ?></td>
-                <td><?= $w['Ptrend'] ?></td>
-                <td><?= $w['Art'] ?></td>
+                <td><?= htmlspecialchars((string) ($w['Kommentar']), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></td>
+                <td><?= htmlspecialchars((string) ($w['Pok']), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></td>
+                <td><?= htmlspecialchars((string) ($w['Ptrend']), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></td>
+                <td><?= htmlspecialchars((string) ($w['Art']), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></td>
 
                 <?php if ($w['Art'] === 's'): ?>
                     <td>
-                        <img src="<?= $this->fussballUtil->getImagePath($d['Flagge1']) ?>" />
-                        <?= $d['M1Name'] ?> :
-                        <img src="<?= $this->fussballUtil->getImagePath($d['Flagge2']) ?>" />
-                        <?= $d['M2Name'] ?>
+                        <img src="<?= htmlspecialchars((string) ($this->fussballUtil->getImagePath($d['Flagge1'])), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>" />
+                        <?= htmlspecialchars((string) ($d['M1Name']), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?> :
+                        <img src="<?= htmlspecialchars((string) ($this->fussballUtil->getImagePath($d['Flagge2'])), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>" />
+                        <?= htmlspecialchars((string) ($d['M2Name']), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>
                     </td>
-                    <td><?= $w['Tipp2'] ?></td>
-                    <td><?= $w['Tipp3'] ?></td>
-                    <td><?= $w['Tipp4'] ?></td>
+                    <td><?= htmlspecialchars((string) ($w['Tipp2']), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></td>
+                    <td><?= htmlspecialchars((string) ($w['Tipp3']), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></td>
+                    <td><?= htmlspecialchars((string) ($w['Tipp4']), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></td>
 
                 <?php else: ?>
-                    <td><?= $w['Tipp1'] ?></td>
-                    <td><?= $w['Tipp2'] ?></td>
-                    <td><?= $w['Tipp3'] ?></td>
-                    <td><?= $w['Tipp4'] ?></td>
+                    <td><?= htmlspecialchars((string) ($w['Tipp1']), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></td>
+                    <td><?= htmlspecialchars((string) ($w['Tipp2']), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></td>
+                    <td><?= htmlspecialchars((string) ($w['Tipp3']), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></td>
+                    <td><?= htmlspecialchars((string) ($w['Tipp4']), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></td>
                 <?php endif; ?>
             </tr>
         <?php endforeach; ?>

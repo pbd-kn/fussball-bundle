@@ -118,7 +118,7 @@ class FussballUtil
         return $optarray;
       }
       public function getImagePath($image) {
-        if (empty($image)) {
+        if (!is_string($image) || !preg_match('~^(?:[a-zA-Z0-9_-]+/)*[a-zA-Z0-9_-]+\\.(?:gif|png|jpg|jpeg|webp|svg)$~D', $image)) {
             return '';
         }
         return 'bundles/fussball/assets/flaggen/'.$image;

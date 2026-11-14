@@ -35,7 +35,7 @@ $GLOBALS['TL_DCA']['tl_hy_mannschaft'] = [
 //        'ctable' => ['tl_extcss_file'],
     // Config
     'config' => [
-        'dataContainer' => 'Table',
+        'dataContainer' => \Contao\DC_Table::class,
         'enableVersioning' => true,
         'sql' => [
             'keys' => [

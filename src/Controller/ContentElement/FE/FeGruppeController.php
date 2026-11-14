@@ -10,10 +10,7 @@ use Contao\ContentModel;
 use Contao\CoreBundle\Exception\PageNotFoundException;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\CoreBundle\String\HtmlDecoder;
-use Contao\CoreBundle\InsertTag\InsertTagParser;
 use Contao\Environment;
-use Contao\CoreBundle\ServiceAnnotation\ContentElement;
 use Contao\Template;
 use Contao\FrontendTemplate;
 use Contao\Input;
@@ -27,7 +24,6 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\Exception as DoctrineDBALDriverException;
 use Doctrine\DBAL\Exception as DoctrineDBALException;
 use PBDKN\FussballBundle\Util\CgiUtil;
-use FOS\HttpCacheBundle\Http\SymfonyResponseTagger;
 use Twig\Environment as TwigEnvironment;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
@@ -38,14 +34,12 @@ use PBDKN\FussballBundle\Controller\ContentElement\DependencyAggregate;
 /**
  * Class FeGruppeController
  *
- * @ContentElement(FeGruppeController::TYPE, category="fussball-FE")
  */
 class FeGruppeController extends AbstractFussballController
 {
     public const TYPE = 'AnzeigeGruppen';
     protected ContaoFramework $framework;
     protected Connection $connection;
-    protected ?SymfonyResponseTagger $responseTagger;
     protected ?string $viewMode = null;
     protected ?ContentModel $model;
     protected ?PageModel $pageModel;
@@ -62,19 +56,13 @@ class FeGruppeController extends AbstractFussballController
     public function __construct(
       DependencyAggregate $dependencyAggregate, 
       ContaoFramework $framework, 
-      TwigEnvironment $twig, 
-      HtmlDecoder $htmlDecoder, 
-      ?SymfonyResponseTagger $responseTagger)    
+      TwigEnvironment $twig)
     {
-        \System::log('PBD Gruppecontroller ', __METHOD__, TL_GENERAL);
 
         parent::__construct($dependencyAggregate);  // standard Klassen plus akt. Wettbewerb lesen
                                                     // AbstractFussballController übernimmt sie in die akt Klasse
-//        \System::log('PBD Spielecontroller nach dependencyAggregate', __METHOD__, TL_GENERAL);
         $this->framework = $framework;
         $this->twig = $twig;
-        $this->htmlDecoder = $htmlDecoder;
-        $this->responseTagger = $responseTagger;         //  FriendsOfSymfony/FOSHttpCacheBundle https://foshttpcachebundle.readthedocs.io/en/latest/ 
 
         // Adapters
         $this->config = $this->framework->getAdapter(Config::class);
@@ -83,8 +71,9 @@ class FeGruppeController extends AbstractFussballController
         $this->stringUtil = $this->framework->getAdapter(StringUtil::class);
 
     }
-    public function __invoke(Request $request, ContentModel $model, string $section, array $classes = null, PageModel $pageModel = null): Response
+    public function __invoke(Request $request, ContentModel $model, string $section, ?array $classes = null, ?PageModel $pageModel = null): Response
     {
+        $this->loadAktWettbewerb();
         // Do not parse the content element in the backend
         if ($this->scopeMatcher->isBackendRequest($request)) {
             return new Response(
@@ -107,7 +96,7 @@ class FeGruppeController extends AbstractFussballController
     /**
      * Generate the content element
      */
-    protected function getResponse(Template $template, ContentModel $model, Request $request): ?Response
+    protected function getResponse(Template $template, ContentModel $model, Request $request): Response
     {
         $Wettbewerb = $this->aktWettbewerb['aktWettbewerb'];
 

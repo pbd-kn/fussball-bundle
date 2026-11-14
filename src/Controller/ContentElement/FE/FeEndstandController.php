@@ -8,8 +8,6 @@ use Contao\Config;
 use Contao\ContentModel;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\CoreBundle\ServiceAnnotation\ContentElement;
-use Contao\CoreBundle\String\HtmlDecoder;
 use Contao\Environment;
 use Contao\FrontendTemplate;
 use Contao\Input;
@@ -17,27 +15,21 @@ use Contao\PageModel;
 use Contao\StringUtil;
 use Contao\Template;
 use Doctrine\DBAL\Connection;
-use FOS\HttpCacheBundle\Http\SymfonyResponseTagger;
 use PBDKN\FussballBundle\Controller\ContentElement\AbstractFussballController;
 use PBDKN\FussballBundle\Controller\ContentElement\DependencyAggregate;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Twig\Environment as TwigEnvironment;
 
-/**
- * @ContentElement(FeEndstandController::TYPE, category="fussball-FE")
- */
 class FeEndstandController extends AbstractFussballController
 {
     public const TYPE = 'AnzeigeEndstand';
 
     protected ContaoFramework $framework;
     protected Connection $connection;
-    protected ?SymfonyResponseTagger $responseTagger;
     protected ?ContentModel $model = null;
     protected ?PageModel $pageModel = null;
     protected TwigEnvironment $twig;
-    protected HtmlDecoder $htmlDecoder;
 
     protected Adapter $config;
     protected Adapter $environment;
@@ -47,16 +39,12 @@ class FeEndstandController extends AbstractFussballController
     public function __construct(
         DependencyAggregate $dependencyAggregate,
         ContaoFramework $framework,
-        TwigEnvironment $twig,
-        HtmlDecoder $htmlDecoder,
-        ?SymfonyResponseTagger $responseTagger
+        TwigEnvironment $twig
     ) {
         parent::__construct($dependencyAggregate);
 
         $this->framework = $framework;
         $this->twig = $twig;
-        $this->htmlDecoder = $htmlDecoder;
-        $this->responseTagger = $responseTagger;
 
         // Adapter
         $this->config = $this->framework->getAdapter(Config::class);
@@ -65,8 +53,9 @@ class FeEndstandController extends AbstractFussballController
         $this->stringUtil = $this->framework->getAdapter(StringUtil::class);
     }
 
-    public function __invoke(Request $request, ContentModel $model, string $section, array $classes = null, PageModel $pageModel = null): Response
+    public function __invoke(Request $request, ContentModel $model, string $section, ?array $classes = null, ?PageModel $pageModel = null): Response
     {
+        $this->loadAktWettbewerb();
         if ($this->scopeMatcher->isBackendRequest($request)) {
             return new Response(
                 $this->twig->render('@Fussball/Backend/backend_element_view.html.twig', [
@@ -85,7 +74,7 @@ class FeEndstandController extends AbstractFussballController
         return parent::__invoke($request, $this->model, $section, $classes);
     }
 
-    protected function getResponse(Template $template, ContentModel $model, Request $request): ?Response
+    protected function getResponse(Template $template, ContentModel $model, Request $request): Response
     {
         $conn = $this->connection;
         $Wettbewerb = (string) $this->aktWettbewerb['aktWettbewerb'];
@@ -99,8 +88,6 @@ class FeEndstandController extends AbstractFussballController
         // Wetten (für P/V)
         $wetten = $this->loadWetten($conn, $Wettbewerb, $debug);
 
-        // Punkte komplett neu berechnen -> erst DB resetten, dann in-memory rechnen, dann final schreiben
-        $this->loescheTlnPunkte($conn, $Wettbewerb);
 
         // Alle Teilnehmer (unique) als Basis für Summen
         $allTeilnehmer = $this->uniqueTeilnehmerFromAny($teilnehmerByArt);
@@ -142,10 +129,8 @@ class FeEndstandController extends AbstractFussballController
         $sections[] = $this->createPuVSection( $conn, $Wettbewerb, $wetten, $teilnehmerAktWetten, $sectionPunkteSumme, ['p', 'v'], 'Platz und Vergleich');
         // Die offizielle Rangliste muss dieselbe Wetten-Berechnung nutzen wie die Punkteuebersicht.
         $punkteSumme = $this->calculatePunkteUebersicht($conn, $Wettbewerb);
-        // Final: Punkte in DB schreiben (einmal pro Teilnehmer => keine Mehrfachwertung möglich)
-        $this->writeFinalPoints($conn, $Wettbewerb, $punkteSumme);
-        // Rangliste laden
-        $rangliste = $this->loadRangliste($conn, $Wettbewerb);
+        // A public GET only calculates the ranking; it must not change stored data.
+        $rangliste = $this->loadRangliste($conn, $Wettbewerb, $punkteSumme);
         $data = [
             'debug' => $debug,
             'wettbewerb' => $Wettbewerb,
@@ -164,11 +149,6 @@ class FeEndstandController extends AbstractFussballController
     /* =========================================================
      *  Punkte-Logik (wie gehabt)
      * ========================================================= */
-
-    private function loescheTlnPunkte(Connection $conn, string $Wettbewerb): void
-    {
-        $conn->executeStatement("UPDATE tl_hy_teilnehmer SET Punkte=0 WHERE Wettbewerb=?", [$Wettbewerb]);
-    }
 
     private function berechnePunkte(string $Art, $W1, $W2, $Tipp1, $Tipp2, $Tipp3, $Pok, $Ptrend): int
     {
@@ -252,17 +232,19 @@ class FeEndstandController extends AbstractFussballController
         return $wetten;
     }
 
-    private function loadRangliste(Connection $conn, string $Wettbewerb): array
+    private function loadRangliste(Connection $conn, string $Wettbewerb, array $points): array
     {
         $stmt = $conn->executeQuery(
-            "SELECT ID, Kurzname, Name, Punkte FROM tl_hy_teilnehmer WHERE Wettbewerb=? ORDER BY Punkte DESC, Kurzname ASC",
+            "SELECT ID, Kurzname, Name FROM tl_hy_teilnehmer WHERE Wettbewerb=? ORDER BY Kurzname ASC",
             [$Wettbewerb]
         );
 
         $out = [];
         while (($r = $stmt->fetchAssociative()) !== false) {
+            $r['Punkte'] = (int) ($points[(string) $r['ID']] ?? 0);
             $out[] = $r;
         }
+        usort($out, static fn (array $a, array $b): int => ($b['Punkte'] <=> $a['Punkte']) ?: strnatcasecmp($a['Kurzname'], $b['Kurzname']));
         return $out;
     }
 
@@ -392,16 +374,6 @@ class FeEndstandController extends AbstractFussballController
             }
         }
         return array_values($unique);
-    }
-
-    private function writeFinalPoints(Connection $conn, string $Wettbewerb, array $punkteSumme): void
-    {
-        foreach ($punkteSumme as $id => $pkt) {
-            $conn->executeStatement(
-                "UPDATE tl_hy_teilnehmer SET Punkte=? WHERE Wettbewerb=? AND ID=?",
-                [(int)$pkt, $Wettbewerb, (int)$id]
-            );
-        }
     }
 
     /* =========================================================

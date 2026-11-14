@@ -19,11 +19,8 @@ use Contao\Controller;
 use Contao\CoreBundle\Controller\ContentElement\AbstractContentElementController;
 use Contao\CoreBundle\Exception\PageNotFoundException;
 use Contao\CoreBundle\File\Metadata;
-use Contao\CoreBundle\InsertTag\InsertTagParser;
 use Contao\CoreBundle\Routing\ResponseContext\HtmlHeadBag\HtmlHeadBag;
-use Contao\CoreBundle\Routing\ResponseContext\ResponseContextAccessor;
 use Contao\CoreBundle\Routing\ScopeMatcher;
-use Contao\CoreBundle\String\HtmlDecoder;
 use Contao\Date;
 use Contao\Environment;
 use Contao\FilesModel;
@@ -45,9 +42,6 @@ abstract class AbstractFussballController extends AbstractContentElementControll
     protected FussballUtil $fussballUtil;
     protected Connection $connection;
     protected ScopeMatcher $scopeMatcher;
-    protected ResponseContextAccessor $responseContextAccessor;
-    protected InsertTagParser $insertTagParser;
-    protected HtmlDecoder $htmlDecoder;
     protected $aktWettbewerb=array('aktWettbewerb'=>'','aktWettbewerbId'=>'','id'=>'','aktAnzgruppen'=>-1,'aktDGruppe'=>'','aktStartdatum'=>'','aktEndedatum'=>'');
 
     public function __construct(DependencyAggregate $dependencyAggregate)
@@ -56,23 +50,21 @@ abstract class AbstractFussballController extends AbstractContentElementControll
         $this->fussballUtil = $dependencyAggregate->fussballUtil;
         $this->connection = $dependencyAggregate->connection;
         $this->scopeMatcher = $dependencyAggregate->scopeMatcher;
-        $this->responseContextAccessor = $dependencyAggregate->responseContextAccessor;
-        $this->insertTagParser = $dependencyAggregate->insertTagParser;
-        $this->htmlDecoder = $dependencyAggregate->htmlDecoder;
-                // akt Wettbewerb lesen.
-        $stmt = $this->connection->executeQuery("SELECT * from tl_hy_config WHERE Name='Wettbewerb' AND aktuell = 1 LIMIT 1");
-        $num_rows = $stmt->rowCount(); 
-        if ($num_rows != 0) {
-            $row = $stmt->fetchAssociative();
-            $this->aktWettbewerb['id']=$row['id'];
-            $this->aktWettbewerb['aktWettbewerbId']=$row['id'];
-            $this->aktWettbewerb['aktuell']=$row['aktuell'];
-            $this->aktWettbewerb['aktWettbewerb']=$row['value1'];
-            $this->aktWettbewerb['aktAnzgruppen']=$row['value2'];
-            $this->aktWettbewerb['aktDGruppe']=$row['value3'];
-            $this->aktWettbewerb['aktStartdatum']=$row['value4'];
-            $this->aktWettbewerb['aktEndedatum']=$row['value5'];
-        }
+    }
+
+    protected function loadAktWettbewerb(): void
+    {
+        $row = $this->connection->executeQuery("SELECT * FROM tl_hy_config WHERE Name='Wettbewerb' AND aktuell=1 LIMIT 1")->fetchAssociative();
+        $this->aktWettbewerb = [
+            'id' => $row['id'] ?? '',
+            'aktWettbewerbId' => $row['id'] ?? '',
+            'aktuell' => $row['aktuell'] ?? 0,
+            'aktWettbewerb' => $row['value1'] ?? '',
+            'aktAnzgruppen' => $row['value2'] ?? -1,
+            'aktDGruppe' => $row['value3'] ?? '',
+            'aktStartdatum' => $row['value4'] ?? '',
+            'aktEndedatum' => $row['value5'] ?? '',
+        ];
     }
 
     protected function berechneWettPunkte(string $Art, $W1, $W2, $Tipp1, $Tipp2, $Tipp3, $Pok, $Ptrend): int

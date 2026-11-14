@@ -1,12 +1,26 @@
 <?php
-/*
-// Content-Element registrieren
-$GLOBALS['TL_CTE']['fussball-FE']['AnzeigeUebersicht'] = 'AnzeigeUebersicht';
 
-// Palette für den Typ definieren MIT Template-Auswahl
-//       {template_legend:hide},customTpl;
-$GLOBALS['TL_DCA']['tl_content']['palettes']['AnzeigeUebersicht']= '{type_legend},type,headline;{expert_legend:hide},cssID;{invisible_legend:hide},invisible,start,stop';
+declare(strict_types=1);
 
-// Templates registrieren
-$GLOBALS['TL_CTE']['AnzeigeUebersicht']['templates'] = ['ce_fe_uebersicht'];   // zeigt alle templates die mit ce_fe_uebersicht beginnen an
-*/
+// Keep the persisted element types identical in Contao 4.13 and 5.7.
+$types = [
+    'AnzeigeEndstand',
+    'AnzeigeGruppen',
+    'TeilnehmerPunkte',
+    'AnzeigeRegel',
+    'AnzeigeSpiele',
+    'AnzeigeUebersicht',
+    'AnzeigeWetten',
+    'Orte',
+    'Spiele',
+    'Gruppen verwalten manuell',
+    'Mannschaften',
+    'Nation',
+    'Teilnehmer',
+    'Wetten',
+    'Wettbewerbe',
+];
+
+foreach ($types as $type) {
+    $GLOBALS['TL_DCA']['tl_content']['palettes'][$type] = '{type_legend},type,headline;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},cssID;{invisible_legend:hide},invisible,start,stop';
+}

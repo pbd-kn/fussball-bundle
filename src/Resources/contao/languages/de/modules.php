@@ -33,6 +33,11 @@ declare(strict_types=1);
  */
 $GLOBALS['TL_LANG']['MOD']['hy_config'] = 'Konfiguration Fussball';
 
+$GLOBALS['TL_LANG']['MOD'][\PBDKN\FussballBundle\Backend\BackendModules::GROUP] = 'Fußball';
+foreach (\PBDKN\FussballBundle\Admin\AdminSchema::ENTITIES as $entity => $schema) {
+    $GLOBALS['TL_LANG']['MOD'][\PBDKN\FussballBundle\Backend\BackendModules::moduleName($entity)] = [$schema['title'], $schema['title'].' im Fußball-Tippspiel verwalten.'];
+}
+
 /*
  * Front end modules
  */

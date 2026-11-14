@@ -1,7 +1,7 @@
 <div class="tabellenueberschrift">
-    Gruppenplan der <?= $this->wettbewerb ?>
-    vom <?= $this->datumStart ?>
-    bis <?= $this->datumEnde ?>
+    Gruppenplan der <?= htmlspecialchars((string) ($this->wettbewerb), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>
+    vom <?= htmlspecialchars((string) ($this->datumStart), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>
+    bis <?= htmlspecialchars((string) ($this->datumEnde), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>
 </div>
 
 <table class="tablecss sortierbar" rules="all" border="1">
@@ -27,22 +27,22 @@
         <?php foreach ($gruppen as $row): ?>
 
             <tr>
-                <td><?= $row['Gruppe'] ?></td>
+                <td><?= htmlspecialchars((string) ($row['Gruppe']), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></td>
 
                 <td>
-                    <img src="<?= $this->fussballUtil->getImagePath($row['Flagge1']) ?>" />
-                    <?= $row['M1Name'] ?>
+                    <img src="<?= htmlspecialchars((string) ($this->fussballUtil->getImagePath($row['Flagge1'])), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>" />
+                    <?= htmlspecialchars((string) ($row['M1Name']), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>
                 </td>
 
-                <td><?= $row['Platz'] ?></td>
-                <td><?= $row['Spiele'] ?></td>
-                <td><?= $row['Sieg'] ?></td>
-                <td><?= $row['Unentschieden'] ?></td>
-                <td><?= $row['Niederlage'] ?></td>
-                <td><?= $row['Tore'] ?></td>
-                <td><?= $row['Gegentore'] ?></td>
-                <td><?= $row['Differenz'] ?></td>
-                <td><?= $row['Punkte'] ?></td>
+                <td><?= htmlspecialchars((string) ($row['Platz']), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></td>
+                <td><?= htmlspecialchars((string) ($row['Spiele']), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></td>
+                <td><?= htmlspecialchars((string) ($row['Sieg']), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></td>
+                <td><?= htmlspecialchars((string) ($row['Unentschieden']), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></td>
+                <td><?= htmlspecialchars((string) ($row['Niederlage']), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></td>
+                <td><?= htmlspecialchars((string) ($row['Tore']), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></td>
+                <td><?= htmlspecialchars((string) ($row['Gegentore']), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></td>
+                <td><?= htmlspecialchars((string) ($row['Differenz']), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></td>
+                <td><?= htmlspecialchars((string) ($row['Punkte']), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></td>
             </tr>
 
         <?php endforeach; ?>

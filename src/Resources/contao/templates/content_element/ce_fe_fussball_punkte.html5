@@ -1,14 +1,15 @@
+<?php $escape = static fn ($value): string => htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>
 <div class="punkte-wrapper">
 
     <h2 class="punkte-title">
-        Punkteübersicht – <?= $this->wettbewerb ?>
+        Punkteübersicht – <?= htmlspecialchars((string) ($this->wettbewerb), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>
     </h2>
 
     <div class="punkte-list">
 
         <?php foreach ($this->teilnehmer as $t): ?>
-            <?php 
-                $tid = $t['ID']; 
+            <?php
+                $tid = $t['ID'];
                 $gesamt = $this->summe[$tid] ?? 0;
                 $wetten = $this->wetten[$tid] ?? [];
             ?>
@@ -17,13 +18,13 @@
 
                 <div class="punkte-head">
                     <div class="punkte-name">
-                        <?= $t['Name'] ?>
+                        <?= htmlspecialchars((string) ($t['Name']), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>
                     </div>
                     <div class="punkte-score">
-                        <?= $gesamt ?> Punkte
+                        <?= htmlspecialchars((string) ($gesamt), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?> Punkte
                     </div>
 
-                    <button class="punkte-toggle" data-target="detail-<?= $tid ?>">
+                    <button class="punkte-toggle" data-target="detail-<?= htmlspecialchars((string) ($tid), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>">
                         Details
                     </button>
                 </div>
@@ -31,14 +32,14 @@
 //die (var_dump($this->spiele));
 //die (var_dump($wetten));
 ?>
-                <div id="detail-<?= $tid ?>" class="punkte-details">
+                <div id="detail-<?= htmlspecialchars((string) ($tid), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>" class="punkte-details">
 
                     <?php foreach ($wetten as $w): ?>
                         <div class="wette-item">
                             <div class="wette-header">
-                                <span class="wette-art"><?= strtoupper($w['Art']) ?></span>
-                                <span class="wette-kommentar"><?= $w['Kommentar'] ?></span>
-                                <span class="wette-punkte"><?= $w['Punkte'] ?> Pkt</span>
+                                <span class="wette-art"><?= htmlspecialchars((string) (strtoupper($w['Art'])), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></span>
+                                <span class="wette-kommentar"><?= htmlspecialchars((string) ($w['Kommentar']), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></span>
+                                <span class="wette-punkte"><?= htmlspecialchars((string) ($w['Punkte']), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?> Pkt</span>
                             </div>
 
                             <div class="wette-body">
@@ -66,12 +67,12 @@
                                             if ($M2Index != -1 && isset($this->mannschaften[$M2Index])) {
                                                 $M2 = $this->mannschaften[$M2Index]['Name'] ?? ' - ';
                                                 $flaggeM2 = $this->mannschaften[$M2Index]['Flagge'] ?? '';
-                                            }  
+                                            }
                                             $T1 = $spiel['T1'];
                                             $T2 = $spiel['T2'];
-                                            
-                                        
-                                            // gewettet  
+
+
+                                            // gewettet
                                             /*
                                             $W1Index = $w['W1'] ?? -1;
                                             $W1 = ' - ';
@@ -79,26 +80,26 @@
                                             if ($W1Index != -1 && isset($this->mannschaften[$W1Index])) {
                                                 $W1 = $this->mannschaften[$W1Index]['Name'] ?? ' - ';
                                                 $flaggeW1 = $this->mannschaften[$W1Index]['Flagge'] ?? '';
-                                            }  
+                                            }
                                             $W2Index = $w['W2'] ?? -1;
                                             $W2 = ' - ';
                                             $flaggeW2 = '';
                                             if ($W2Index != -1 && isset($this->mannschaften[$W2Index])) {
                                                 $W2 = $this->mannschaften[$W2Index]['Name'] ?? ' - ';
                                                 $flaggeW2 = $this->mannschaften[$W2Index]['Flagge'] ?? '';
-                                            } 
-                                            */ 
+                                            }
+                                            */
                                             $W1 = $w['W1'];
                                             $W2 = $w['W2'];
 //die (var_dump($w));
 //die (var_dump($this->spiele[$spIndex]));
 
-                                        } 
-                                        echo "<strong>$spIndex:$M1 <img class='flag' src='" .  $this->fussballUtil->getImagePath($flaggeM1) ."'> ";
-                                        echo "$M2  <img class='flag' src='" .  $this->fussballUtil->getImagePath($flaggeM2) ."'> ";
-                                        echo " $T1:$T2";
-                                        echo " </strong>gewettet: $W1:$W2";                   
-                                        //echo "<strong>Ergebnis:</strong> " . $w['Tipp2'] ."/".$w['Tipp3']; 
+                                        }
+                                        echo "<strong>".$escape($spIndex).":".$escape($M1)." <img class='flag' src='" .  $this->fussballUtil->getImagePath($flaggeM1) ."'> ";
+                                        echo "".$escape($M2)."  <img class='flag' src='" .  $this->fussballUtil->getImagePath($flaggeM2) ."'> ";
+                                        echo " ".$escape($T1).":".$escape($T2)."";
+                                        echo " </strong>gewettet: ".$escape($W1).":".$escape($W2)."";
+                                        //echo "<strong>Ergebnis:</strong> " . $w['Tipp2'] ."/".$w['Tipp3'];
                                         //echo "<strong>gewettet:</strong> " . $w['W1'] ."/".$w['W2'];
                                     echo "</div>";
                                 ?>
@@ -119,26 +120,26 @@
                                             $M2 = $this->mannschaften[$M2Index]['Name'] ?? ' - ';
                                             $flaggeM2 = $this->mannschaften[$M2Index]['Flagge'] ?? '';
                                         }
-                                        // gewettet  
+                                        // gewettet
                                         $W1Index = $w['W1'] ?? -1;
                                         $W1 = ' - ';
                                         $flaggeW1 = '';
                                         if ($W1Index != -1 && isset($this->mannschaften[$W1Index])) {
                                             $W1 = $this->mannschaften[$W1Index]['Name'] ?? ' - ';
                                             $flaggeW1 = $this->mannschaften[$W1Index]['Flagge'] ?? '';
-                                        }  
+                                        }
                                         $W2Index = $w['W2'] ?? -1;
                                         $W2 = ' - ';
                                         $flaggeW2 = '';
                                         if ($W2Index != -1 && isset($this->mannschaften[$W2Index])) {
                                             $W2 = $this->mannschaften[$W2Index]['Name'] ?? ' - ';
                                             $flaggeW2 = $this->mannschaften[$W2Index]['Flagge'] ?? '';
-                                        }  
-                                        echo "<strong>1: $M1</strong>  <img class='flag' src='" .  $this->fussballUtil->getImagePath($flaggeM1) ."'> ";
-                                        echo "<strong>2: $M2</strong>  <img class='flag' src='" .  $this->fussballUtil->getImagePath($flaggeM2) ."'> ";
+                                        }
+                                        echo "<strong>1: ".$escape($M1)."</strong>  <img class='flag' src='" .  $this->fussballUtil->getImagePath($flaggeM1) ."'> ";
+                                        echo "<strong>2: ".$escape($M2)."</strong>  <img class='flag' src='" .  $this->fussballUtil->getImagePath($flaggeM2) ."'> ";
                                         echo "gewettet: ";
-                                        echo "<strong>1: $W1</strong>  <img class='flag' src='" .  $this->fussballUtil->getImagePath($flaggeM1) ."'> ";
-                                        echo "<strong>2: $W2</strong>  <img class='flag' src='" .  $this->fussballUtil->getImagePath($flaggeM2) ."'> ";
+                                        echo "<strong>1: ".$escape($W1)."</strong>  <img class='flag' src='" .  $this->fussballUtil->getImagePath($flaggeM1) ."'> ";
+                                        echo "<strong>2: ".$escape($W2)."</strong>  <img class='flag' src='" .  $this->fussballUtil->getImagePath($flaggeM2) ."'> ";
                                     echo "</div>";
                                 ?>
                                 <?php elseif ($w['Art'] === 'P'): ?>
@@ -157,18 +158,18 @@
                                         if ($W1Index != -1 && isset($this->mannschaften[$W1Index])) {
                                             $W1 = $this->mannschaften[$W1Index]['Name'] ?? ' - ';
                                             $flaggeW1 = $this->mannschaften[$W1Index]['Flagge'] ?? '';
-                                        }  
-                                        echo "<strong>Meister: $M1</strong>  <img class='flag' src='" .  $this->fussballUtil->getImagePath($flaggeM1) ."'> ";
+                                        }
+                                        echo "<strong>Meister: ".$escape($M1)."</strong>  <img class='flag' src='" .  $this->fussballUtil->getImagePath($flaggeM1) ."'> ";
                                         echo "gewettet: ";
-                                        echo "<strong> $W1</strong>  <img class='flag' src='" .  $this->fussballUtil->getImagePath($flaggeM1) ."'> ";
+                                        echo "<strong> ".$escape($W1)."</strong>  <img class='flag' src='" .  $this->fussballUtil->getImagePath($flaggeM1) ."'> ";
                                     echo "</div>";
                                 ?>
                                 <?php elseif ($w['Art'] === 'V'): ?>
                                 <?php
 //die(var_dump($w));
                                     echo "<div class='wette-row'>";
-                                        echo "<strong>Scheidet aus:</strong> ".$w['Tipp1'].": ";
-                                        echo "<strong>Getippt:</strong> ". $w['W1'] ."<br>";
+                                        echo "<strong>Scheidet aus:</strong> ".$escape($w['Tipp1']).": ";
+                                        echo "<strong>Getippt:</strong> ". $escape($w['W1']) ."<br>";
                                         echo "1: Meister
 2: Ausscheiden in Finale
 4: Ausscheiden in Halbfinale

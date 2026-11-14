@@ -22,7 +22,7 @@ $GLOBALS['TL_DCA']['tl_hy_teilnehmer'] = [
 //        'ctable' => ['tl_extcss_file'],
     // Config
     'config' => [
-        'dataContainer' => 'Table',
+        'dataContainer' => \Contao\DC_Table::class,
         'enableVersioning' => true,
         'sql' => [
             'keys' => [
@@ -124,8 +124,9 @@ $GLOBALS['TL_DCA']['tl_hy_teilnehmer'] = [
         'pwd' => [
             'label' => &$GLOBALS['TL_LANG']['tl_hy_teilnehmer']['pwd'],
             'exclude' => true,
-            'inputType' => 'text',
-            'eval' => ['mandatory' => true, 'maxlength' => 64],
+            'inputType' => 'password',
+            'eval' => ['doNotSaveEmpty' => true, 'hideInput' => true, 'minlength' => 12],
+            'save_callback' => [[\PBDKN\FussballBundle\Security\ParticipantPassword::class, 'save']],
             'sql' => "varchar(255) NOT NULL default ''",
         ],
         'Punkte' => [

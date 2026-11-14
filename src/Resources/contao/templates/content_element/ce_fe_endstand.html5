@@ -40,9 +40,9 @@ function toggleDebug(el){
 <tbody>
 <?php $i=1; foreach ($this->data['rangliste'] as $r): ?>
 <tr>
-  <td><?= $i++ ?></td>
+  <td><?= htmlspecialchars((string) ($i++), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></td>
   <td><?= htmlspecialchars($r['Name']) ?></td>
-  <td><?= (int)$r['Punkte'] ?></td>
+  <td><?= htmlspecialchars((string) ((int)$r['Punkte']), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></td>
 </tr>
 <?php endforeach; ?>
 </tbody>
@@ -76,20 +76,20 @@ function toggleDebug(el){
         <div class="card">
             <div><b><?= htmlspecialchars($card['datum']) ?></b></div>
             <div>
-                <img class="flag" src="<?= $this->fussballUtil->getImagePath($card['flag1']) ?>">
+                <img class="flag" src="<?= htmlspecialchars((string) ($this->fussballUtil->getImagePath($card['flag1'])), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>">
                 <?= htmlspecialchars($card['m1']) ?>
-                <?= $card['t1'] ?> : <?= $card['t2'] ?>
+                <?= htmlspecialchars((string) ($card['t1']), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?> : <?= htmlspecialchars((string) ($card['t2']), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>
                 <?= htmlspecialchars($card['m2']) ?>
-                <img class="flag" src="<?= $this->fussballUtil->getImagePath($card['flag2']) ?>">
+                <img class="flag" src="<?= htmlspecialchars((string) ($this->fussballUtil->getImagePath($card['flag2'])), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>">
             </div>
             <hr>
             <div>gewettet: <?= htmlspecialchars($card['wette']) ?></div>
-            <div>Punkte: <?= (int)$card['punkte'] ?></div>
+            <div>Punkte: <?= htmlspecialchars((string) ((int)$card['punkte']), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></div>
         </div>
     <?php endforeach; ?>
 </div>
 
-<div class="player-sum"><?= $row['sum'] ?></div>
+<div class="player-sum"><?= htmlspecialchars((string) ($row['sum']), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></div>
 </div>
 <?php endforeach; ?>
 
@@ -106,19 +106,19 @@ function toggleDebug(el){
                     <div class="card">
                         <div><b>Gruppe <?= htmlspecialchars($card['gruppe']) ?></b></div>
                         <div>gewettet:</div>
-                        <div>1: <?= htmlspecialchars($card['tipp1'] ?? '-') ?>  
-                        <img class="flag" src="<?= $this->fussballUtil->getImagePath($card['tippFlag1']) ?>"> 
+                        <div>1: <?= htmlspecialchars($card['tipp1'] ?? '-') ?>
+                        <img class="flag" src="<?= htmlspecialchars((string) ($this->fussballUtil->getImagePath($card['tippFlag1'])), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>">
                         </div>
-                        <div>2: <?= htmlspecialchars($card['tipp2'] ?? ' — ') ?>  <img class="flag" src="<?= $this->fussballUtil->getImagePath($card['tippFlag2']) ?>"> </div>
+                        <div>2: <?= htmlspecialchars($card['tipp2'] ?? ' — ') ?>  <img class="flag" src="<?= htmlspecialchars((string) ($this->fussballUtil->getImagePath($card['tippFlag2'])), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>"> </div>
                         <div><hr>Ist:</div>
-                        <div>1: <?= htmlspecialchars($card['ist1'] ?? '&nbsp;—&nbsp;') ?>  <img class="flag" src="<?= $this->fussballUtil->getImagePath($card['istFlag1']) ?>"> </div>
-                        <div>2: <?= htmlspecialchars($card['ist2'] ?? ' — ') ?>  <img class="flag" src="<?= $this->fussballUtil->getImagePath($card['istFlag2']) ?>"> </div>
-                        <div>Punkte: <?= (int)$card['punkte'] ?></div>
+                        <div>1: <?= htmlspecialchars($card['ist1'] ?? '&nbsp;—&nbsp;') ?>  <img class="flag" src="<?= htmlspecialchars((string) ($this->fussballUtil->getImagePath($card['istFlag1'])), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>"> </div>
+                        <div>2: <?= htmlspecialchars($card['ist2'] ?? ' — ') ?>  <img class="flag" src="<?= htmlspecialchars((string) ($this->fussballUtil->getImagePath($card['istFlag2'])), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>"> </div>
+                        <div>Punkte: <?= htmlspecialchars((string) ((int)$card['punkte']), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></div>
                     </div>
                 <?php endforeach; ?>
             </div>
 
-            <div class="player-sum"><?= $row['sum'] ?></div>
+            <div class="player-sum"><?= htmlspecialchars((string) ($row['sum']), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></div>
         </div>
     <?php endforeach; ?>
 
@@ -135,21 +135,21 @@ function toggleDebug(el){
                         <div class="card">
                         <?php
                             //echo "Windex: " . $card['wetteId'] . "<br>";
-                            echo $card['kommentar'] . "(".$card['tipp1'].")<br>";
+                            echo htmlspecialchars((string) $card['kommentar'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . "(".(int) $card['tipp1'].")<br>";
                             if (!empty($card['mpnation'])) {
                                 echo "<div>" . htmlspecialchars($card['mpnation']) . " <img class='flag' src='" . $this->fussballUtil->getImagePath($card['mpflagge']) . "'><br></div>";
                             } else {
-                                echo $card['tipp1']."<br>";
+                                echo (int) $card['tipp1']."<br>";
                             }
                             echo "<hr>";
-                            echo "gewettet: " . $card['gewettet'] . "<br>";
-                            echo "Punkte: "  . $card['punkte'] . "<br>";
+                            echo "gewettet: " . htmlspecialchars((string) $card['gewettet'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . "<br>";
+                            echo "Punkte: "  . (int) $card['punkte'] . "<br>";
                         ?>
                         </div>
                     <?php endforeach; ?>
                 </div>
 
-            <div class="player-sum"><?= $row['sum'] ?></div>
+            <div class="player-sum"><?= htmlspecialchars((string) ($row['sum']), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></div>
         </div>
     <?php endforeach; ?>
 <?php else: ?>

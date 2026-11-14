@@ -15,8 +15,11 @@
 		"source":"https://github.com/pbd-kn/fussball-bundle"
 	},
 	"require":{
-		"php": ">=5.6.0",
-		"contao/core-bundle": ">=4.4.4 || >=5.3"
+		"php": "^8.0",
+		"contao/core-bundle": "^4.13 || ^5.7",
+		"symfony/framework-bundle": "^5.4 || ^6.4 || ^7.4",
+		"symfony/routing": "^5.4 || ^6.4 || ^7.4",
+		"doctrine/dbal": "^2.13 || ^3.0 || ^4.0"
 	},
 	"conflict": {
 			"contao/manager-plugin": "<2.0 || >=3.0",

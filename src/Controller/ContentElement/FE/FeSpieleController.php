@@ -10,10 +10,7 @@ use Contao\ContentModel;
 use Contao\CoreBundle\Exception\PageNotFoundException;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\CoreBundle\String\HtmlDecoder;
-use Contao\CoreBundle\InsertTag\InsertTagParser;
 use Contao\Environment;
-use Contao\CoreBundle\ServiceAnnotation\ContentElement;
 use Contao\Template;
 use Contao\FrontendTemplate;
 use Contao\Input;
@@ -27,7 +24,6 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\Exception as DoctrineDBALDriverException;
 use Doctrine\DBAL\Exception as DoctrineDBALException;
 use PBDKN\FussballBundle\Util\CgiUtil;
-use FOS\HttpCacheBundle\Http\SymfonyResponseTagger;
 use Twig\Environment as TwigEnvironment;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
@@ -38,14 +34,12 @@ use PBDKN\FussballBundle\Controller\ContentElement\DependencyAggregate;
 /**
  * Class MannschaftController
  *
- * @ContentElement(FeSpieleController::TYPE, category="fussball-FE")
  */
 class FeSpieleController extends AbstractFussballController
 {
     public const TYPE = 'AnzeigeSpiele';
     protected ContaoFramework $framework;
     protected Connection $connection;
-    protected ?SymfonyResponseTagger $responseTagger;
     protected ?string $viewMode = null;
     protected ?ContentModel $model;
     protected ?PageModel $pageModel;
@@ -62,19 +56,13 @@ class FeSpieleController extends AbstractFussballController
     public function __construct(
       DependencyAggregate $dependencyAggregate, 
       ContaoFramework $framework, 
-      TwigEnvironment $twig, 
-      HtmlDecoder $htmlDecoder, 
-      ?SymfonyResponseTagger $responseTagger)    
+      TwigEnvironment $twig)
     {
-        \System::log('PBD Spielecontroller ', __METHOD__, TL_GENERAL);
 
         parent::__construct($dependencyAggregate);  // standard Klassen plus akt. Wettbewerb lesen
                                                     // AbstractFussballController übernimmt sie in die akt Klasse
-//        \System::log('PBD Spielecontroller nach dependencyAggregate', __METHOD__, TL_GENERAL);
         $this->framework = $framework;
         $this->twig = $twig;
-        $this->htmlDecoder = $htmlDecoder;
-        $this->responseTagger = $responseTagger;         //  FriendsOfSymfony/FOSHttpCacheBundle https://foshttpcachebundle.readthedocs.io/en/latest/ 
 
         // Adapters
         $this->config = $this->framework->getAdapter(Config::class);
@@ -83,8 +71,9 @@ class FeSpieleController extends AbstractFussballController
         $this->stringUtil = $this->framework->getAdapter(StringUtil::class);
 
     }
-    public function __invoke(Request $request, ContentModel $model, string $section, array $classes = null, PageModel $pageModel = null): Response
+    public function __invoke(Request $request, ContentModel $model, string $section, ?array $classes = null, ?PageModel $pageModel = null): Response
     {
+        $this->loadAktWettbewerb();
         // Do not parse the content element in the backend
         if ($this->scopeMatcher->isBackendRequest($request)) {
             return new Response(
@@ -113,7 +102,7 @@ class FeSpieleController extends AbstractFussballController
     /**
      * Generate the content element
      */
-    protected function getResponse(Template $template, ContentModel $model, Request $request): ?Response
+    protected function getResponse(Template $template, ContentModel $model, Request $request): Response
     {
         //$template->text = $model->text;
         $c=$this->cgiUtil;
@@ -142,19 +131,19 @@ class FeSpieleController extends AbstractFussballController
         $sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft1 ON tl_hy_spiele.M1 = mannschaft1.ID";
         $sql .= " LEFT JOIN tl_hy_mannschaft AS mannschaft2 ON tl_hy_spiele.M2 = mannschaft2.ID";
         $sql .= " LEFT JOIN tl_hy_orte ON tl_hy_spiele.Ort = tl_hy_orte.ID";
-        $sql .= " WHERE tl_hy_spiele.Wettbewerb  ='".$this->aktWettbewerb['aktWettbewerb']."'";
+        $sql .= " WHERE tl_hy_spiele.Wettbewerb = ?";
         $sql .= " ORDER BY tl_hy_spiele.Datum ASC , tl_hy_spiele.Uhrzeit ASC ;";
        
 
-        $stmt = $this->connection->executeQuery($sql);
+        $stmt = $this->connection->executeQuery($sql, [$Wettbewerb]);
         $num_rows = $stmt->rowCount();    
         while (($row = $stmt->fetchAssociative()) !== false) {
-          $this->Spiele[]=$row;
+          $this->Spiele[] = array_map(static fn ($value): string => htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'), $row);
         }
         $rowcnt=1; 
 
 
-        $html.="<div class='tabellenueberschrift'>Spielplan der ".$Wettbewerb." vom ".$this->fussballUtil->getDatum($this->aktWettbewerb,'start').' bis '.$this->fussballUtil->getDatum($this->aktWettbewerb,'ende')."&nbsp;<input class='druck' type='button' onclick='print()' value='Drucken'></div>\n";
+        $html.="<div class='tabellenueberschrift'>Spielplan der ".htmlspecialchars($Wettbewerb, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8')." vom ".htmlspecialchars($this->fussballUtil->getDatum($this->aktWettbewerb,'start'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8').' bis '.htmlspecialchars($this->fussballUtil->getDatum($this->aktWettbewerb,'ende'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8')."&nbsp;<input class='druck' type='button' onclick='print()' value='Drucken'></div>\n";
         $html.=$c->table(array("class"=>"tablecss sortierbar","rules"=>"all","border"=>"1"));
         $html.=$c->thead();
 	      $html.=$c->tr();

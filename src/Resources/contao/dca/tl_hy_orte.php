@@ -35,7 +35,7 @@ $GLOBALS['TL_DCA']['tl_hy_orte'] = [
 //        'ctable' => ['tl_extcss_file'],
     // Config
     'config' => [
-        'dataContainer' => 'Table',
+        'dataContainer' => \Contao\DC_Table::class,
         'enableVersioning' => true,
         'sql' => [
             'keys' => [
@@ -48,11 +48,11 @@ $GLOBALS['TL_DCA']['tl_hy_orte'] = [
     'list' => [
         'sorting' => [
             'mode' => 1,
-            'fields' => ['Name'],
+            'fields' => ['Ort'],
             'flag' => 1,
         ],
         'label' => [
-            'fields' => ['Name'],
+            'fields' => ['Ort'],
             'format' => '%s',
         ],
         'global_operations' => [

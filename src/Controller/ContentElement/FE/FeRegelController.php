@@ -10,10 +10,7 @@ use Contao\ContentModel;
 use Contao\CoreBundle\Exception\PageNotFoundException;
 use Contao\CoreBundle\Framework\Adapter;
 use Contao\CoreBundle\Framework\ContaoFramework;
-use Contao\CoreBundle\String\HtmlDecoder;
-use Contao\CoreBundle\InsertTag\InsertTagParser;
 use Contao\Environment;
-use Contao\CoreBundle\ServiceAnnotation\ContentElement;
 use Contao\Template;
 use Contao\FrontendTemplate;
 use Contao\Input;
@@ -27,7 +24,6 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\Exception as DoctrineDBALDriverException;
 use Doctrine\DBAL\Exception as DoctrineDBALException;
 use PBDKN\FussballBundle\Util\CgiUtil;
-use FOS\HttpCacheBundle\Http\SymfonyResponseTagger;
 use Twig\Environment as TwigEnvironment;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
@@ -38,14 +34,12 @@ use PBDKN\FussballBundle\Controller\ContentElement\DependencyAggregate;
 /**
  * Class FeRegelController
  *
- * @ContentElement(FeRegelController::TYPE, category="fussball-FE")
  */
 class FeRegelController extends AbstractFussballController
 {
     public const TYPE = 'AnzeigeRegel';
     protected ContaoFramework $framework;
     protected Connection $connection;
-    protected ?SymfonyResponseTagger $responseTagger;
     protected ?string $viewMode = null;
     protected ?ContentModel $model;
     protected ?PageModel $pageModel;
@@ -62,19 +56,13 @@ class FeRegelController extends AbstractFussballController
     public function __construct(
       DependencyAggregate $dependencyAggregate, 
       ContaoFramework $framework, 
-      TwigEnvironment $twig, 
-      HtmlDecoder $htmlDecoder, 
-      ?SymfonyResponseTagger $responseTagger)    
+      TwigEnvironment $twig)
     {
-        \System::log('PBD FeRegelController ', __METHOD__, TL_GENERAL);
 
         parent::__construct($dependencyAggregate);  // standard Klassen plus akt. Wettbewerb lesen
                                                     // AbstractFussballController übernimmt sie in die akt Klasse
-//        \System::log('PBD FeRegelController nach dependencyAggregate', __METHOD__, TL_GENERAL);
         $this->framework = $framework;
         $this->twig = $twig;
-        $this->htmlDecoder = $htmlDecoder;
-        $this->responseTagger = $responseTagger;         //  FriendsOfSymfony/FOSHttpCacheBundle https://foshttpcachebundle.readthedocs.io/en/latest/ 
 
         // Adapters
         $this->config = $this->framework->getAdapter(Config::class);
@@ -83,8 +71,9 @@ class FeRegelController extends AbstractFussballController
         $this->stringUtil = $this->framework->getAdapter(StringUtil::class);
 
     }
-    public function __invoke(Request $request, ContentModel $model, string $section, array $classes = null, PageModel $pageModel = null): Response
+    public function __invoke(Request $request, ContentModel $model, string $section, ?array $classes = null, ?PageModel $pageModel = null): Response
     {
+        $this->loadAktWettbewerb();
         // Do not parse the content element in the backend
         if ($this->scopeMatcher->isBackendRequest($request)) {
             return new Response(
@@ -107,20 +96,16 @@ class FeRegelController extends AbstractFussballController
     /**
      * Generate the content element
      */
-    protected function getResponse(Template $template, ContentModel $model, Request $request): ?Response
+    protected function getResponse(Template $template, ContentModel $model, Request $request): Response
     {
     
       //$template->text = $model->text;
       $Wettbewerb=$this->aktWettbewerb['aktWettbewerb'];
       $regelurl = strtolower ("regel_$Wettbewerb.php");
-      $fi='vendor/pbd-kn/fussball-bundle/regeln/'.$regelurl;
-      $regFile = new \File($fi, true);
-      //\System::log('PBD FeRegelController getResponse fi '.$fi, __METHOD__, TL_GENERAL);
-      if($regFile->exists()) {
-        $html=$regFile->getContent();
-        //$regFile->close();
-      } else {
-        $html=="<div class='tabellenueberschrift'>Spielregeln</div><p><bold>!!!Achtung es sind derzeit keine Wetten moeglich, deshalb gibt es keine Regeln</bold></p></div>";
+      $fi = dirname(__DIR__, 4).'/regeln/'.basename($regelurl);
+      $html = is_file($fi) ? file_get_contents($fi) : false;
+      if ($html === false) {
+          $html = "<div class='tabellenueberschrift'>Spielregeln</div><p>Derzeit sind keine Regeln hinterlegt.</p>";
       }
       $response = new Response($html,Response::HTTP_OK,['content-type' => 'text/html']);
       return $response;
