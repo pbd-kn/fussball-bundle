@@ -6,10 +6,21 @@
 .fussball-admin-form input, .fussball-admin-form select { max-width: 100%; }
 .fussball-admin-form fieldset { margin: 1rem 0; padding: .75rem; border: 1px solid #89939e; }
 .fussball-admin-scroll { overflow-x: auto; margin-top: 1rem; }
-.fussball-admin button { margin: .2rem; }
-.fussball-admin table.verwtablecss { width: 100%; border-collapse: collapse; border: 1px solid #89939e; }
+#tl_fussball .fussball-admin button.tl_submit {
+  box-sizing: border-box;
+  width: auto;
+  min-width: 0;
+  height: auto;
+  min-height: 24px;
+  margin: 0 3px 0 0;
+  padding: 2px 7px;
+  font-size: 12px;
+  line-height: 18px;
+  white-space: nowrap;
+}
+.fussball-admin table.verwtablecss { width: auto; table-layout: auto; border-collapse: collapse; border: 1px solid #89939e; }
 .fussball-admin table.verwtablecss th,
-.fussball-admin table.verwtablecss td { border: 1px solid #89939e; padding: .45rem .6rem; text-align: left; vertical-align: top; }
+.fussball-admin table.verwtablecss td { border: 1px solid #89939e; padding: 3px 6px; text-align: left; vertical-align: middle; }
 .fussball-admin table.verwtablecss th { font-weight: bold; white-space: nowrap; }
 
 /* Compact editing rows, including the forms inserted by AJAX. */
@@ -51,7 +62,7 @@
 #tl_fussball .fussball-admin-actions button {
   width: auto;
   height: auto;
-  min-height: 30px;
+  min-height: 24px;
   white-space: nowrap;
 }
 #tl_fussball .fussball-admin-actions { white-space: nowrap; }

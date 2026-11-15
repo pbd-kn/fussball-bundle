@@ -72,12 +72,36 @@ final class AdminView
         } else {
             $html .= $this->button('Neu anlegen', ['data-fussball-read' => $this->url('anzeige'.$entity, ['aktion' => 'n', 'ID' => -1])]);
         }
-        $html .= '<div class="fussball-admin-scroll"><table class="verwtablecss" border="1"><thead><tr><th>Aktionen</th><th>ID</th>';
-        foreach ($schema['fields'] as $field) {
-            $html .= '<th>'.self::escape(AdminSchema::LABELS[$field] ?? $field).'</th>';
+        $rows = $this->service->rows($entity);
+        $groupTeams = $entity === 'gruppe' ? $this->teams() : [];
+        $sort = 'Gruppe';
+        $direction = 'asc';
+        if ($entity === 'gruppe') {
+            $requestedSort = $request->query->get('sort', 'Gruppe');
+            $sort = in_array($requestedSort, array_merge(['ID'], $schema['fields']), true) ? $requestedSort : 'Gruppe';
+            $direction = $request->query->get('dir') === 'desc' ? 'desc' : 'asc';
+            usort($rows, static function (array $a, array $b) use ($sort, $direction, $groupTeams): int {
+                $left = $sort === 'M1' ? ($groupTeams[$a['M1']] ?? '') : ($a[$sort] ?? '');
+                $right = $sort === 'M1' ? ($groupTeams[$b['M1']] ?? '') : ($b[$sort] ?? '');
+                $comparison = in_array($sort, ['Gruppe', 'M1'], true) ? strnatcasecmp((string) $left, (string) $right) : ((int) $left <=> (int) $right);
+                return ($direction === 'desc' ? -$comparison : $comparison)
+                    ?: strnatcasecmp((string) $a['Gruppe'], (string) $b['Gruppe'])
+                    ?: ((int) $a['Platz'] <=> (int) $b['Platz'])
+                    ?: ((int) $a['ID'] <=> (int) $b['ID']);
+            });
+        }
+        $html .= '<div class="fussball-admin-scroll"><table class="verwtablecss" border="1"><thead><tr><th>Aktionen</th>';
+        foreach (array_merge(['ID'], $schema['fields']) as $field) {
+            $label = $entity === 'gruppe' && $field === 'M1' ? 'Mannschaft' : (AdminSchema::LABELS[$field] ?? $field);
+            if ($entity === 'gruppe') {
+                $sortUrl = $this->urls->generate('contao_backend', ['do' => BackendModules::moduleName($entity), 'sort' => $field, 'dir' => $sort === $field && $direction === 'asc' ? 'desc' : 'asc']);
+                $html .= '<th'.($sort === $field ? ' aria-sort="'.($direction === 'asc' ? 'ascending' : 'descending').'"' : '').'><a href="'.self::escape($sortUrl).'">'.self::escape($label).($sort === $field ? ($direction === 'asc' ? ' ↑' : ' ↓') : '').'</a></th>';
+            } else {
+                $html .= '<th>'.self::escape($label).'</th>';
+            }
         }
         $html .= '</tr></thead><tbody>';
-        foreach ($this->service->rows($entity) as $row) {
+        foreach ($rows as $row) {
             $id = (int) $row[$schema['id']];
             $params = ['aktion' => $entity === 'wette' ? 'b' : 'u', 'ID' => $id];
             if ($entity === 'wette') {
@@ -94,7 +118,8 @@ final class AdminView
             }
             $html .= '</td><td>'.$id.'</td>';
             foreach ($schema['fields'] as $field) {
-                $html .= '<td>'.self::escape($row[$field] ?? '').'</td>';
+                $value = $entity === 'gruppe' && $field === 'M1' ? ($groupTeams[$row[$field]] ?? $row[$field]) : ($row[$field] ?? '');
+                $html .= '<td>'.self::escape($value).'</td>';
             }
             $html .= '</tr>';
         }
@@ -108,15 +133,15 @@ final class AdminView
         return '<input type="hidden" name="'.self::escape($name).'" value="'.self::escape($value).'">';
     }
 
-    private function input(string $name, string $label, $value = '', string $type = 'text', bool $required = true): string
+    private function input(string $name, string $label, $value = '', string $type = 'text', bool $required = true, string $help = ''): string
     {
         $attributes = $type === 'password' ? ' autocomplete="new-password" minlength="12"' : ($type === 'number' ? ' step="1" min="-1" max="2147483647"' : ' maxlength="255"');
-        return '<label>'.self::escape($label).' <input type="'.$type.'" name="'.self::escape($name).'" value="'.self::escape($value).'"'.$attributes.($required ? ' required' : '').'></label><br>';
+        return '<label>'.self::escape($label).' <input type="'.$type.'" name="'.self::escape($name).'" value="'.self::escape($value).'"'.$attributes.($required ? ' required' : '').($help !== '' ? ' title="'.self::escape($help).'"' : '').'></label><br>';
     }
 
-    private function select(string $name, string $label, array $options, $selected = -1): string
+    private function select(string $name, string $label, array $options, $selected = -1, string $help = ''): string
     {
-        $html = '<label>'.self::escape($label).' <select name="'.self::escape($name).'">';
+        $html = '<label>'.self::escape($label).' <select name="'.self::escape($name).'"'.($help !== '' ? ' title="'.self::escape($help).'"' : '').'>';
         foreach ($options as $value => $text) {
             $html .= '<option value="'.self::escape($value).'"'.((string) $selected === (string) $value ? ' selected' : '').'>'.self::escape($text).'</option>';
         }
@@ -227,17 +252,44 @@ final class AdminView
         $html = '<h3>Tipps von '.self::escape($participant['Name']).'</h3>';
         $close = '<p>'.$this->button('Tipps schließen', ['data-fussball-cancel' => '1']).'</p>';
         $html .= $close;
+        $games = null;
+        $teamNames = [];
         foreach ($this->service->participantBets($id) as $bet) {
             $type = strtolower((string) $bet['Art']);
+            $labels = ['W1' => 'Tippwert', 'W2' => 'W2', 'W3' => 'W3'];
+            $help = 'Den Zahlenwert für diese Wette eingeben. -1 bedeutet: noch kein Tipp.';
+            if ($type === 's') {
+                if ($games === null) {
+                    $games = [];
+                    foreach ($this->service->rows('spiel') as $game) {
+                        $games[(int) $game['ID']] = $game;
+                    }
+                    $teamNames = $this->teams();
+                    unset($teamNames[-1]);
+                }
+                $game = $games[(int) $bet['Tipp1']] ?? [];
+                $firstTeam = $teamNames[(int) ($game['M1'] ?? -1)] ?? 'Mannschaft 1';
+                $secondTeam = $teamNames[(int) ($game['M2'] ?? -1)] ?? 'Mannschaft 2';
+                $labels = ['W1' => $firstTeam, 'W2' => $secondTeam];
+                $help = 'Getippte Tore für '.$firstTeam.' (erstes Feld) und '.$secondTeam.' (zweites Feld). -1 bedeutet: noch kein Tipp.';
+            } elseif ($type === 'g') {
+                $labels = ['W1' => '1. Platz', 'W2' => '2. Platz', 'W3' => '3. Platz'];
+                $help = 'Mannschaften für die Plätze 1, 2 und 3 der Gruppe auswählen. Keine Angabe bedeutet: noch kein Tipp.';
+            } elseif ($type === 'p') {
+                $labels['W1'] = 'Mannschaft';
+                $help = 'Die getippte Mannschaft auswählen. Keine Angabe bedeutet: noch kein Tipp.';
+            } elseif ($type === 'v' && preg_match('/deutschland\s+wird/iu', (string) $bet['Kommentar'])) {
+                $help = '1 = Meister; 2 = Ausscheiden im Finale; 4 = Ausscheiden im Halbfinale; 8 = Ausscheiden im Viertelfinale; 16 = Ausscheiden im Achtelfinale; 32 = Ausscheiden im Sechzehntelfinale; 64 = Ausscheiden in der Gruppenphase. -1 = noch kein Tipp.';
+            }
             $html .= '<form method="post" action="'.self::escape($this->url('storeteilnehmerwette')).'" data-fussball-form data-keep-open="1"><fieldset><legend>'.self::escape($bet['Kommentar']).'</legend>';
             $html .= $this->hidden('aktion', 's').$this->hidden('Idwettaktuell', (int) $bet['ID']);
             foreach (['W1', 'W2', 'W3'] as $index => $field) {
                 if (($type === 's' && $index === 2) || (in_array($type, ['p', 'v'], true) && $index > 0)) {
                     $html .= $this->hidden($field, -1);
                 } elseif ($type === 'g' || $type === 'p') {
-                    $html .= $this->select($field, $field, $this->teams($type === 'g' ? (string) $bet['Tipp1'] : null), $bet[$field]);
+                    $html .= $this->select($field, $labels[$field], $this->teams($type === 'g' ? (string) $bet['Tipp1'] : null), $bet[$field], $help);
                 } else {
-                    $html .= $this->input($field, $field.' (-1 = offen)', $bet[$field], 'number');
+                    $html .= $this->input($field, $labels[$field].' (-1 = offen)', $bet[$field], 'number', true, $help);
                 }
             }
             $html .= '<button type="submit" class="tl_submit">Tipp speichern</button></fieldset></form>';
