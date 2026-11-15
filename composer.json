@@ -1,6 +1,8 @@
 {
 	"name":"pbd-kn/fussball-bundle",
-	"description":"Bearbeitet das Fussball wetten Modell",
+	"description": "Fußball-Tippspiel für Contao mit Wettbewerben, Mannschaften, Spieltipps, Gruppentabellen und Teilnehmerwertung",
+	"keywords": ["contao", "fussball", "tippspiel", "football", "prediction"],
+	"homepage": "https://github.com/pbd-kn/fussball-bundle",
 	"type":"contao-bundle",
 	"license":"LGPL-3.0-or-later",
 	"authors":[
@@ -16,7 +18,7 @@
 	},
 	"require":{
 		"php": "^8.0",
-		"contao/core-bundle": "^4.13 || ^5.7",
+		"contao/core-bundle": "^4.13 || ^5.3",
 		"symfony/framework-bundle": "^5.4 || ^6.4 || ^7.4",
 		"symfony/routing": "^5.4 || ^6.4 || ^7.4",
 		"doctrine/dbal": "^2.13 || ^3.0 || ^4.0"
