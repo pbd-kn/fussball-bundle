@@ -1,38 +1,45 @@
 {
-	"name":"pbd-kn/fussball-bundle",
-	"description": "Fußball-Tippspiel für Contao mit Wettbewerben, Mannschaften, Spieltipps, Gruppentabellen und Teilnehmerwertung",
-	"keywords": ["contao", "fussball", "tippspiel", "football", "prediction"],
-	"homepage": "https://github.com/pbd-kn/fussball-bundle",
-	"type":"contao-bundle",
-	"license":"LGPL-3.0-or-later",
-	"authors":[
-		{
-			"name":"Peter Broghammer",
-			"email":"pb-contao@gmx.de",
-			"role":"Developer"
-		}
-	],
-	"support":{
-		"issues":"https://github.com/pbd-kn/fussball-bundle/issues",
-		"source":"https://github.com/pbd-kn/fussball-bundle"
-	},
-	"require":{
-		"php": "^8.0",
-		"contao/core-bundle": "^4.13 || ^5.3",
-		"symfony/framework-bundle": "^5.4 || ^6.4 || ^7.4",
-		"symfony/routing": "^5.4 || ^6.4 || ^7.4",
-		"doctrine/dbal": "^2.13 || ^3.0 || ^4.0"
-	},
-	"conflict": {
-			"contao/manager-plugin": "<2.0 || >=3.0",
-			"symfony/symfony": "3.2.7"
-	},
-	"autoload":{
-			"psr-4": {
-					"PBDKN\\FussballBundle\\": "src/"
-		}
-	},
-	"extra":{
-		"contao-manager-plugin": "PBDKN\\FussballBundle\\ContaoManager\\Plugin"
-	}
+  "name": "pbd-kn/fussball-bundle",
+  "description": "Fußball-Tippspiel für Contao mit Wettbewerben, Mannschaften, Spieltipps, Gruppentabellen und Teilnehmerwertung",
+  "keywords": [
+    "contao",
+    "fussball",
+    "tippspiel",
+    "football",
+    "prediction"
+  ],
+  "homepage": "https://github.com/pbd-kn/fussball-bundle",
+  "type": "contao-bundle",
+  "license": "LGPL-3.0-or-later",
+  "authors": [
+    {
+      "name": "Peter Broghammer",
+      "email": "pb-contao@gmx.de",
+      "role": "Developer"
+    }
+  ],
+  "support": {
+    "issues": "https://github.com/pbd-kn/fussball-bundle/issues",
+    "source": "https://github.com/pbd-kn/fussball-bundle"
+  },
+  "require": {
+    "php": "^8.0",
+    "contao/core-bundle": "^4.13 || ^5.3",
+    "symfony/framework-bundle": "^5.4 || ^6.4 || ^7.4",
+    "symfony/routing": "^5.4 || ^6.4 || ^7.4",
+    "doctrine/dbal": "^2.13 || ^3.0 || ^4.0",
+    "markocupic/gallery-creator-bundle": "^1.3.8 || ^3.3"
+  },
+  "conflict": {
+    "contao/manager-plugin": "<2.0 || >=3.0",
+    "symfony/symfony": "3.2.7"
+  },
+  "autoload": {
+    "psr-4": {
+      "PBDKN\\FussballBundle\\": "src/"
+    }
+  },
+  "extra": {
+    "contao-manager-plugin": "PBDKN\\FussballBundle\\ContaoManager\\Plugin"
+  }
 }

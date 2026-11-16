@@ -13,7 +13,7 @@ final class AdminService
 {
     private Connection $connection;
 
-    public function __construct(Connection $connection)
+    public function __construct(Connection $connection, private \PBDKN\FussballBundle\Gallery\AlbumImages $albumImages)
     {
         $this->connection = $connection;
     }
@@ -102,8 +102,8 @@ final class AdminService
             case 'nation':
                 $image = self::text($data, 'Image');
                 if (!preg_match('~^(?:[a-zA-Z0-9_-]+/)*[a-zA-Z0-9_-]+\.(?:gif|png|jpg|jpeg|webp|svg)$~D', $image)
-                    || !is_file(dirname(__DIR__).'/Resources/public/assets/flaggen/'.$image)) {
-                    throw new \InvalidArgumentException('Bitte eine vorhandene Flagge aus dem Bundle wählen.');
+                    || $this->albumImages->path('Flaggen', $image) === '') {
+                    throw new \InvalidArgumentException('Bitte eine vorhandene Flagge aus dem Gallery-Creator-Album Flaggen wählen.');
                 }
                 return ['Nation' => self::text($data, 'Nation'), 'Type' => self::text($data, 'Type'), 'Alfa2' => self::text($data, 'Alfa2', false), 'Alfa3' => self::text($data, 'Alfa3', false), 'Domain' => self::text($data, 'Domain', false), 'Image' => $image];
             case 'mannschaft':

@@ -19,6 +19,7 @@ class Plugin implements BundlePluginInterface, RoutingPluginInterface
             BundleConfig::create(FussballBundle::class)
                 ->setLoadAfter([
                     ContaoCoreBundle::class,   // WICHTIG! Jetzt sauber importiert!
+                    \Markocupic\GalleryCreatorBundle\MarkocupicGalleryCreatorBundle::class,
                 ])
                 ->setReplace(['fussball']),
         ];

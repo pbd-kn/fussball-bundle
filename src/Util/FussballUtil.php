@@ -6,7 +6,7 @@ namespace PBDKN\FussballBundle\Util;
 
 class FussballUtil
 {
-    public function __construct()
+    public function __construct(private \PBDKN\FussballBundle\Gallery\AlbumImages $albumImages)
     {
     }
     /**
@@ -121,7 +121,7 @@ class FussballUtil
         if (!is_string($image) || !preg_match('~^(?:[a-zA-Z0-9_-]+/)*[a-zA-Z0-9_-]+\\.(?:gif|png|jpg|jpeg|webp|svg)$~D', $image)) {
             return '';
         }
-        return 'bundles/fussball/assets/flaggen/'.$image;
+        return $this->albumImages->path('Flaggen', $image);
         //return 'files/hoyzer-wetten/content/flaggen/'.$image;
         
       }
