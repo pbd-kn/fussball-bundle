@@ -6,6 +6,7 @@ namespace PBDKN\FussballBundle\Admin;
 
 use PBDKN\FussballBundle\Security\AjaxSecurity;
 use PBDKN\FussballBundle\Backend\BackendModules;
+use PBDKN\FussballBundle\Gallery\AlbumImages;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -15,7 +16,7 @@ final class AdminView
     private AjaxSecurity $security;
     private UrlGeneratorInterface $urls;
 
-    public function __construct(AdminService $service, AjaxSecurity $security, UrlGeneratorInterface $urls)
+    public function __construct(AdminService $service, AjaxSecurity $security, UrlGeneratorInterface $urls, private AlbumImages $albumImages)
     {
         $this->service = $service;
         $this->security = $security;
@@ -92,7 +93,7 @@ final class AdminView
         }
         $html .= '<div class="fussball-admin-scroll"><table class="verwtablecss" border="1"><thead><tr><th>Aktionen</th>';
         foreach (array_merge(['ID'], $schema['fields']) as $field) {
-            $label = $entity === 'gruppe' && $field === 'M1' ? 'Mannschaft' : (AdminSchema::LABELS[$field] ?? $field);
+            $label = $entity === 'gruppe' && $field === 'M1' ? 'Mannschaft' : ($field === 'Image' ? 'Flagge' : (AdminSchema::LABELS[$field] ?? $field));
             if ($entity === 'gruppe') {
                 $sortUrl = $this->urls->generate('contao_backend', ['do' => BackendModules::moduleName($entity), 'sort' => $field, 'dir' => $sort === $field && $direction === 'asc' ? 'desc' : 'asc']);
                 $html .= '<th'.($sort === $field ? ' aria-sort="'.($direction === 'asc' ? 'ascending' : 'descending').'"' : '').'><a href="'.self::escape($sortUrl).'">'.self::escape($label).($sort === $field ? ($direction === 'asc' ? ' ↑' : ' ↓') : '').'</a></th>';
@@ -119,7 +120,7 @@ final class AdminView
             $html .= '</td><td>'.$id.'</td>';
             foreach ($schema['fields'] as $field) {
                 $value = $entity === 'gruppe' && $field === 'M1' ? ($groupTeams[$row[$field]] ?? $row[$field]) : ($row[$field] ?? '');
-                $html .= '<td>'.self::escape($value).'</td>';
+                $html .= '<td>'.(in_array($field, ['Image', 'Flagge'], true) ? $this->flag((string) $value, (string) ($row['Nation'] ?? $row['Name'] ?? 'Flagge')) : self::escape($value)).'</td>';
             }
             $html .= '</tr>';
         }
@@ -139,13 +140,27 @@ final class AdminView
         return '<label>'.self::escape($label).' <input type="'.$type.'" name="'.self::escape($name).'" value="'.self::escape($value).'"'.$attributes.($required ? ' required' : '').($help !== '' ? ' title="'.self::escape($help).'"' : '').'></label><br>';
     }
 
-    private function select(string $name, string $label, array $options, $selected = -1, string $help = ''): string
+    private function flag(string $filename, string $label): string
     {
-        $html = '<label>'.self::escape($label).' <select name="'.self::escape($name).'"'.($help !== '' ? ' title="'.self::escape($help).'"' : '').'>';
-        foreach ($options as $value => $text) {
-            $html .= '<option value="'.self::escape($value).'"'.((string) $selected === (string) $value ? ' selected' : '').'>'.self::escape($text).'</option>';
+        $path = $this->albumImages->path('Flaggen', $filename);
+        if ($path === '') {
+            return '<span class="fussball-flag-missing" title="'.self::escape($filename).'">Keine Flagge verfügbar</span>';
         }
-        return $html.'</select></label><br>';
+        return '<img class="fussball-admin-flag" src="'.self::escape($path).'" alt="'.self::escape($label).'" title="'.self::escape($label).'" width="32" height="22" loading="lazy">';
+    }
+
+    private function select(string $name, string $label, array $options, $selected = -1, string $help = '', ?array $flagPaths = null): string
+    {
+        $html = ($flagPaths !== null ? '<div class="fussball-flag-choice">' : '').'<label>'.self::escape($label).' <select name="'.self::escape($name).'"'.($help !== '' ? ' title="'.self::escape($help).'"' : '').($flagPaths !== null ? ' data-fussball-flag-select' : '').'>';
+        foreach ($options as $value => $text) {
+            $html .= '<option value="'.self::escape($value).'"'.($flagPaths !== null ? ' data-flag-src="'.self::escape($flagPaths[$value] ?? '').'"' : '').((string) $selected === (string) $value ? ' selected' : '').'>'.self::escape($text).'</option>';
+        }
+        $html .= '</select></label>';
+        if ($flagPaths !== null) {
+            $path = $flagPaths[$selected] ?? '';
+            $html .= ' <img class="fussball-admin-flag" data-fussball-flag-preview alt="Flaggenvorschau" width="32" height="22"'.($path !== '' ? ' src="'.self::escape($path).'"' : ' hidden').'></div>';
+        }
+        return $html.'<br>';
     }
 
     private function teams(?string $group = null): array
@@ -180,16 +195,34 @@ final class AdminView
                 $html .= $this->input('ort', 'Ort', $row['Ort'] ?? '').$this->input('beschreibung', 'Beschreibung', $row['Beschreibung'] ?? '', 'text', false);
                 break;
             case 'nation':
-                foreach (['Nation', 'Type', 'Alfa2', 'Alfa3', 'Domain', 'Image'] as $field) {
+                foreach (['Nation', 'Type', 'Alfa2', 'Alfa3', 'Domain'] as $field) {
                     $html .= $this->input($field, $field, $row[$field] ?? ($field === 'Type' ? 'n' : ''), 'text', in_array($field, ['Nation', 'Type', 'Image'], true));
+                }
+                $paths = $this->albumImages->all('Flaggen');
+                $options = $paths;
+                foreach ($options as $filename => $path) {
+                    $options[$filename] = $filename;
+                }
+                asort($options, SORT_NATURAL | SORT_FLAG_CASE);
+                $options = ['' => 'Bitte Flagge wählen'] + $options;
+                $selected = (string) ($row['Image'] ?? '');
+                if ($selected !== '' && !isset($paths[$selected])) {
+                    $options[$selected] = $selected.' (nicht im Album verfügbar)';
+                }
+                $html .= $this->select('Image', 'Flagge', $options, $selected, '', $paths);
+                if ($paths === []) {
+                    $html .= '<p>Im Album „Flaggen“ sind keine veröffentlichten Bilder vorhanden. Bitte den Flaggen-Import in der Datenbankmigration ausführen.</p>';
                 }
                 break;
             case 'mannschaft':
                 $nations = [];
+                $nationFlags = [];
                 foreach ($this->service->rows('nation') as $nation) {
                     $nations[$nation['Nation']] = $nation['Nation'];
+                    $nationFlags[$nation['Nation']] = $this->albumImages->path('Flaggen', (string) $nation['Image']);
                 }
-                $html .= $this->input('name', 'Name', $row['Name'] ?? '').$this->select('nation', 'Nation', $nations, $row['Nation'] ?? '').$this->input('Gruppe', 'Gruppe', $row['Gruppe'] ?? 'A');
+                $html .= $this->input('name', 'Name', $row['Name'] ?? '').$this->select('nation', 'Nation', $nations, $row['Nation'] ?? array_key_first($nations) ?? '', '', $nationFlags).$this->input('Gruppe', 'Gruppe', $row['Gruppe'] ?? 'A');
+                $html .= '<p>Die Flagge wird beim Speichern von der gewählten Nation übernommen.</p>';
                 break;
             case 'spiel':
                 $places = [-1 => 'Bitte wählen'];

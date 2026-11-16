@@ -22,6 +22,13 @@ final class AlbumImages
         if (!preg_match('~^(?:[a-zA-Z0-9_-]+/)*[a-zA-Z0-9_-]+\.(?:gif|png|jpg|jpeg|webp|svg)$~D', $filename)) {
             return '';
         }
+        $paths = $this->all($album);
+        return $paths[$filename] ?? '';
+    }
+
+    /** @return array<string, string> Relative filename => URL-encoded public path. */
+    public function all(string $album): array
+    {
         if (!isset($this->albums[$album])) {
             $rows = $this->connection->fetchAllAssociative(
                 'SELECT f.path, d.path AS directory FROM tl_gallery_creator_albums a '
@@ -39,10 +46,9 @@ final class AlbumImages
                 }
                 $key = !empty($row['directory']) && str_starts_with($path, $row['directory'].'/')
                     ? substr($path, strlen($row['directory']) + 1) : basename($path);
-                $this->albums[$album][$key] ??= $path;
+                $this->albums[$album][$key] ??= implode('/', array_map('rawurlencode', explode('/', $path)));
             }
         }
-        $path = $this->albums[$album][$filename] ?? '';
-        return implode('/', array_map('rawurlencode', explode('/', $path)));
+        return $this->albums[$album];
     }
 }

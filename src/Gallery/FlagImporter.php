@@ -21,6 +21,38 @@ final class FlagImporter
     {
     }
 
+    private function captionField(): string
+    {
+        $schema = method_exists($this->connection, 'createSchemaManager') ? $this->connection->createSchemaManager() : $this->connection->getSchemaManager();
+        return isset($schema->listTableColumns('tl_gallery_creator_pictures')['caption']) ? 'caption' : 'comment';
+    }
+
+    private function nationNames(): array
+    {
+        $schema = method_exists($this->connection, 'createSchemaManager') ? $this->connection->createSchemaManager() : $this->connection->getSchemaManager();
+        if (!$schema->tablesExist(['tl_hy_nation'])) {
+            return [];
+        }
+        $rows = $this->connection->fetchAllAssociative('SELECT Nation, Alfa2, Alfa3, Image FROM tl_hy_nation ORDER BY ID');
+        $names = [];
+        // Country codes take precedence over potentially incorrect image assignments.
+        foreach ($rows as $nation) {
+            foreach (['Alfa2', 'Alfa3'] as $field) {
+                $code = strtolower(trim((string) $nation[$field]));
+                if ($code !== '' && trim((string) $nation['Nation']) !== '') {
+                    $names[$code] ??= (string) $nation['Nation'];
+                }
+            }
+        }
+        foreach ($rows as $nation) {
+            $code = strtolower(pathinfo((string) $nation['Image'], PATHINFO_FILENAME));
+            if ($code !== '' && trim((string) $nation['Nation']) !== '') {
+                $names[$code] ??= (string) $nation['Nation'];
+            }
+        }
+        return $names;
+    }
+
     public function shouldRun(): bool
     {
         $schema = method_exists($this->connection, 'createSchemaManager') ? $this->connection->createSchemaManager() : $this->connection->getSchemaManager();
@@ -31,11 +63,17 @@ final class FlagImporter
         if (!$album || empty($album['path'])) {
             return true;
         }
-        $paths = array_flip($this->connection->fetchFirstColumn('SELECT f.path FROM tl_gallery_creator_pictures p JOIN tl_files f ON f.uuid = p.uuid WHERE p.pid = ?', [$album['id']]));
+        $paths = [];
+        $captionField = $this->captionField();
+        $names = $this->nationNames();
+        foreach ($this->connection->fetchAllAssociative('SELECT f.path, p.title, p.'.$captionField.' AS caption FROM tl_gallery_creator_pictures p JOIN tl_files f ON f.uuid = p.uuid WHERE p.pid = ?', [$album['id']]) as $picture) {
+            $paths[$picture['path']] = $picture;
+        }
         $root = System::getContainer()->getParameter('kernel.project_dir');
         foreach ($this->sources() as $relative => $source) {
             $path = $album['path'].'/'.$relative;
-            if (!isset($paths[$path]) || !is_file($root.'/'.$path)) {
+            if (!isset($paths[$path]) || trim((string) $paths[$path]['title']) === '' || !is_file($root.'/'.$path)
+                || (isset($names[strtolower(pathinfo($relative, PATHINFO_FILENAME))]) && trim((string) $paths[$path]['caption']) === '')) {
                 return true;
             }
         }
@@ -83,7 +121,10 @@ final class FlagImporter
         $album->tstamp = time();
         $album->save();
         $count = 0;
+        $captionField = $this->captionField();
+        $names = $this->nationNames();
         foreach ($this->sources() as $relative => $source) {
+            $caption = $names[strtolower(pathinfo($relative, PATHINFO_FILENAME))] ?? '';
             $destination = $path.'/'.$relative;
             new Folder(dirname($destination));
             // Existing gallery files are deliberately preserved on repeated imports.
@@ -91,12 +132,28 @@ final class FlagImporter
                 throw new \RuntimeException('Flagge konnte nicht kopiert werden: '.$relative);
             }
             $model = Dbafs::addResource($destination);
-            if (GalleryCreatorPicturesModel::findOneBy(['pid=?', 'uuid=?'], [$album->id, $model->uuid]) !== null) {
+            $existing = GalleryCreatorPicturesModel::findOneBy(['pid=?', 'uuid=?'], [$album->id, $model->uuid]);
+            if ($existing !== null) {
+                $changed = false;
+                if (trim((string) $existing->title) === '') {
+                    $existing->title = $relative;
+                    $changed = true;
+                }
+                if (trim((string) $existing->$captionField) === '' && $caption !== '') {
+                    $existing->$captionField = $caption;
+                    $changed = true;
+                }
+                if ($changed) {
+                    $existing->tstamp = time();
+                    $existing->save();
+                }
                 continue;
             }
             $picture = new GalleryCreatorPicturesModel();
             $picture->pid = $album->id;
             $picture->uuid = $model->uuid;
+            $picture->title = $relative;
+            $picture->$captionField = $caption;
             $picture->published = '1';
             $picture->tstamp = time();
             $picture->date = time();

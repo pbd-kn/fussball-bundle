@@ -3,6 +3,17 @@
     if (window.fussballAdminInitialized) return;
     window.fussballAdminInitialized = true;
 
+    document.addEventListener('change', function (event) {
+        const select = event.target.closest('[data-fussball-flag-select]');
+        if (!select) return;
+        const preview = select.closest('.fussball-flag-choice').querySelector('[data-fussball-flag-preview]');
+        const option = select.options[select.selectedIndex];
+        const path = option ? option.dataset.flagSrc : '';
+        preview.hidden = !path;
+        if (path) preview.setAttribute('src', path);
+        else preview.removeAttribute('src');
+    });
+
     function result(root, message) {
         root.querySelector('.fussball-admin-result').textContent = message;
     }

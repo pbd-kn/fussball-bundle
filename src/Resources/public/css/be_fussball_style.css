@@ -71,3 +71,12 @@
   #tl_fussball .fussball-admin-form label { max-width: 100%; }
   #tl_fussball .fussball-admin-form fieldset { gap: .6rem; }
 }
+.fussball-admin-flag {
+  object-fit: contain;
+  vertical-align: middle;
+  filter: drop-shadow(0 1px 2px #0002);
+}
+.fussball-flag-choice { display: inline-flex; align-items: center; gap: 12px; }
+.fussball-flag-choice label { margin: 0; }
+.fussball-flag-missing { color: #777; font-size: .85em; }
+
