@@ -76,3 +76,7 @@ services:
     PBDKN\FussballBundle\Controller\ContentElement\WettbewerbController:
         tags:
             - { name: contao.content_element, category: "fussball-Verwaltung", type: "Wettbewerbe" }
+
+    PBDKN\FussballBundle\Migration\FlagGalleryMigration:
+        autoconfigure: false
+        tags: [contao.migration]

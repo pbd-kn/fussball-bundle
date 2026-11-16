@@ -81,3 +81,7 @@ Der zuletzt durchgeführte Composer-Audit des bestehenden Projekts meldet darüb
 ## Separate Portierung unter co5
 
 Die eigenständige Kopie unter C:/wampneu/www/co5/websites/Hoyzer verwendet Contao 5.7.17, PHP 8.3.36 und die Datenbank co5_hoyzer. Sie ist unter http://hoyzer5.local erreichbar und bindet dieses Repository unter C:/wampneu/www/co5/co5Bundles/fussball-bundle mit dev-portierung-nach-5.7 ein. Die ursprüngliche co4-Installation bleibt bestehen. Das ausführliche lokale Upgrade-Protokoll steht in der Datei UPGRADE-5.7.md im neuen Website-Verzeichnis.
+
+## Automatischer Flaggen-Import
+
+Nach dem Paketupdate die Datenbankmigration im Contao Manager vollständig ausführen. Sobald die Gallery-Creator-Tabellen vorhanden sind, legt die Migration 'Fußball: Flaggen in das Gallery-Creator-Album importieren' das Album Flaggen und die mitgelieferten Bilder an. Nach dem erstmaligen Anlegen der Tabellen gegebenenfalls erneut nach Migrationen suchen. Kein SSH nötig. Vorhandene Dateien bleiben erhalten; unvollständige Importe werden fortgesetzt. Der Bilderordner wird öffentlich verknüpft. Der manuelle Befehl fussball:import-flags bleibt verfügbar.
